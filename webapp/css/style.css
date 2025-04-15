@@ -1,1 +1,77 @@
-/* style.css */
+
+/* Estilo para el fondo del DynamicPage */
+.customDynamicPage {
+    background-color: rgba(137, 168, 199, 0.77) !important;
+}
+
+/* Estilo para el título principal */
+.customCenteredTitle {
+    color: rgb(19, 17, 17) !important;
+    background-color: #e1e8f5 !important;
+    justify-content: center;
+    padding: 10px !important;
+    font-size: 2.5rem !important;
+    border-radius: 5px !important;
+    text-align: center !important;
+}
+
+/* Estilo para el DynamicPageHeader */
+.customDynamicHeader {
+    background: linear-gradient(90deg, #85b4d8 0%, #205d9e 100%) !important;
+}
+
+/* Estilo para el contenedor del título */
+.titleContainer {
+    padding: 10px !important;
+}
+
+/* Estilo para el Grid */
+.customGrid {
+    background-color: #f5f6f8 !important;
+    padding: 20px !important;
+    border-radius: 10px !important;
+}
+
+
+
+/* Estilo para los Labels */
+.customLabel {
+    font-size: 1.1rem !important;
+    color: #0d0d0e !important;
+}
+
+
+
+/* Estilo para el footer */
+.customFooter {
+    background-color: #003087 !important;
+    padding: 10px !important;
+}
+
+
+
+/* Estilo para el logo */
+.customLogo {
+    margin-right: 15px !important;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 600px) {
+    .customCenteredTitle {
+        font-size: 1.2rem !important;
+        padding: 8px !important;
+    }
+
+    .customLabel {
+        font-size: 1rem !important;
+    }
+
+    .customInput, .customSelect, .customDatePicker, .customTextArea {
+        width: 100% !important;
+    }
+
+    .customButton {
+        font-size: 1rem !important;
+        padding: 8px 16px !important;
+    }
+}

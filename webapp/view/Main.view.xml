@@ -9,22 +9,28 @@
 >
     <f:DynamicPage
         id="dynamicPageId"
-        showFooter="false"
+        showFooter="true"
         class="customDynamicPage"
+        
+        
     >
-        <f:title>
-            <f:DynamicPageTitle>
-                <f:heading>
+        <f:title >
+            <f:DynamicPageTitle class="customDynamicPageTitle" >
+                <f:heading >
                     <HBox
                         justifyContent="Center"
                         width="100%"
                         backgroundDesign="Solid"
                         alignItems="Center"
                         class="titleContainer"
+                        
                     >
                         <Title
                             text="{i18n>title}"
                             class="customCenteredTitle"
+                            
+                            
+                            
                         />
                     </HBox>
                 </f:heading>
@@ -196,26 +202,7 @@
                     </VBox>
                 </VBox>
 
-                <!-- Columna 4: Fecha Documento (cuando "Reserva") / Fecha Contabilización -->
-                <VBox>
-                    <!-- Fecha Documento (cuando "Reserva") -->
-                    <VBox visible="{= ${/header/reference_type} === 'reserva'}">
-                        <Label
-                            text="Fecha Documento"
-                            design="Bold"
-                            class="sapUiSmallMarginTop sapUiSmallMarginBottom customLabel"
-                        />
-                        <DatePicker
-                            id="fechaDocReserva"
-                            value="{/header/doc_date}"
-                            valueFormat="yyyy-MM-dd"
-                            displayFormat="dd.MM.yyyy"
-                            width="75%"
-                            placeholder="Selecciona Fecha"
-                            class="customDatePicker"
-                        />
-                    </VBox>
-
+                
                     <!-- Fecha Contabilización -->
                     <VBox visible="{= ${/header/reference_type} !== 'reserva'}">
                         <Label
@@ -232,52 +219,12 @@
                             placeholder="Selecciona Fecha"
                             class="customDatePicker"
                         />
-                    </VBox>
-                </VBox>
 
-                <!-- Columna 5: Fecha Contabilización (cuando "Reserva") / Referencia -->
-                <VBox>
-                    <!-- Fecha Contabilización (cuando "Reserva") -->
-                    <VBox visible="{= ${/header/reference_type} === 'reserva'}">
-                        <Label
-                            text="Fecha de Contabilización"
-                            design="Bold"
-                            class="sapUiSmallMarginTop sapUiSmallMarginBottom customLabel"
-                        />
-                        <DatePicker
-                            id="fechaContabilizacionReserva"
-                            value="{/header/pstng_date}"
-                            valueFormat="yyyy-MM-dd"
-                            displayFormat="dd.MM.yyyy"
-                            width="75%"
-                            placeholder="Selecciona Fecha"
-                            class="customDatePicker"
-                        />
+                        
                     </VBox>
+                
 
-                    <!-- Referencia -->
-                    <VBox visible="{= ${/header/reference_type} !== 'reserva'}">
-                        <Label
-                            text="Referencia"
-                            design="Bold"
-                            class="sapUiSmallMarginTop sapUiSmallMarginBottom customLabel"
-                        />
-                        <Input
-                            id="referencia"
-                            value="{/header/ref_doc_no}"
-                            width="75%"
-                            placeholder="Ingresa referencia"
-                            class="customInput"
-                        />
-                    </VBox>
-                </VBox>
-
-                <!-- Columna 6: Referencia (cuando "Reserva") / Texto Cabecera -->
-                <VBox>
-                    <layoutData>
-                        <layout:GridData span="XL12 L12 M12 S12" />
-                    </layoutData>
-                    <!-- Referencia (cuando "Reserva") -->
+              
                     <VBox visible="{= ${/header/reference_type} === 'reserva'}">
                         <Label
                             text="Referencia"
@@ -292,6 +239,8 @@
                             class="customInput"
                         />
                     </VBox>
+
+                    <VBox >
 
                     <!-- Texto Cabecera -->
                     <Label
@@ -317,6 +266,7 @@
                     text="{i18n>Siguiente}"
                     type="Emphasized"
                     press="onNext"
+                    class="customButton"
                 />
             </OverflowToolbar>
         </f:footer>
