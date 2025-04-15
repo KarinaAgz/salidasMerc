@@ -1,0 +1,86 @@
+<mvc:XMLView
+    controllerName="logaligroup.mapeobapi.controller.Item"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout"
+    displayBlock="true"
+>
+
+    <f:DynamicPage id="itemPage" showFooter="true" class="customDynamicPage">
+        <f:title>
+            <f:DynamicPageTitle >
+                <f:heading>
+                <Title text="{i18n>datosPosicion}" class="customTitleMain"/>
+                </f:heading>
+                <f:navigationActions>
+                    <Button  text="{i18n>volver}" icon="sap-icon://nav-back" press="onBack" class="customButton"/>
+                </f:navigationActions>
+            </f:DynamicPageTitle>
+        </f:title>
+        <f:content>
+            <layout:Grid defaultSpan="XL4 L6 M6 S12" class="sapUiMedumMargin customGrid">
+                <VBox >
+                    <Label  text="{i18n>Material}" design="Bold" class="sapUiSmallMarginTop sapUiSmallMarginBotttom customLabel"/>
+                    <Input id="material" value="{/currentItem/material}" width="75%" placeholder="Escanea o ingresa material" submit="onMaterialSubmit" class="customInput"/>
+                    <Button text="{i18n>Escanear}" icon="sap-icon://bar-code" press="onScan" class="sapUiSmallMarginTop customButton"/>
+                </VBox>
+
+                <VBox >
+                    <Label text="{i18n>centro}" design="Bold" class="sapUiSmallMarginTop sapUiSmallMarginBottom customLabel" />
+                    <Input id="plant" value="{/currentItem/plant}" width="75%" placeholder="Ingresa centro" class="customInput"/>
+                </VBox>
+
+                <VBox >
+                    <Label text="{i18n>Almace}" design="Bold" class="sapUiSmallMarginTop sapUiSmallMarrginBotton customLabel"/>
+                    <Input id="stgeloc" value="{/currentItem/stge_loc}" width="75%" placeholder="Ingresa almacen" class="customInput"/>
+                </VBox>
+
+                <VBox >
+                    <Label text="{i18n>lote}" design="Bold" class="sapUiSmallMarginTop sapUiSmallMarginBottom customLabel"/>
+                    <Input id="batch" value="{/currentItem/batch}" width="75%" placeholder="Ingresa lote(opcional)" class="customInput"/>
+                </VBox>
+
+                <VBox>
+                    <Label text="Cantidad" design="Bold" class="sapUiSmallMarginTop sapUiSmallMarginBottom customLabel"/>
+                    <Input id="entryQnt" value="{/currentItem/entry_qnt}" type="Number" width="75%" placeholder="Ingresa Cantidad" class="customInput"/>
+
+                </VBox>
+                <VBox >
+                    <Label text="{i18n>unidadmedida}" design="Bold" class="sapUiSmallMarginTop sapUiSmallMarginBottom customLabel"/>
+                    <Input id="entryUom" value="{/currentItem/entry_uom}" width="75%" placeholder="Ingresa unidad" class="customInput"/>
+                </VBox>
+
+                <VBox visible="{= ${/header/move_type} === '201' || ${/header/move_type}==='551'}">
+                    <Label  text="{i18n>CentroCosto}" design="Bold" class="sapUiSmallMarginTop sapUiSmallMarginBottom customLabel"/>
+                    <Input id="costcenter" value="{/currentItem/costcenter}" width="75%" placeholder="Ingresa centro de costo" class="customInput"/>
+                </VBox>
+
+                <VBox visible="{= ${/header/move_type}==='551'}">
+                    <Label text="Motivo" design="Bold" class="sapUiSmallMarginTop sapUiSmalllMarginBottom customLabel" />
+                    <Select id="moveReas" selectedKey="{/currentItem/move_reas}" width="75%" class="customSelect" forceSelection="false">
+                        <items>
+                            <core:Item key="" text="Seleccionar ..."/>
+                            <core:Item key="0001" text="Material dañadp" />
+                            <core:Item key="0002" text="Obsolencia"/>
+                        </items>
+                    </Select>
+                </VBox>
+            </layout:Grid>
+            <List items="{ /items }" class="sapUiMediumMargin customList" headerText="Posiciones Agregadas">
+                <StandardListItem title="{material}" description="Cantidad: {entry_qnt} {entry_uom}, Centro:{plant} , Almacén : {stge_loc}">
+                </StandardListItem>
+            </List>
+        </f:content>
+
+        <f:footer>
+            <OverflowToolbar class="customFooter">
+                <Button text="{i18n>Agregarposicion}" press="onAddItem" class="customButton"/>
+                <ToolbarSpacer />
+                <Button text="{i18n>guardar" type="Emphasized" press="onSubmitAll" enabled="{= ${/items}.length > 0}" class="customButton" />
+            </OverflowToolbar>
+        </f:footer>
+    </f:DynamicPage>
+
+</mvc:XMLView>

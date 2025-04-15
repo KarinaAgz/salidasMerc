@@ -1,0 +1,324 @@
+<mvc:View
+    controllerName="logaligroup.mapeobapi.controller.Main"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout"
+    displayBlock="true"
+>
+    <f:DynamicPage
+        id="dynamicPageId"
+        showFooter="false"
+        class="customDynamicPage"
+    >
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <HBox
+                        justifyContent="Center"
+                        width="100%"
+                        backgroundDesign="Solid"
+                        alignItems="Center"
+                        class="titleContainer"
+                    >
+                        <Title
+                            text="{i18n>title}"
+                            class="customCenteredTitle"
+                        />
+                    </HBox>
+                </f:heading>
+            </f:DynamicPageTitle>
+        </f:title>
+
+        <f:header>
+            <f:DynamicPageHeader class="customDynamicHeader">
+                <f:content>
+                    <HBox
+                        alignItems="Center"
+                        class="customHeaderHBox"
+                    >
+                        <Image
+                            src="./img/image.png"
+                            width="150px"
+                            height="100px"
+                            class="customLogo"
+                        />
+                    </HBox>
+                </f:content>
+            </f:DynamicPageHeader>
+        </f:header>
+
+        <f:content>
+            <layout:Grid
+                defaultSpan="XL3 L4 M6 S12"
+                class="sapUiMediumMargin customGrid"
+            >
+                <!-- Columna 1 -->
+                <VBox>
+                    <Label
+                        text="{i18n>salidaMercancia}"
+                        design="Bold"
+                        class="sapUiSmallMarginTop sapUiSmallMarginBottom customLabel"
+                    />
+                    <Select
+                        id="opcionesSelect"
+                        selectedKey="{/header/reference_Type}"
+                        change="onSelectionChange"
+                        width="75%"
+                        forceSelection="false"
+                    >
+                        <items>
+                            <core:Item
+                                key=""
+                                text="{i18n>Eligeopcion}"
+                            />
+                            <core:Item
+                                key="reserva"
+                                text="{i18n>Reserva}"
+                            />
+                            <core:Item
+                                key="orden"
+                                text="{i18n>Orden}"
+                            />
+                            <core:Item
+                                key="otros"
+                                text="{i18n>Otros}"
+                            />
+                        </items>
+                    </Select>
+                </VBox>
+
+                <!-- Columna 2: Clase de Movimiento / Número de Reserva / Número de Orden -->
+                <VBox>
+                    <!-- Clase de Movimiento (para "Otros") -->
+                    <VBox visible="{= ${/header/reference_type} === 'otros'}">
+                        <Label
+                            text="{i18n>Clasemovimiento}"
+                            design="Bold"
+                            class="customLabel customLabelSmall"
+                        />
+                        <Select
+                            id="claseMovimiento"
+                            selectedKey="{/header/move_type}"
+                            width="75%"
+                            class="customSelect customSelectSmall"
+                            forceSelection="false"
+                        >
+                            <items>
+                                <core:Item
+                                    key=""
+                                    text="Seleccionar..."
+                                />
+                                <core:Item
+                                    key="201"
+                                    text="201 - Centro de Costo"
+                                />
+                                <core:Item
+                                    key="261"
+                                    text="261 - Orden"
+                                />
+                                <core:Item
+                                    key="551"
+                                    text="551 - Baja"
+                                />
+                            </items>
+                        </Select>
+                    </VBox>
+
+                    <!-- Número de Reserva (para "Reserva") -->
+                    <VBox visible="{= ${/header/reference_type} === 'reserva'}">
+                        <Label
+                            text="Número de Reserva"
+                            design="Bold"
+                            class="customLabel customLabelSmall"
+                        />
+                        <Input
+                            id="reservNo"
+                            value="{/header/reserv_no}"
+                            width="75%"
+                            placeholder="Ingresa número de reserva"
+                            class="customInput customInputSmall"
+                        />
+                    </VBox>
+
+                    <!-- Número de Orden (para "Orden") -->
+                    <VBox visible="{= ${/header/reference_type} === 'orden'}">
+                        <Label
+                            text="Número de Orden"
+                            design="Bold"
+                            class="customLabel customLabelSmall"
+                        />
+                        <Input
+                            id="orderId"
+                            value="{/header/orderid}"
+                            width="75%"
+                            placeholder="Ingresa número de orden"
+                            class="customInput customInputSmall"
+                        />
+                    </VBox>
+                </VBox>
+
+                <!-- Columna 3: Posición de Reserva / Fecha Documento -->
+                <VBox>
+                    <!-- Posición de Reserva (para "Reserva") -->
+                    <VBox visible="{= ${/header/reference_type} === 'reserva'}">
+                        <Label
+                            text="Posición de Reserva"
+                            design="Bold"
+                            class="customLabel customLabelSmall"
+                        />
+                        <Input
+                            id="resItem"
+                            value="{/header/res_item}"
+                            width="75%"
+                            placeholder="Ingresa posición"
+                            class="customInput customInputSmall"
+                        />
+                    </VBox>
+
+                    <!-- Fecha Documento -->
+                    <VBox visible="{= ${/header/reference_type} !== 'reserva'}">
+                        <Label
+                            text="Fecha Documento"
+                            design="Bold"
+                            class="sapUiSmallMarginTop sapUiSmallMarginBottom customLabel"
+                        />
+                        <DatePicker
+                            id="fechaDoc"
+                            value="{/header/doc_date}"
+                            valueFormat="yyyy-MM-dd"
+                            displayFormat="dd.MM.yyyy"
+                            width="75%"
+                            placeholder="Selecciona Fecha"
+                            class="customDatePicker"
+                        />
+                    </VBox>
+                </VBox>
+
+                <!-- Columna 4: Fecha Documento (cuando "Reserva") / Fecha Contabilización -->
+                <VBox>
+                    <!-- Fecha Documento (cuando "Reserva") -->
+                    <VBox visible="{= ${/header/reference_type} === 'reserva'}">
+                        <Label
+                            text="Fecha Documento"
+                            design="Bold"
+                            class="sapUiSmallMarginTop sapUiSmallMarginBottom customLabel"
+                        />
+                        <DatePicker
+                            id="fechaDocReserva"
+                            value="{/header/doc_date}"
+                            valueFormat="yyyy-MM-dd"
+                            displayFormat="dd.MM.yyyy"
+                            width="75%"
+                            placeholder="Selecciona Fecha"
+                            class="customDatePicker"
+                        />
+                    </VBox>
+
+                    <!-- Fecha Contabilización -->
+                    <VBox visible="{= ${/header/reference_type} !== 'reserva'}">
+                        <Label
+                            text="Fecha de Contabilización"
+                            design="Bold"
+                            class="sapUiSmallMarginTop sapUiSmallMarginBottom customLabel"
+                        />
+                        <DatePicker
+                            id="fechaContabilizacion"
+                            value="{/header/pstng_date}"
+                            valueFormat="yyyy-MM-dd"
+                            displayFormat="dd.MM.yyyy"
+                            width="75%"
+                            placeholder="Selecciona Fecha"
+                            class="customDatePicker"
+                        />
+                    </VBox>
+                </VBox>
+
+                <!-- Columna 5: Fecha Contabilización (cuando "Reserva") / Referencia -->
+                <VBox>
+                    <!-- Fecha Contabilización (cuando "Reserva") -->
+                    <VBox visible="{= ${/header/reference_type} === 'reserva'}">
+                        <Label
+                            text="Fecha de Contabilización"
+                            design="Bold"
+                            class="sapUiSmallMarginTop sapUiSmallMarginBottom customLabel"
+                        />
+                        <DatePicker
+                            id="fechaContabilizacionReserva"
+                            value="{/header/pstng_date}"
+                            valueFormat="yyyy-MM-dd"
+                            displayFormat="dd.MM.yyyy"
+                            width="75%"
+                            placeholder="Selecciona Fecha"
+                            class="customDatePicker"
+                        />
+                    </VBox>
+
+                    <!-- Referencia -->
+                    <VBox visible="{= ${/header/reference_type} !== 'reserva'}">
+                        <Label
+                            text="Referencia"
+                            design="Bold"
+                            class="sapUiSmallMarginTop sapUiSmallMarginBottom customLabel"
+                        />
+                        <Input
+                            id="referencia"
+                            value="{/header/ref_doc_no}"
+                            width="75%"
+                            placeholder="Ingresa referencia"
+                            class="customInput"
+                        />
+                    </VBox>
+                </VBox>
+
+                <!-- Columna 6: Referencia (cuando "Reserva") / Texto Cabecera -->
+                <VBox>
+                    <layoutData>
+                        <layout:GridData span="XL12 L12 M12 S12" />
+                    </layoutData>
+                    <!-- Referencia (cuando "Reserva") -->
+                    <VBox visible="{= ${/header/reference_type} === 'reserva'}">
+                        <Label
+                            text="Referencia"
+                            design="Bold"
+                            class="sapUiSmallMarginTop sapUiSmallMarginBottom customLabel"
+                        />
+                        <Input
+                            id="referenciaReserva"
+                            value="{/header/ref_doc_no}"
+                            width="75%"
+                            placeholder="Ingresa referencia"
+                            class="customInput"
+                        />
+                    </VBox>
+
+                    <!-- Texto Cabecera -->
+                    <Label
+                        text="Texto Cabecera"
+                        design="Bold"
+                        class="sapUiSmallMarginTop sapUiSmallMarginBottom customLabel"
+                    />
+                    <TextArea
+                        id="textoCabecera"
+                        value="{/header/header_txt}"
+                        width="75%"
+                        rows="3"
+                        placeholder="Ingresa el texto cabecera"
+                        class="customTextArea"
+                    />
+                </VBox>
+            </layout:Grid>
+        </f:content>
+        <f:footer>
+            <OverflowToolbar>
+                <ToolbarSpacer />
+                <Button
+                    text="{i18n>Siguiente}"
+                    type="Emphasized"
+                    press="onNext"
+                />
+            </OverflowToolbar>
+        </f:footer>
+    </f:DynamicPage>
+</mvc:View>
