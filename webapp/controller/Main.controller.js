@@ -6,19 +6,46 @@ sap.ui.define([
 
     return Controller.extend("logaligroup.mapeobapi.controller.Main", {
         onInit: function () {
+            var oModel = new sap.ui.model.json.JSONModel({
+                header: {
+                    reference_type: "",
+                    reserv_no: "",
+                    res_item: "",
+                    orderid: "",
+                    move_type: "",
+                    pstng_date: new Date().toISOString().split("T")[0],
+                    doc_date: new Date().toISOString().split("T")[0],
+                    ref_doc_no: "",
+                    header_txt: "",
+                    ver_gr_gi_slip: "3",
+                    ver_gr_gi_slipx: "X"
+                },
+                code: {
+                    gm_code: "03"
+                },
+                items: [],
+                currentItem: {
+                    material: "",
+                    plant: "",
+                    stge_loc: "",
+                    batch: "",
+                    entry_qnt: "",
+                    entry_uom: "",
+                    costcenter: "",
+                    orderid: "",
+                    move_reas: ""
+                }
+            });
+            this.getView().setModel(oModel, "mainModel");
+            console.log("Modelo inicializado:", oModel.getData());
+
             // Establecer visibilidad inicial
-            var oModel = this.getOwnerComponent().getModel("mainModel");
-            if (!oModel) {
-                MessageToast.show("Error: Modelo mainModel no encontrado en Main.onInit");
-                return;
-            }
-            console.log("Modelo inicializado en Main:", oModel.getData());
             this._updateFieldVisibility("");
         },
 
         onSelectionChange: function (oEvent) {
             var sSelectedKey = oEvent.getSource().getSelectedKey();
-            var oModel = this.getOwnerComponent().getModel("mainModel");
+            var oModel = this.getView().getModel("mainModel");
             if (oModel) {
                 console.log("Selected reference_type:", sSelectedKey);
                 oModel.setProperty("/header/reference_type", sSelectedKey);
@@ -71,7 +98,7 @@ sap.ui.define([
 
         onReservNoChange: function (oEvent) {
             var sReservNo = oEvent.getSource().getValue();
-            var oModel = this.getOwnerComponent().getModel("mainModel");
+            var oModel = this.getView().getModel("mainModel");
             var sMoveType = this._simulateMoveTypeForReservation(sReservNo);
             oModel.setProperty("/header/move_type", sMoveType);
             if (sMoveType) {
@@ -83,7 +110,7 @@ sap.ui.define([
 
         onOrderIdChange: function (oEvent) {
             var sOrderId = oEvent.getSource().getValue();
-            var oModel = this.getOwnerComponent().getModel("mainModel");
+            var oModel = this.getView().getModel("mainModel");
             console.log("Número de Orden ingresado:", sOrderId);
             console.log("Modelo /header/orderid después de ingreso:", oModel.getProperty("/header/orderid"));
 
@@ -115,36 +142,36 @@ sap.ui.define([
         },
 
         onNext: function () {
-            var oModel = this.getOwnerComponent().getModel("mainModel");
+            var oModel = this.getView().getModel("mainModel");
             if (!oModel) {
                 MessageToast.show("Error: Modelo no encontrado");
                 return;
             }
-        
+
             var oHeader = oModel.getProperty("/header");
             if (!oHeader) {
                 MessageToast.show("Error: Datos del header no encontrados");
                 return;
             }
-        
+
             console.log("Estado del modelo antes de la validación:", oHeader);
-        
+
             this._clearRequiredFieldStyles();
-        
+
             var bHasErrors = false;
-        
+
             if (!oHeader.reference_type) {
                 MessageToast.show("Por favor, selecciona un tipo de referencia");
                 this.byId("opcionesSelect").addStyleClass("requiredFieldEmpty");
                 bHasErrors = true;
             }
-        
+
             if (oHeader.reference_type === "reserva") {
                 var oNumeroReservaFragment = this.getView().byId("numeroReservaFragment");
                 var oPosicionReservaFragment = this.getView().byId("posicionReservaFragment");
                 var oReservNo = oNumeroReservaFragment?.getItems()[1];
                 var oResItem = oPosicionReservaFragment?.getItems()[1];
-        
+
                 if (!oHeader.reserv_no) {
                     MessageToast.show("Por favor, completa el número de reserva");
                     if (oReservNo) oReservNo.addStyleClass("requiredFieldEmpty");
@@ -156,11 +183,11 @@ sap.ui.define([
                     bHasErrors = true;
                 }
             }
-        
+
             if (oHeader.reference_type === "orden") {
                 var oNumeroOrdenFragment = this.getView().byId("numeroOrdenFragment");
                 var oOrderId = oNumeroOrdenFragment?.getItems()[1];
-        
+
                 console.log("Validando Número de Orden:", oHeader.orderid);
                 if (!oHeader.orderid || (typeof oHeader.orderid === "string" && oHeader.orderid.trim() === "")) {
                     MessageToast.show("Por favor, ingresa el número de orden");
@@ -168,34 +195,19 @@ sap.ui.define([
                     bHasErrors = true;
                 }
             }
-        
+
             if (oHeader.reference_type === "otros" && !oHeader.move_type) {
                 var oClaseMovimientoFragment = this.getView().byId("claseMovimientoFragment");
                 var oClaseMovimiento = oClaseMovimientoFragment?.getItems()[1];
-        
+
                 MessageToast.show("Por favor, selecciona una clase de movimiento");
                 if (oClaseMovimiento) oClaseMovimiento.addStyleClass("requiredFieldEmpty");
                 bHasErrors = true;
             }
-        
+
             if (!bHasErrors) {
                 MessageToast.show("Validación exitosa, navegando a la vista de ítems");
-                var oRouter = this.getOwnerComponent().getRouter();
-                if (!oRouter) {
-                    MessageToast.show("Error: Router no encontrado");
-                    console.error("Router no inicializado");
-                    return;
-                }
-                try {
-                    // Forzar move_type a "551" para asegurar que "Motivo" sea visible
-                    oModel.setProperty("/header/move_type", "551"); // Ajuste para mostrar "Motivo"
-                    console.log("Intentando navegar a 'RouteItem' con move_type:", oModel.getProperty("/header/move_type"));
-                    oRouter.navTo("RouteItem"); // Usa el nombre de la ruta correcto
-                    console.log("Navegación iniciada");
-                } catch (e) {
-                    MessageToast.show("Error al navegar: " + e.message);
-                    console.error("Error de navegación:", e);
-                }
+                this.getOwnerComponent().getRouter().navTo("RouteItem");
             }
         },
 

@@ -2,184 +2,131 @@
     controllerName="logaligroup.mapeobapi.controller.Item"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
-    xmlns:f="sap.f"
+    xmlns:f="sap.ui.layout.form"
     xmlns:core="sap.ui.core"
-    xmlns:layout="sap.ui.layout"
-    xmlns:form="sap.ui.layout.form"
-    displayBlock="true"
->
-    <f:DynamicPage
-        id="itemPageId"
-        showFooter="true"
-        class="customDynamicPage"
-    >
-        <f:title>
-            <f:DynamicPageTitle class="customDynamicPageTitle">
-                <f:heading>
-                    <HBox
-                        justifyContent="Center"
-                        width="100%"
-                        backgroundDesign="Solid"
-                        alignItems="Center"
-                        class="titleContainer"
-                    >
-                        <Title
-                            text="{i18n>itemTitle}"
-                            class="customCenteredTitle"
-                        />
+    displayBlock="true">
+    <Page
+        id="page"
+        title="{i18n>itemTitle}">
+        <content>
+            <f:SimpleForm
+                id="SimpleFormItem"
+                editable="true"
+                layout="ResponsiveGridLayout"
+                title="Posiciones (1 posición por visualización)"
+                labelSpanXL="4"
+                labelSpanL="4"
+                labelSpanM="4"
+                labelSpanS="12"
+                adjustLabelSpan="false"
+                emptySpanXL="0"
+                emptySpanL="0"
+                emptySpanM="0"
+                emptySpanS="0"
+                columnsXL="2"
+                columnsL="2"
+                columnsM="1"
+                singleContainerFullSize="false">
+                <f:content>
+                    <Label
+                        text="Material:"
+                        design="Bold"
+                        required="true"/>
+                    <HBox>
+                        <Input
+                            id="material"
+                            placeholder="Ingresa o escanea el código de barra"
+                            value="{mainModel>/currentItem/material}"
+                            width="100%"/>
+                        <Button
+                            icon="sap-icon://bar-code"
+                            press="onScanMaterial"
+                            class="sapUiSmallMarginBegin"/>
                     </HBox>
-                </f:heading>
-            </f:DynamicPageTitle>
-        </f:title>
 
-        <f:content>
-            <layout:Grid
-                defaultSpan="XL6 L6 M12 S12"
-                class="sapUiMediumMargin customGrid"
-            >
-                <VBox class="customVBox">
-                    <form:SimpleForm
-                        editable="true"
-                        layout="ResponsiveGridLayout"
-                        labelSpanXL="4"
-                        labelSpanL="4"
-                        labelSpanM="4"
-                        labelSpanS="12"
-                        adjustLabelSpan="false"
-                        singleContainerFullSize="false"
-                    >
-                        <form:content>
-                            <Label text="Material" design="Bold" class="customLabel" />
-                            <Input
-                                id="material"
-                                value="{mainModel>/currentItem/material}"
-                                width="100%"
-                                placeholder="Ingresa o escanea el código de barra"
-                                class="customInput"
-                                submit="onMaterialScan"
-                                showClearIcon="true"
-                            />
+                    <Label
+                        text="Cantidad:"
+                        design="Bold"
+                        required="true"/>
+                    <Input
+                        id="entryQnt"
+                        placeholder="Ingresa la cantidad"
+                        value="{mainModel>/currentItem/entry_qnt}"
+                        type="Number"/>
 
-                            <Label text="Cantidad" design="Bold" class="customLabel" />
-                            <Input
-                                id="entryQnt"
-                                value="{mainModel>/currentItem/entry_qnt}"
-                                width="100%"
-                                placeholder="Ingresa la cantidad"
-                                class="customInput"
-                                showClearIcon="true"
-                            />
+                    <Label
+                        text="Unidad de Medida:"
+                        design="Bold"
+                        required="true"/>
+                    <Input
+                        id="entryUom"
+                        placeholder="Ingresa la unidad de medida"
+                        value="{mainModel>/currentItem/entry_uom}"
+                        change="onEntryUomChange"/>
 
-                            <Label text="Unidad de Medida" design="Bold" class="customLabel" />
-                            <Input
-                                id="entryUom"
-                                value="{mainModel>/currentItem/entry_uom}"
-                                width="100%"
-                                placeholder="Ingresa la unidad de medida"
-                                class="customInput"
-                                change="onEntryUomChange"
-                                showClearIcon="true"
-                            />
+                    <Label
+                        text="Lote:"
+                        design="Bold"/>
+                    <Input
+                        id="batch"
+                        placeholder="Ingresa el lote"
+                        value="{mainModel>/currentItem/batch}"/>
 
-                            <Label text="Lote" design="Bold" class="customLabel" />
-                            <Input
-                                id="batch"
-                                value="{mainModel>/currentItem/batch}"
-                                width="100%"
-                                placeholder="Ingresa el lote"
-                                class="customInput"
-                                showClearIcon="true"
-                            />
+                    <Label
+                        text="Centro:"
+                        design="Bold"/>
+                    <Input
+                        id="plant"
+                        placeholder="Ingresa el centro"
+                        value="{mainModel>/currentItem/plant}"/>
 
-                            <Label text="Centro" design="Bold" class="customLabel" />
-                            <Input
-                                id="plant"
-                                value="{mainModel>/currentItem/plant}"
-                                width="100%"
-                                placeholder="Ingresa el centro"
-                                class="customInput"
-                                showClearIcon="true"
-                            />
+                    <Label
+                        text="Almacén:"
+                        design="Bold"/>
+                    <Input
+                        id="stgeLoc"
+                        placeholder="Ingresa el almacén"
+                        value="{mainModel>/currentItem/stge_loc}"/>
 
-                            <Label text="Almacén" design="Bold" class="customLabel" />
-                            <Input
-                                id="stgeLoc"
-                                value="{mainModel>/currentItem/stge_loc}"
-                                width="100%"
-                                placeholder="Ingresa el almacén"
-                                class="customInput"
-                                showClearIcon="true"
-                            />
+                    <Label
+                        text="Centro de Costo:"
+                        design="Bold"/>
+                    <Input
+                        id="costcenter"
+                        placeholder="Ingresa el centro de costo"
+                        value="{mainModel>/currentItem/costcenter}"/>
 
-                            <Label
-                                text="CeCo"
-                                design="Bold"
-                                class="customLabel"
-                                visible="{= ${mainModel>/header/move_type} === '201' || ${mainModel>/header/move_type} === '551'}"
-                            />
-                            <Input
-                                id="costcenter"
-                                value="{mainModel>/currentItem/costcenter}"
-                                width="100%"
-                                placeholder="Ingresa el centro de costo"
-                                class="customInput"
-                                visible="{= ${mainModel>/header/move_type} === '201' || ${mainModel>/header/move_type} === '551'}"
-                                showClearIcon="true"
-                            />
-
-                            <Label
-                                text="Número de Orden"
-                                design="Bold"
-                                class="customLabel"
-                                visible="{= ${mainModel>/header/move_type} === '261'}"
-                            />
-                            <Input
-                                id="itemOrderId"
-                                value="{mainModel>/currentItem/orderid}"
-                                width="100%"
-                                placeholder="Ingresa número de orden"
-                                class="customInput"
-                                visible="{= ${mainModel>/header/move_type} === '261'}"
-                                showClearIcon="true"
-                            />
-
-                            <Label
-                                text="Motivo"
-                                design="Bold"
-                                class="customLabel"
-                                visible="{= ${mainModel>/header/move_type} === '551'}"
-                            />
-                            <ComboBox
-                                id="moveReas"
-                                selectedKey="{mainModel>/currentItem/move_reas}"
-                                width="100%"
-                                class="customSelect"
-                                visible="{= ${mainModel>/header/move_type} === '551'}"
-                                items="{moveReasons>/items}"
-                            >
-                                <core:Item key="{moveReasons>key}" text="{moveReasons>text}" />
-                            </ComboBox>
-                        </form:content>
-                    </form:SimpleForm>
-                </VBox>
-            </layout:Grid>
-        </f:content>
-
-        <f:footer>
-            <OverflowToolbar class="customFooter">
-                <ToolbarSpacer />
+                    <Label
+                        text="Motivo:"
+                        design="Bold"
+                        visible="{= ${mainModel>/header/move_type} === '551'}"/>
+                    <Select
+                        id="moveReas"
+                        visible="{= ${mainModel>/header/move_type} === '551'}"
+                        selectedKey="{mainModel>/currentItem/move_reas}"
+                        items="{motivoModel>/motivos}">
+                        <core:Item
+                            key="{motivoModel>key}"
+                            text="{motivoModel>text}"/>
+                    </Select>
+                </f:content>
+            </f:SimpleForm>
+            <Link
+                text="Entradas nuevas"
+                press="onNewEntry"
+                class="sapUiSmallMarginBegin sapUiSmallMarginBottom"/>
+        </content>
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer/>
                 <Button
-                    text="{i18n>Guardar}"
+                    text="GUARDAR"
                     type="Emphasized"
-                    press="onSaveItem"
-                    class="customButton"
-                />
+                    press="onSaveItem"/>
                 <Button
-                    text="{i18n>Cancelar}"
-                    press="onCancel"
-                    class="customButton"
-                />
-            </OverflowToolbar>
-        </f:footer>
-    </f:DynamicPage>
+                    text="CANCELAR"
+                    press="onCancel"/>
+            </Toolbar>
+        </footer>
+    </Page>
 </mvc:View>
