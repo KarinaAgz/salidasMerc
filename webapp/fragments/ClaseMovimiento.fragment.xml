@@ -1,0 +1,28 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    
+    
+
+    <Label
+        text="{i18n>Clasemovimiento}"
+        design="Bold"
+        class="customLabel"
+        visible="{= ${mainModel>/header/reference_type} === 'otros'}"
+    />
+    <Select
+        selectedKey="{mainModel>/header/move_type}"
+        width="100%"
+        class="customSelect"
+        forceSelection="false"
+        visible="{= ${mainModel>/header/reference_type} === 'otros'}"
+    >
+        <items>
+            <core:Item key="" text="Seleccionar..." />
+            <core:Item key="201" text="201 - Centro de Costo" />
+            <core:Item key="261" text="261 - Orden" />
+            <core:Item key="551" text="551 - Baja" />
+        </items>
+    </Select>
+</core:FragmentDefinition>

@@ -80,14 +80,14 @@
       "routes": [
         {
           "name": "RouteMain",
-          "pattern": ":?query:",
+          "pattern": "",
           "target": [
             "TargetMain"
           ]
         },
         {
           "name": "RouteItem",
-          "pattern": ":?query:",
+          "pattern": "item",
           "target": [
             "TargetItem"
           ]

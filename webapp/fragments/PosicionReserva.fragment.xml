@@ -1,0 +1,16 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Label
+        text="Posición de Reserva"
+        design="Bold"
+        class="customLabel"
+    />
+    <Input
+        value="{mainModel>/header/res_item}"
+        width="100%"
+        placeholder="Ingresa posición"
+        class="customInput"
+    />
+</core:FragmentDefinition>

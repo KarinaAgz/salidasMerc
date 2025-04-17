@@ -1,25 +1,24 @@
 sap.ui.define([
     "sap/ui/core/UIComponent",
-    "logaligroup/mapeobapi/model/models"
-], (UIComponent, models) => {
+    "sap/ui/Device",
+    "sap/ui/model/JSONModel"
+], function (UIComponent, Device, JSONModel) {
     "use strict";
 
     return UIComponent.extend("logaligroup.mapeobapi.Component", {
         metadata: {
-            manifest: "json",
-            interfaces: [
-                "sap.ui.core.IAsyncContentCreation"
-            ]
+            manifest: "json"
         },
 
-        init() {
-            // call the base component's init function
+        init: function () {
+            // Llama a la inicialización del componente padre
             UIComponent.prototype.init.apply(this, arguments);
 
-            // set the device model
-            this.setModel(models.createDeviceModel(), "device");
+            // Prueba simple con JSONModel
+            var oModel = new JSONModel({ test: "Hello" });
+            this.setModel(oModel, "testModel");
 
-            // enable routing
+            // Inicializa el router
             this.getRouter().initialize();
         }
     });
