@@ -28,10 +28,10 @@ sap.ui.define([
             // Definir las opciones para el motivo (motivoModel)
             var oMotivoData = {
                 motivos: [
-                    { key: "0001", text: "Obsolescencia" },
-                    { key: "0002", text: "Defectuoso" },
-                    { key: "0003", text: "Fin de vida útil" },
-                    { key: "0004", text: "Otros" }
+                    { key: "0001", text: "{i18n>Obsolescencia}" },
+                    { key: "0002", text: "{i18n>Defectuoso}" },
+                    { key: "0003", text: "{i18n>Fin}" },
+                    { key: "0004", text: "{i18n>Otros}" }
                 ]
             };
             var oMotivoModel = new JSONModel(oMotivoData);
@@ -203,7 +203,21 @@ sap.ui.define([
         },
 
         onScanMaterial: function () {
-            var that = this;
+            var that = this; // Preservar el contexto del controlador
+            var oComponent = this.getOwnerComponent();
+            if (!oComponent) {
+                console.error("Componente no encontrado en onScanMaterial");
+                MessageToast.show("Error: Componente no encontrado");
+                return;
+            }
+
+            var oMainModel = oComponent.getModel("mainModel");
+            if (!oMainModel) {
+                console.error("Modelo mainModel no encontrado en onScanMaterial");
+                MessageToast.show("Error: Modelo mainModel no encontrado");
+                return;
+            }
+
             var oDialog = new Dialog({
                 title: "Escanear Código de Barras",
                 content: [
@@ -228,11 +242,33 @@ sap.ui.define([
                                 width: 640,
                                 height: 480,
                                 facingMode: "environment"
+                            },
+                            area: {
+                                top: "5%",
+                                right: "5%",
+                                left: "5%",
+                                bottom: "5%"
                             }
                         },
                         decoder: {
-                            readers: ["code_128_reader", "ean_reader", "ean_8_reader", "upc_reader"]
-                        }
+                            readers: [
+                                "ean_reader",
+                                "ean_8_reader",
+                                "code_128_reader",
+                                "upc_reader",
+                                "code_39_reader",
+                                "codabar_reader",
+                                "i2of5_reader"
+                            ]
+                        },
+                        locator: {
+                            patchSize: "large",
+                            halfSample: false
+                        },
+                        numOfWorkers: 4,
+                        locate: true,
+                        frequency: 5,
+                        debug: true
                     }, function (err) {
                         if (err) {
                             console.error("Error al inicializar Quagga:", err);
@@ -240,15 +276,62 @@ sap.ui.define([
                             oDialog.close();
                             return;
                         }
+                        console.log("Quagga inicializado correctamente");
                         Quagga.start();
+
+                        setTimeout(function () {
+                            if (oDialog.isOpen()) {
+                                Quagga.stop();
+                                oDialog.close();
+                                MessageToast.show("Tiempo de escaneo agotado. Asegúrate de que el código sea claro y esté bien iluminado.");
+                            }
+                        }, 60000);
                     });
 
                     Quagga.onDetected(function (result) {
                         var code = result.codeResult.code;
-                        MessageToast.show("Código escaneado: " + code);
-                        that.getOwnerComponent().getModel("mainModel").setProperty("/currentItem/material", code);
-                        Quagga.stop();
-                        oDialog.close();
+                        console.log("Código detectado:", code);
+
+                        // Usar la variable 'that' para mantener el contexto
+                        if (!that.getOwnerComponent()) {
+                            console.error("Componente no encontrado en onDetected");
+                            MessageToast.show("Error: Componente no encontrado al detectar el código");
+                            Quagga.stop();
+                            oDialog.close();
+                            return;
+                        }
+
+                        var oMainModel = that.getOwnerComponent().getModel("mainModel");
+                        if (!oMainModel) {
+                            console.error("Modelo mainModel no encontrado en onDetected");
+                            MessageToast.show("Error: Modelo mainModel no encontrado al detectar el código");
+                            Quagga.stop();
+                            oDialog.close();
+                            return;
+                        }
+
+                        try {
+                            oMainModel.setProperty("/currentItem/material", code);
+                            MessageToast.show("Código escaneado: " + code);
+                            Quagga.stop();
+                            oDialog.close();
+                        } catch (error) {
+                            console.error("Error al setear el código en el modelo:", error);
+                            MessageToast.show("Error al guardar el código escaneado");
+                            Quagga.stop();
+                            oDialog.close();
+                        }
+                    });
+
+                    Quagga.onProcessed(function (result) {
+                        if (result) {
+                            console.log("Procesando imagen:", result);
+                            if (result.boxes && result.boxes.length > 0) {
+                                console.log("Cajas detectadas:", result.boxes);
+                            } else {
+                                console.log("No se detectaron cajas en este frame");
+                            }
+                        }
                     });
                 },
                 afterClose: function () {

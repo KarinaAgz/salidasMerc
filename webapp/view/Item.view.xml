@@ -13,7 +13,7 @@
                 id="SimpleFormItem"
                 editable="true"
                 layout="ResponsiveGridLayout"
-                title="Posiciones (1 posición por visualización)"
+                title="{i18n>posiciones1PosicionPorVisualizacion}"
                 labelSpanXL="4"
                 labelSpanL="4"
                 labelSpanM="4"
@@ -29,7 +29,7 @@
                 singleContainerFullSize="false">
                 <f:content>
                     <Label
-                        text="Material:"
+                        text="{i18n>material}"
                         design="Bold"
                         required="true"/>
                     <HBox>
@@ -45,7 +45,7 @@
                     </HBox>
 
                     <Label
-                        text="Cantidad:"
+                        text="{i18n>cantidad}"
                         design="Bold"
                         required="true"/>
                     <Input
@@ -55,7 +55,7 @@
                         type="Number"/>
 
                     <Label
-                        text="Unidad de Medida:"
+                        text="{i18n>unidadMedida}"
                         design="Bold"
                         required="true"/>
                     <Input
@@ -65,7 +65,7 @@
                         change="onEntryUomChange"/>
 
                     <Label
-                        text="Lote:"
+                        text="{i18n>lote}"
                         design="Bold"/>
                     <Input
                         id="batch"
@@ -73,7 +73,7 @@
                         value="{mainModel>/currentItem/batch}"/>
 
                     <Label
-                        text="Centro:"
+                        text="{i18n>centro}"
                         design="Bold"/>
                     <Input
                         id="plant"
@@ -81,7 +81,7 @@
                         value="{mainModel>/currentItem/plant}"/>
 
                     <Label
-                        text="Almacén:"
+                        text="{i18n>almacen}"
                         design="Bold"/>
                     <Input
                         id="stgeLoc"
@@ -89,7 +89,7 @@
                         value="{mainModel>/currentItem/stge_loc}"/>
 
                     <Label
-                        text="Centro de Costo:"
+                        text="{i18n>centroCosto}"
                         design="Bold"/>
                     <Input
                         id="costcenter"
@@ -97,7 +97,7 @@
                         value="{mainModel>/currentItem/costcenter}"/>
 
                     <Label
-                        text="Motivo:"
+                        text="{i18n>motivo}"
                         design="Bold"
                         visible="{= ${mainModel>/header/move_type} === '551'}"/>
                     <Select
@@ -112,7 +112,7 @@
                 </f:content>
             </f:SimpleForm>
             <Link
-                text="Entradas nuevas"
+                text="{i18n>entradasNuevas}"
                 press="onNewEntry"
                 class="sapUiSmallMarginBegin sapUiSmallMarginBottom"/>
         </content>
@@ -120,11 +120,11 @@
             <Toolbar>
                 <ToolbarSpacer/>
                 <Button
-                    text="GUARDAR"
+                    text="{i18n>guardar}"
                     type="Emphasized"
                     press="onSaveItem"/>
                 <Button
-                    text="CANCELAR"
+                    text="{i18n>cancelar}"
                     press="onCancel"/>
             </Toolbar>
         </footer>
