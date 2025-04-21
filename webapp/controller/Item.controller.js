@@ -61,10 +61,10 @@ sap.ui.define([
                 MessageToast.show("Error: Modelo mainModel no encontrado");
                 return;
             }
-
+        
             var oCurrentItem = oModel.getProperty("/currentItem");
             var oItems = oModel.getProperty("/items") || [];
-
+        
             // Validar campos obligatorios
             var bHasErrors = false;
             if (!oCurrentItem.material) {
@@ -82,9 +82,19 @@ sap.ui.define([
                 this.byId("entryUom").addStyleClass("requiredFieldEmpty");
                 bHasErrors = true;
             }
-
+            if (!oCurrentItem.plant) {
+                MessageToast.show("Por favor, ingresa el centro");
+                this.byId("plant").addStyleClass("requiredFieldEmpty");
+                bHasErrors = true;
+            }
+            if (!oCurrentItem.stge_loc) {
+                MessageToast.show("Por favor, ingresa el almacén");
+                this.byId("stgeLoc").addStyleClass("requiredFieldEmpty");
+                bHasErrors = true;
+            }
+        
             if (bHasErrors) return;
-
+        
             // Guardar el ítem
             oItems.push(Object.assign({}, oCurrentItem));
             oModel.setProperty("/items", oItems);
@@ -152,24 +162,32 @@ sap.ui.define([
                 MessageToast.show("Error: Modelo mainModel no encontrado");
                 return;
             }
-
+        
             var oHeader = oModel.getProperty("/header");
             var oItems = oModel.getProperty("/items");
-
+        
             if (!oItems || oItems.length === 0) {
                 MessageToast.show("Por favor, agrega al menos un ítem antes de enviar");
                 return;
             }
-
-            // Estructura de datos para enviar al backend (simulada)
+        
+            // Simulación de T006 para ORDERPR_UN_ISO
+            var unitToIsoMap = {
+                "PC": "PCE",
+                "KG": "KGM",
+                "EA": "EA",
+                "M": "MTR"
+            };
+        
+            // Estructura de datos para enviar al backend
             var oData = {
                 GOODSMVT_HEADER: {
                     PSTNG_DATE: oHeader.pstng_date || new Date().toISOString().split('T')[0],
                     DOC_DATE: oHeader.doc_date || new Date().toISOString().split('T')[0],
                     REF_DOC_NO: oHeader.ref_doc_no || "",
                     HEADER_TXT: oHeader.header_txt || "",
-                    VER_GR_GI_SLIP: oHeader.ver_gr_gi_slip || "",
-                    VER_GR_GI_SLIPX: oHeader.ver_gr_gi_slipx || ""
+                    VER_GR_GI_SLIP: oHeader.ver_gr_gi_slip || "3",
+                    VER_GR_GI_SLIPX: oHeader.ver_gr_gi_slipx || "x"
                 },
                 GOODSMVT_CODE: {
                     GM_CODE: oModel.getProperty("/code/gm_code") || "03"
@@ -183,17 +201,50 @@ sap.ui.define([
                         MOVE_TYPE: oHeader.move_type,
                         ENTRY_QNT: item.entry_qnt,
                         ENTRY_UOM: item.entry_uom,
+                        ORDERPR_UN_ISO: unitToIsoMap[item.entry_uom] || item.entry_uom,
                         COSTCENTER: item.costcenter,
                         ORDERID: item.orderid,
                         MOVE_REAS: item.move_reas
                     };
                 })
             };
-
+        
             console.log("Datos enviados al backend:", oData);
-
-            // Simulación por ahora
             MessageToast.show("Datos enviados al backend (simulado)");
+        
+            // Limpiar el modelo mainModel
+            oModel.setData({
+                header: {
+                    reference_type: "",
+                    reserv_no: "",
+                    res_item: "",
+                    orderid: "",
+                    move_type: "",
+                    pstng_date: new Date().toISOString().split("T")[0],
+                    doc_date: new Date().toISOString().split("T")[0],
+                    ref_doc_no: "",
+                    header_txt: "",
+                    ver_gr_gi_slip: "3",
+                    ver_gr_gi_slipx: "X"
+                },
+                code: {
+                    gm_code: "03"
+                },
+                items: [],
+                currentItem: {
+                    material: "",
+                    plant: "",
+                    stge_loc: "",
+                    batch: "",
+                    entry_qnt: "",
+                    entry_uom: "",
+                    costcenter: "",
+                    orderid: "",
+                    move_reas: ""
+                }
+            });
+        
+            // Navegar de regreso a Main
             this.getOwnerComponent().getRouter().navTo("RouteMain");
         },
 

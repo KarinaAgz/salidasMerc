@@ -126,7 +126,7 @@
                         />
                     </VBox>
 
-                    <!-- Número de Orden (sin fragmento, con binding) -->
+                   
                     <VBox id="numeroOrdenFragment" visible="{= ${mainModel>/header/reference_type} === 'orden'}">
                         <Label
                             text="Número de Orden"
@@ -143,8 +143,8 @@
                     </VBox>
                 </VBox>
 
-                <!-- Columna 2: Fecha Documento -->
-                <VBox visible="{= ${mainModel>/header/reference_type} !== 'reserva'}">
+                
+                <VBox >
                     <Label
                         text="Fecha Documento"
                         design="Bold"
@@ -161,8 +161,8 @@
                     />
                 </VBox>
 
-                <!-- Columna 3: Fecha de Contabilización -->
-                <VBox visible="{= ${mainModel>/header/reference_type} !== 'reserva'}">
+                
+                <VBox >
                     <Label
                         text="Fecha de Contabilización"
                         design="Bold"
@@ -179,8 +179,8 @@
                     />
                 </VBox>
 
-                <!-- Columna 4: Referencia -->
-                <VBox visible="{= ${mainModel>/header/reference_type} === 'reserva'}">
+              
+                <VBox >
                     <Label
                         text="Referencia"
                         design="Bold"

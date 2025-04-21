@@ -41,6 +41,74 @@ sap.ui.define([
 
             // Establecer visibilidad inicial
             this._updateFieldVisibility("");
+
+            // Registrar el manejador de la ruta RouteMain
+            var oRouter = this.getOwnerComponent().getRouter();
+            if (oRouter) {
+                oRouter.getRoute("RouteMain").attachPatternMatched(this._onObjectMatched, this);
+                console.log("Router inicializado en Main.onInit");
+            } else {
+                console.error("Router no encontrado en Main.onInit");
+                MessageToast.show("Error: Router no encontrado");
+            }
+        },
+
+        _onObjectMatched: function () {
+            console.log("Navegación a vista Main exitosa");
+            var oModel = this.getView().getModel("mainModel");
+            console.log("Modelo al regresar a Main:", oModel.getData());
+
+            // Asegurarnos de que la visibilidad se actualice según el reference_type
+            this._updateFieldVisibility(oModel.getProperty("/header/reference_type"));
+
+            // Forzar un refresco del modelo
+            oModel.refresh(true);
+
+            // Forzar la actualización de los controles
+            var oView = this.getView();
+            var oSelect = oView.byId("opcionesSelect");
+            if (oSelect) {
+                oSelect.setSelectedKey("");
+            }
+
+            var oFechaDoc = oView.byId("fechaDoc");
+            if (oFechaDoc) {
+                oFechaDoc.setValue(new Date().toISOString().split("T")[0]);
+            }
+
+            var oFechaContabilizacion = oView.byId("fechaContabilizacion");
+            if (oFechaContabilizacion) {
+                oFechaContabilizacion.setValue(new Date().toISOString().split("T")[0]);
+            }
+
+            var oReferencia = oView.byId("referenciaReserva");
+            if (oReferencia) {
+                oReferencia.setValue("");
+            }
+
+            var oTextoCabecera = oView.byId("textoCabecera");
+            if (oTextoCabecera) {
+                oTextoCabecera.setValue("");
+            }
+
+            // Limpiar los fragmentos condicionales
+            var oNumeroReserva = oView.byId("numeroReservaFragment").getItems()[1];
+            if (oNumeroReserva) {
+                oNumeroReserva.setValue("");
+            }
+
+            var oPosicionReserva = oView.byId("posicionReservaFragment").getItems()[1];
+            if (oPosicionReserva) {
+                oPosicionReserva.setValue("");
+            }
+
+            var oNumeroOrden = oView.byId("numeroOrdenFragment").getItems()[1];
+            if (oNumeroOrden) {
+                oNumeroOrden.setValue("");
+            }
+
+            // Limpiar los estilos de campos requeridos
+            this._clearRequiredFieldStyles();
         },
 
         onSelectionChange: function (oEvent) {
@@ -55,7 +123,7 @@ sap.ui.define([
                 oModel.setProperty("/header/move_type", "");
                 oModel.refresh(true);
 
-                // Actualizar visibilidad de los campos (solo para Clase de Movimiento)
+                // Actualizar visibilidad de los campos
                 this._updateFieldVisibility(sSelectedKey);
 
                 console.log("Modelo después de cambiar selección:", oModel.getData());
@@ -229,7 +297,7 @@ sap.ui.define([
                     }
                 } else {
                     var oFragment = this.getView().byId(sFragmentId);
-                    var oField = oFragment?.getItems()[1]; // El control es el segundo elemento (índice 1)
+                    var oField = oFragment?.getItems()[1];
                     if (oField) {
                         oField.removeStyleClass("requiredFieldEmpty");
                     }
