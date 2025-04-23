@@ -51,6 +51,20 @@
         "settings": {
           "bundleName": "logaligroup.mapeobapi.i18n.i18n"
         }
+      },
+      "odataModel": {
+        "type": "sap.ui.model.odata.v2.ODataModel",
+        "settings": {
+          "serviceUrl": "/sap/opu/odata/sap/ZYOUR_SERVICE_SRV/",
+          "defaultBindingMode": "TwoWay",
+          "useBatch": false
+        }
+      },
+      "mainModel": {
+        "type": "sap.ui.model.json.JSONModel",
+        "settings": {
+          "defaultBindingMode": "TwoWay"
+        }
       }
     },
     "resources": {

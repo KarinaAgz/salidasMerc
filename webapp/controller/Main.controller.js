@@ -1,48 +1,63 @@
 sap.ui.define([
     "sap/ui/core/mvc/Controller",
-    "sap/m/MessageToast"
-], function (Controller, MessageToast) {
+    "sap/m/MessageToast",
+    "sap/ui/core/Fragment",
+    "sap/ui/model/json/JSONModel" 
+], function (Controller, MessageToast, Fragment, JSONModel) {
     "use strict";
 
     return Controller.extend("logaligroup.mapeobapi.controller.Main", {
+        _oClaseMovimientoFragmentControls: null,
+
         onInit: function () {
-            var oModel = new sap.ui.model.json.JSONModel({
-                header: {
-                    reference_type: "",
-                    reserv_no: "",
-                    res_item: "",
-                    orderid: "",
-                    move_type: "",
-                    pstng_date: new Date().toISOString().split("T")[0],
-                    doc_date: new Date().toISOString().split("T")[0],
-                    ref_doc_no: "",
-                    header_txt: "",
-                    ver_gr_gi_slip: "3",
-                    ver_gr_gi_slipx: "X"
-                },
-                code: {
-                    gm_code: "03"
-                },
-                items: [],
-                currentItem: {
-                    material: "",
-                    plant: "",
-                    stge_loc: "",
-                    batch: "",
-                    entry_qnt: "",
-                    entry_uom: "",
-                    costcenter: "",
-                    orderid: "",
-                    move_reas: ""
-                }
-            });
-            this.getView().setModel(oModel, "mainModel");
+            var oModel = this.getView().getModel("mainModel");
+            if (!oModel) {
+                console.error("Modelo mainModel no encontrado en Main.onInit, inicializando localmente");
+                oModel = new JSONModel({
+                    header: {
+                        reference_type: "",
+                        reserv_no: "",
+                        res_item: "",
+                        orderid: "",
+                        move_type: "",
+                        pstng_date: new Date().toISOString().split("T")[0],
+                        doc_date: new Date().toISOString().split("T")[0],
+                        ref_doc_no: "",
+                        header_txt: "",
+                        ver_gr_gi_slip: "3",
+                        ver_gr_gi_slipx: "X"
+                    },
+                    code: {
+                        gm_code: "03"
+                    },
+                    items: [],
+                    currentItem: {
+                        material: "",
+                        plant: "",
+                        stge_loc: "",
+                        batch: "",
+                        entry_qnt: "",
+                        entry_uom: "",
+                        costcenter: "",
+                        orderid: "",
+                        move_reas: ""
+                    },
+                    motivos: [
+                        { key: "", text: "Seleccionar..." },
+                        { key: "0001", text: "Obsolescencia" },
+                        { key: "0002", text: "Defectuoso" },
+                        { key: "0003", text: "Fin de Vida" },
+                        { key: "0004", text: "Otros Motivos" }
+                    ]
+                });
+                oModel.setDefaultBindingMode("TwoWay");
+                this.getView().setModel(oModel, "mainModel");
+                this.getOwnerComponent().setModel(oModel, "mainModel"); // Propagar al componente
+            }
             console.log("Modelo inicializado:", oModel.getData());
 
-            // Establecer visibilidad inicial
             this._updateFieldVisibility("");
 
-            // Registrar el manejador de la ruta RouteMain
             var oRouter = this.getOwnerComponent().getRouter();
             if (oRouter) {
                 oRouter.getRoute("RouteMain").attachPatternMatched(this._onObjectMatched, this);
@@ -56,15 +71,17 @@ sap.ui.define([
         _onObjectMatched: function () {
             console.log("Navegación a vista Main exitosa");
             var oModel = this.getView().getModel("mainModel");
+            if (!oModel) {
+                console.error("Modelo mainModel no encontrado en _onObjectMatched");
+                MessageToast.show("Error: Modelo mainModel no encontrado");
+                return;
+            }
             console.log("Modelo al regresar a Main:", oModel.getData());
 
-            // Asegurarnos de que la visibilidad se actualice según el reference_type
             this._updateFieldVisibility(oModel.getProperty("/header/reference_type"));
 
-            // Forzar un refresco del modelo
             oModel.refresh(true);
 
-            // Forzar la actualización de los controles
             var oView = this.getView();
             var oSelect = oView.byId("opcionesSelect");
             if (oSelect) {
@@ -91,82 +108,113 @@ sap.ui.define([
                 oTextoCabecera.setValue("");
             }
 
-            // Limpiar los fragmentos condicionales
-            var oNumeroReserva = oView.byId("numeroReservaFragment").getItems()[1];
+            var oNumeroReserva = oView.byId("numeroReservaFragment")?.getItems()[1];
             if (oNumeroReserva) {
                 oNumeroReserva.setValue("");
             }
 
-            var oPosicionReserva = oView.byId("posicionReservaFragment").getItems()[1];
+            var oPosicionReserva = oView.byId("posicionReservaFragment")?.getItems()[1];
             if (oPosicionReserva) {
                 oPosicionReserva.setValue("");
             }
 
-            var oNumeroOrden = oView.byId("numeroOrdenFragment").getItems()[1];
+            var oNumeroOrden = oView.byId("numeroOrdenFragment")?.getItems()[1];
             if (oNumeroOrden) {
                 oNumeroOrden.setValue("");
             }
 
-            // Limpiar los estilos de campos requeridos
             this._clearRequiredFieldStyles();
         },
 
         onSelectionChange: function (oEvent) {
-            var sSelectedKey = oEvent.getSource().getSelectedKey();
+            console.log("onSelectionChange ejecutado");
+            var oSelect = oEvent.getSource();
+            var sSelectedKey = oSelect.getSelectedKey();
+            oSelect.setSelectedKey(sSelectedKey); // Forzar la selección
             var oModel = this.getView().getModel("mainModel");
-            if (oModel) {
-                console.log("Selected reference_type:", sSelectedKey);
-                oModel.setProperty("/header/reference_type", sSelectedKey);
-                oModel.setProperty("/header/reserv_no", "");
-                oModel.setProperty("/header/res_item", "");
-                oModel.setProperty("/header/orderid", "");
-                oModel.setProperty("/header/move_type", "");
-                oModel.refresh(true);
-
-                // Actualizar visibilidad de los campos
-                this._updateFieldVisibility(sSelectedKey);
-
-                console.log("Modelo después de cambiar selección:", oModel.getData());
-                console.log("Debería mostrar Número de Orden:", oModel.getProperty("/header/reference_type") === "orden");
-                console.log("Debería mostrar Número de Reserva:", oModel.getProperty("/header/reference_type") === "reserva");
-                console.log("Debería mostrar Clase de Movimiento:", oModel.getProperty("/header/reference_type") === "otros");
-                MessageToast.show("Seleccionaste: " + sSelectedKey);
-                this._clearRequiredFieldStyles();
-            } else {
-                MessageToast.show("Error: Modelo no encontrado");
+            if (!oModel) {
+                console.error("Modelo mainModel no encontrado en onSelectionChange");
+                MessageToast.show("Error: Modelo mainModel no encontrado");
+                return;
             }
+            console.log("Selected reference_type:", sSelectedKey);
+            oModel.setProperty("/header/reference_type", sSelectedKey);
+            oModel.setProperty("/header/reserv_no", "");
+            oModel.setProperty("/header/res_item", "");
+            oModel.setProperty("/header/orderid", "");
+            oModel.setProperty("/header/move_type", "");
+            oModel.refresh(true);
+
+            this._updateFieldVisibility(sSelectedKey);
+
+            console.log("Modelo después de cambiar selección:", oModel.getData());
+            console.log("Debería mostrar Número de Orden:", oModel.getProperty("/header/reference_type") === "orden");
+            console.log("Debería mostrar Número de Reserva:", oModel.getProperty("/header/reference_type") === "reserva");
+            console.log("Debería mostrar Clase de Movimiento:", oModel.getProperty("/header/reference_type") === "otros");
+            MessageToast.show("Seleccionaste: " + sSelectedKey);
+            this._clearRequiredFieldStyles();
         },
 
         _updateFieldVisibility: function (sReferenceType) {
             var oView = this.getView();
 
-            // Depuración: Confirmar el valor de sReferenceType
             console.log("Valor de sReferenceType en _updateFieldVisibility:", sReferenceType);
 
-            // Fragmentos completos
-            var oClaseMovimientoFragment = oView.byId("claseMovimientoFragment");
-
-            // Depuración: Verificar si el fragmento existe
-            console.log("ClaseMovimientoFragment encontrado:", !!oClaseMovimientoFragment);
-
-            // Controlar visibilidad
             var bIsOtros = sReferenceType === "otros";
-
             console.log("bIsOtros:", bIsOtros);
 
-            // Ocultar/mostrar los fragmentos completos
-            if (oClaseMovimientoFragment) {
-                oClaseMovimientoFragment.setVisible(bIsOtros);
-                console.log("ClaseMovimientoFragment visibilidad seteada a:", bIsOtros);
+            var oContainer = oView.byId("claseMovimientoContainer");
+            if (!oContainer) {
+                console.error("Contenedor claseMovimientoContainer no encontrado en Main.view.xml");
+                MessageToast.show("Error: Contenedor claseMovimientoContainer no encontrado");
+                return;
             }
 
-            // Forzar rerenderizado
+            if (bIsOtros) {
+                if (this._oClaseMovimientoFragmentControls) {
+                    oContainer.removeAllItems();
+                    this._oClaseMovimientoFragmentControls.forEach(function (oControl) {
+                        oContainer.addItem(oControl);
+                    });
+                    console.log("ClaseMovimientoFragment reutilizado");
+                } else {
+                    Fragment.load({
+                        id: oView.getId(),
+                        name: "logaligroup.mapeobapi.fragments.ClaseMovimiento",
+                        controller: this
+                    }).then(function (oFragment) {
+                        var aControls = oFragment;
+                        if (Array.isArray(aControls)) {
+                            oContainer.removeAllItems();
+                            aControls.forEach(function (oControl) {
+                                oContainer.addItem(oControl);
+                            });
+                            this._oClaseMovimientoFragmentControls = aControls;
+                            console.log("ClaseMovimientoFragment cargado dinámicamente");
+                        } else {
+                            console.error("El fragmento no contiene controles válidos");
+                        }
+                    }.bind(this)).catch(function (oError) {
+                        console.error("Error al cargar ClaseMovimientoFragment:", oError);
+                        MessageToast.show("Error al cargar el fragmento ClaseMovimiento");
+                    });
+                }
+            } else {
+                oContainer.removeAllItems();
+                console.log("ClaseMovimientoFragment removido");
+            }
+
             oView.invalidate();
         },
 
         onReservNoChange: function (oEvent) {
             var sReservNo = oEvent.getSource().getValue();
             var oModel = this.getView().getModel("mainModel");
+            if (!oModel) {
+                console.error("Modelo mainModel no encontrado en onReservNoChange");
+                MessageToast.show("Error: Modelo mainModel no encontrado");
+                return;
+            }
             var sMoveType = this._simulateMoveTypeForReservation(sReservNo);
             oModel.setProperty("/header/move_type", sMoveType);
             if (sMoveType) {
@@ -179,6 +227,11 @@ sap.ui.define([
         onOrderIdChange: function (oEvent) {
             var sOrderId = oEvent.getSource().getValue();
             var oModel = this.getView().getModel("mainModel");
+            if (!oModel) {
+                console.error("Modelo mainModel no encontrado en onOrderIdChange");
+                MessageToast.show("Error: Modelo mainModel no encontrado");
+                return;
+            }
             console.log("Número de Orden ingresado:", sOrderId);
             console.log("Modelo /header/orderid después de ingreso:", oModel.getProperty("/header/orderid"));
 
@@ -212,6 +265,7 @@ sap.ui.define([
         onNext: function () {
             var oModel = this.getView().getModel("mainModel");
             if (!oModel) {
+                console.error("Modelo mainModel no encontrado en onNext");
                 MessageToast.show("Error: Modelo no encontrado");
                 return;
             }
@@ -223,6 +277,7 @@ sap.ui.define([
             }
 
             console.log("Estado del modelo antes de la validación:", oHeader);
+            console.log("Move Type antes de navegar a Item:", oHeader.move_type);
 
             this._clearRequiredFieldStyles();
 
@@ -265,15 +320,13 @@ sap.ui.define([
             }
 
             if (oHeader.reference_type === "otros" && !oHeader.move_type) {
-                var oClaseMovimientoFragment = this.getView().byId("claseMovimientoFragment");
-                var oClaseMovimiento = oClaseMovimientoFragment?.getItems()[1];
-
                 MessageToast.show("Por favor, selecciona una clase de movimiento");
-                if (oClaseMovimiento) oClaseMovimiento.addStyleClass("requiredFieldEmpty");
                 bHasErrors = true;
             }
 
             if (!bHasErrors) {
+                oModel.updateBindings(true);
+                console.log("Modelo antes de navegar:", oModel.getData());
                 MessageToast.show("Validación exitosa, navegando a la vista de ítems");
                 this.getOwnerComponent().getRouter().navTo("RouteItem");
             }
@@ -283,7 +336,7 @@ sap.ui.define([
             var oView = this.getView();
             var aFragments = [
                 "opcionesSelect",
-                "claseMovimientoFragment",
+                "claseMovimientoContainer",
                 "numeroReservaFragment",
                 "posicionReservaFragment",
                 "numeroOrdenFragment"
@@ -303,6 +356,23 @@ sap.ui.define([
                     }
                 }
             }.bind(this));
-        }
+        },
+
+        onMoveTypeChange: function (oEvent) {
+            var oSelect = oEvent.getSource();
+            var sSelectedKey = oSelect.getSelectedKey();
+            var oModel = this.getView().getModel("mainModel");
+            if (!oModel) {
+                console.error("Modelo mainModel no encontrado en onMoveTypeChange");
+                MessageToast.show("Error: Modelo no encontrado");
+                return;
+            }
+
+            oModel.setProperty("/header/move_type", sSelectedKey);
+            oModel.refresh(true);
+
+            console.log("Move Type seleccionado en ClaseMovimiento:", sSelectedKey);
+            console.log("Estado del modelo después de seleccionar move_type:", oModel.getData());
+        },
     });
 });

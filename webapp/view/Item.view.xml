@@ -6,179 +6,209 @@
     xmlns:core="sap.ui.core"
     displayBlock="true"
 >
-    <Page
-        id="page"
-        title="{i18n>itemTitle}"
-    >
-        <content>
-            <f:SimpleForm
-                id="SimpleFormItem"
-                editable="true"
-                layout="ResponsiveGridLayout"
-                title="{i18n>posiciones1PosicionPorVisualizacion}"
-                labelSpanXL="4"
-                labelSpanL="4"
-                labelSpanM="4"
-                labelSpanS="12"
-                adjustLabelSpan="false"
-                emptySpanXL="0"
-                emptySpanL="0"
-                emptySpanM="0"
-                emptySpanS="0"
-                columnsXL="2"
-                columnsL="2"
-                columnsM="1"
-                singleContainerFullSize="false"
+    <Shell>
+        <Page id="page">
+            <HBox
+                width="100%"
+                backgroundDesign="Solid"
+                alignItems="Center"
+                class="titleContainer customDynamicHeader"
             >
-                <f:content>
-                    <Label
-                        text="{i18n>material}"
-                        design="Bold"
-                        required="true"
-                    />
-                    <HBox>
+                <Image
+                    src="./img/image.png"
+                    width="250px"
+                    height="100px"
+                    class="customLogo"
+                />
+                <Title
+                    textAlign="Center"
+                    text="{i18n>itemTitle}"
+                    level="H1"
+                    class="sapUiSmallMarginTop"
+                />
+            </HBox>
+
+            <content>
+                <f:SimpleForm
+                    id="SimpleFormItem"
+                    editable="true"
+                    layout="ResponsiveGridLayout"
+                    labelSpanXL="4"
+                    labelSpanL="4"
+                    labelSpanM="4"
+                    labelSpanS="12"
+                    adjustLabelSpan="false"
+                    emptySpanXL="0"
+                    emptySpanL="0"
+                    emptySpanM="0"
+                    emptySpanS="0"
+                    columnsXL="2"
+                    columnsL="2"
+                    columnsM="1"
+                    singleContainerFullSize="false"
+                >
+                    <f:content>
+                        <Label
+                            text="{i18n>material}"
+                            design="Bold"
+                            required="true"
+                        />
+                        <HBox>
+                            <Input
+                                id="material"
+                                placeholder="Ingresa o escanea el código de barra"
+                                value="{mainModel>/currentItem/material}"
+                                width="100%"
+                            />
+                            <Button
+                                icon="sap-icon://bar-code"
+                                press="onScanMaterial"
+                                class="sapUiSmallMarginBegin"
+                            />
+                        </HBox>
+
+                        <Label
+                            text="{i18n>planta}"
+                            design="Bold"
+                            required="true"
+                        />
                         <Input
-                            id="material"
-                            placeholder="Ingresa o escanea el código de barra"
-                            value="{mainModel>/currentItem/material}"
+                            id="plant"
+                            placeholder="Ingresa la planta"
+                            value="{mainModel>/currentItem/plant}"
+                            maxLength="4"
+                        />
+
+                        <Label
+                            text="{i18n>almacen}"
+                            design="Bold"
+                            required="true"
+                        />
+                        <Input
+                            id="stgeLoc"
+                            placeholder="Ingresa el Stoge Loc"
+                            value="{mainModel>/currentItem/stge_loc}"
+                            maxLength="4"
+                        />
+
+                        <Label
+                            text="{i18n>lote}"
+                            design="Bold"
+                        />
+                        <Input
+                            id="batch"
+                            placeholder="Ingresa el lote"
+                            value="{mainModel>/currentItem/batch}"
+                            maxLength="10"
+                        />
+
+                        <Label
+                            text="{i18n>cantidad}"
+                            design="Bold"
+                            required="true"
+                        />
+                        <Input
+                            id="entryQnt"
+                            placeholder="Ingresa la cantidad"
+                            value="{mainModel>/currentItem/entry_qnt}"
+                            type="Number"
+                        />
+
+                        <Label
+                            text="{i18n>unidadMedida}"
+                            design="Bold"
+                            required="true"
+                        />
+                        <Input
+                            id="entryUom"
+                            placeholder="Ingresa la unidad de medida"
+                            value="{mainModel>/currentItem/entry_uom}"
+                            change="onEntryUomChange"
+                            maxLength="3"
+                        />
+
+                        <Label
+                            text="{i18n>centroCosto}"
+                            design="Bold"
+                            visible="{= ${mainModel>/header/move_type} === '201' || ${mainModel>/header/move_type} === '551'}"
+                            required="{= ${mainModel>/header/move_type} === '201' || ${mainModel>/header/move_type} === '551'}"
+                        />
+                        <Input
+                            id="costcenter"
+                            placeholder="Ingresa el centro de costo"
+                            value="{mainModel>/currentItem/costcenter}"
+                            visible="{= ${mainModel>/header/move_type} === '201' || ${mainModel>/header/move_type} === '551'}"
+                            maxLength="10"
+                        />
+
+                        <Label
+                            text="{i18n>orden}"
+                            design="Bold"
+                            visible="{= ${mainModel>/header/move_type} === '261'}"
+                            required="{= ${mainModel>/header/move_type} === '261'}"
+                        />
+                        <Input
+                            id="orderid"
+                            placeholder="Ingresa la orden"
+                            value="{mainModel>/currentItem/orderid}"
+                            visible="{= ${mainModel>/header/move_type} === '261'}"
+                            maxLength="12"
+                        />
+
+                        <Label
+                            text="{i18n>motivo}"
+                            design="Bold"
+                            visible="{= ${mainModel>/header/move_type} === '551'}"
+                            required="{= ${mainModel>/header/move_type} === '551'}"
+                        />
+                        <Select
+                            id="moveReas"
+                            visible="{= ${mainModel>/header/move_type} === '551'}"
+                            selectedKey="{mainModel>/currentItem/move_reas}"
+                            items="{mainModel>/motivos}"
                             width="100%"
-                        />
-                        <Button
-                            icon="sap-icon://bar-code"
-                            press="onScanMaterial"
-                            class="sapUiSmallMarginBegin"
-                        />
-                    </HBox>
-
-                    <Label
-                        text="{i18n>cantidad}"
-                        design="Bold"
-                        required="true"
-                    />
-                    <Input
-                        id="entryQnt"
-                        placeholder="Ingresa la cantidad"
-                        value="{mainModel>/currentItem/entry_qnt}"
-                        type="Number"
-                    />
-
-                    <Label
-                        text="{i18n>unidadMedida}"
-                        design="Bold"
-                        required="true"
-                    />
-                    <Input
-                        id="entryUom"
-                        placeholder="Ingresa la unidad de medida"
-                        value="{mainModel>/currentItem/entry_uom}"
-                        change="onEntryUomChange"
-                        maxLength="3"
-                    />
-
-                    <Label
-                        text="{i18n>lote}"
-                        design="Bold"
-                    />
-                    <Input
-                        id="batch"
-                        placeholder="Ingresa el lote"
-                        value="{mainModel>/currentItem/batch}"
-                        maxLength="10"
-                    />
-
-                    <Label
-                        text="{i18n>centro}"
-                        design="Bold"
-                        required="true"
-                    />
-                    <Input
-                        id="plant"
-                        placeholder="Ingresa el centro"
-                        value="{mainModel>/currentItem/plant}"
-                        maxLength="4"
-                    />
-
-                    <Label
-                        text="{i18n>almacen}"
-                        design="Bold"
-                        required="true"
-                    />
-                    <Input
-                        id="stgeLoc"
-                        placeholder="Ingresa el almacén"
-                        value="{mainModel>/currentItem/stge_loc}"
-                        maxLength="4"
-                    />
-
-                    <Label
-                        text="{i18n>centroCosto}"
-                        design="Bold"
-                        visible="{= ${mainModel>/header/move_type} === '201' || ${mainModel>/header/move_type} === '551' }"
-                    />
-                    <Input
-                        id="costcenter"
-                        placeholder="Ingresa el centro de costo"
-                        value="{mainModel>/currentItem/costcenter}"
-                        visible="{= ${mainModel>/header/move_type} === '201' || ${mainModel>/header/move_type} === '551' }"
-                        maxLength="10"
-                    />
-
-                    <Label
-                        text="{i18n>orden}"
-                        design="Bold"
-                        visible="{= ${mainModel>/header/move_type} === '261' }"
-                    />
-                    <Input
-                        id="orderid"
-                        placeholder="Ingresa la orden"
-                        value="{mainModel>/currentItem/orderid}"
-                        visible="{= ${mainModel>/header/move_type} === '261' }"
-                        maxLength="12"
-                    />
-
-                    <Label
-                        text="{i18n>motivo}"
-                        design="Bold"
-                        visible="{= ${mainModel>/header/move_type} === '551'}"
-                    />
-                    <Select
-                        id="moveReas"
-                        visible="{= ${mainModel>/header/move_type} === '551'}"
-                        selectedKey="{mainModel>/currentItem/move_reas}"
-                        items="{motivoModel>/motivos}"
-                        width="100%"
-                    >
-                        <core:Item
-                            key="{motivoModel>key}"
-                            text="{motivoModel>text}"
-                        />
-                    </Select>
-                </f:content>
-            </f:SimpleForm>
-            <Button
-                text="{i18n>entradasNuevas}"
-                press="onNewEntry"
-                class="sapUiSmallMarginBegin sapUiSmallMarginBottom"
-            />
-        </content>
-        <footer>
+                            showSecondaryValues="true"
+                            change="onMoveReasChange"
+                        >
+                            <core:Item
+                                key="{mainModel>key}"
+                                text="{mainModel>text}"
+                            />
+                        </Select>
+                    </f:content>
+                </f:SimpleForm>
+            </content>
             <Toolbar>
                 <ToolbarSpacer />
                 <Button
-                    text="{i18n>guardar}"
-                    type="Emphasized"
-                    press="onSaveItem"
+                    text="{i18n>entradasNuevas}"
+                    press="onNewEntry"
+                    class="sapUiSmallMarginBegin customBlueButton"
+                    type="Ghost"
                 />
-                <Button
-                    text="{i18n>enviar}"
-                    type="Accept"
-                    press="onSubmit"
-                />
-                <Button
-                    text="{i18n>cancelar}"
-                    press="onCancel"
-                />
+                <ToolbarSpacer />
             </Toolbar>
-        </footer>
-    </Page>
+
+            <footer>
+                <Toolbar class="customDynamicHeader">
+                    <ToolbarSpacer />
+                    <Button
+                        text="{i18n>guardar}"
+                        type="Emphasized"
+                        press="onSaveItem"
+                    />
+                    <Button
+                        text="{i18n>enviar}"
+                        type="Success"
+                        press="onSubmit"
+                    />
+                    <Button
+                        text="{i18n>cancelar}"
+                        press="onCancel"
+                        type="Reject"
+                    />
+                </Toolbar>
+            </footer>
+        </Page>
+    </Shell>
 </mvc:View>

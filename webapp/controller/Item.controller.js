@@ -1,10 +1,10 @@
 sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "sap/m/MessageToast",
-    "sap/ui/model/json/JSONModel",
+    "sap/ui/model/odata/v2/ODataModel",
     "sap/m/Dialog",
     "sap/m/Button"
-], function (Controller, MessageToast, JSONModel, Dialog, Button) {
+], function (Controller, MessageToast, ODataModel, Dialog, Button) {
     "use strict";
 
     return Controller.extend("logaligroup.mapeobapi.controller.Item", {
@@ -25,18 +25,6 @@ sap.ui.define([
                 MessageToast.show("Error: Router no encontrado");
             }
 
-            // Definir las opciones para el motivo (motivoModel)
-            var oMotivoData = {
-                motivos: [
-                    { key: "0001", text: "{i18n>Obsolescencia}" },
-                    { key: "0002", text: "{i18n>Defectuoso}" },
-                    { key: "0003", text: "{i18n>Fin}" },
-                    { key: "0004", text: "{i18n>Otros}" }
-                ]
-            };
-            var oMotivoModel = new JSONModel(oMotivoData);
-            this.getView().setModel(oMotivoModel, "motivoModel");
-
             // Verificar si el modelo mainModel existe
             var oMainModel = oComponent.getModel("mainModel");
             if (!oMainModel) {
@@ -45,14 +33,105 @@ sap.ui.define([
                 return;
             }
 
-            // Si quieres precargar un valor por defecto
-            if (oMainModel.getProperty("/header/move_type") === "551" && !oMainModel.getProperty("/currentItem/move_reas")) {
-                oMainModel.setProperty("/currentItem/move_reas", "0001"); // Valor por defecto
+            // Inicializar el modelo OData
+            this._initializeODataModel();
+        },
+
+        _initializeODataModel: function () {
+            // Asegúrate de configurar el servicio OData en tu manifest.json
+            var oODataModel = this.getView().getModel("odataModel");
+            if (!oODataModel) {
+                console.error("Modelo OData no encontrado. Asegúrate de configurarlo en manifest.json");
+                MessageToast.show("Error: Modelo OData no configurado");
             }
         },
 
         _onObjectMatched: function () {
             console.log("Navegación a vista Item exitosa");
+
+            var oModel = this.getOwnerComponent().getModel("mainModel");
+            if (!oModel) {
+                console.error("Modelo mainModel no encontrado en _onObjectMatched");
+                MessageToast.show("Error: Modelo mainModel no encontrado");
+                return;
+            }
+
+            oModel.setProperty("/currentItem", {
+                material: "",
+                plant: "",
+                stge_loc: "",
+                batch: "",
+                entry_qnt: "",
+                entry_uom: "",
+                costcenter: "",
+                orderid: "",
+                move_reas: ""
+            });
+
+            var sMoveType = oModel.getProperty("/header/move_type");
+            console.log("Move Type al llegar a Item:", sMoveType);
+
+            var oView = this.getView();
+            oView.byId("costcenter").setVisible(sMoveType === "201" || sMoveType === "551");
+            oView.byId("orderid").setVisible(sMoveType === "261");
+            oView.byId("moveReas").setVisible(sMoveType === "551");
+
+            // Cargar motivos desde T157D si MOVE_TYPE = 551
+            if (sMoveType === "551") {
+                this._loadMoveReasons();
+                if (!oModel.getProperty("/currentItem/move_reas")) {
+                    oModel.setProperty("/currentItem/move_reas", ""); // Valor por defecto vacío para forzar selección
+                }
+            }
+
+            oModel.refresh(true);
+        },
+
+        _loadMoveReasons: function () {
+            var oODataModel = this.getView().getModel("odataModel");
+            var oModel = this.getOwnerComponent().getModel("mainModel");
+
+            if (!oODataModel) {
+                console.error("Modelo OData no disponible para consultar T157D");
+                MessageToast.show("Error: No se puede consultar los motivos");
+                return;
+            }
+
+            // Consultar la tabla T157D con BWART = 551
+            oODataModel.read("/T157DSet", {
+                filters: [
+                    new sap.ui.model.Filter("BWART", sap.ui.model.FilterOperator.EQ, "551")
+                ],
+                success: function (oData) {
+                    var aMotivos = [{
+                        key: "",
+                        text: "Seleccionar..."
+                    }]; // Añadir opción por defecto
+
+                    if (oData.results && oData.results.length > 0) {
+                        aMotivos = aMotivos.concat(oData.results.map(function (oItem) {
+                            return {
+                                key: oItem.MOVEREAS, // Ajusta según el nombre del campo en T157D
+                                text: oItem.MOVEREAS + " - " + (oItem.REASONTEXT || "Sin descripción")
+                            };
+                        }));
+                    }
+
+                    oModel.setProperty("/motivos", aMotivos);
+                    console.log("Motivos cargados desde T157D:", aMotivos);
+                }.bind(this),
+                error: function (oError) {
+                    console.error("Error al cargar motivos desde T157D:", oError);
+                    MessageToast.show("Error al cargar los motivos del movimiento");
+                }
+            });
+        },
+
+        onMoveReasChange: function (oEvent) {
+            var sSelectedKey = oEvent.getSource().getSelectedKey();
+            var oModel = this.getOwnerComponent().getModel("mainModel");
+            oModel.setProperty("/currentItem/move_reas", sSelectedKey);
+            console.log("Motivo seleccionado:", sSelectedKey);
         },
 
         onSaveItem: function () {
@@ -61,10 +140,11 @@ sap.ui.define([
                 MessageToast.show("Error: Modelo mainModel no encontrado");
                 return;
             }
-        
+
             var oCurrentItem = oModel.getProperty("/currentItem");
             var oItems = oModel.getProperty("/items") || [];
-        
+            var sMoveType = oModel.getProperty("/header/move_type");
+
             // Validar campos obligatorios
             var bHasErrors = false;
             if (!oCurrentItem.material) {
@@ -92,9 +172,24 @@ sap.ui.define([
                 this.byId("stgeLoc").addStyleClass("requiredFieldEmpty");
                 bHasErrors = true;
             }
-        
+            if ((sMoveType === "201" || sMoveType === "551") && !oCurrentItem.costcenter) {
+                MessageToast.show("Por favor, ingresa el centro de costo");
+                this.byId("costcenter").addStyleClass("requiredFieldEmpty");
+                bHasErrors = true;
+            }
+            if (sMoveType === "261" && !oCurrentItem.orderid) {
+                MessageToast.show("Por favor, ingresa el número de orden");
+                this.byId("orderid").addStyleClass("requiredFieldEmpty");
+                bHasErrors = true;
+            }
+            if (sMoveType === "551" && !oCurrentItem.move_reas) {
+                MessageToast.show("Por favor, selecciona el motivo del movimiento");
+                this.byId("moveReas").addStyleClass("requiredFieldEmpty");
+                bHasErrors = true;
+            }
+
             if (bHasErrors) return;
-        
+
             // Guardar el ítem
             oItems.push(Object.assign({}, oCurrentItem));
             oModel.setProperty("/items", oItems);
@@ -135,7 +230,6 @@ sap.ui.define([
         },
 
         onCancel: function () {
-            // Limpiar los campos y regresar a la pantalla principal
             var oModel = this.getOwnerComponent().getModel("mainModel");
             if (!oModel) {
                 MessageToast.show("Error: Modelo mainModel no encontrado");
@@ -162,37 +256,22 @@ sap.ui.define([
                 MessageToast.show("Error: Modelo mainModel no encontrado");
                 return;
             }
-        
+
             var oHeader = oModel.getProperty("/header");
             var oItems = oModel.getProperty("/items");
-        
+
             if (!oItems || oItems.length === 0) {
                 MessageToast.show("Por favor, agrega al menos un ítem antes de enviar");
                 return;
             }
-        
-            // Simulación de T006 para ORDERPR_UN_ISO
-            var unitToIsoMap = {
-                "PC": "PCE",
-                "KG": "KGM",
-                "EA": "EA",
-                "M": "MTR"
-            };
-        
-            // Estructura de datos para enviar al backend
-            var oData = {
-                GOODSMVT_HEADER: {
-                    PSTNG_DATE: oHeader.pstng_date || new Date().toISOString().split('T')[0],
-                    DOC_DATE: oHeader.doc_date || new Date().toISOString().split('T')[0],
-                    REF_DOC_NO: oHeader.ref_doc_no || "",
-                    HEADER_TXT: oHeader.header_txt || "",
-                    VER_GR_GI_SLIP: oHeader.ver_gr_gi_slip || "3",
-                    VER_GR_GI_SLIPX: oHeader.ver_gr_gi_slipx || "x"
-                },
-                GOODSMVT_CODE: {
-                    GM_CODE: oModel.getProperty("/code/gm_code") || "03"
-                },
-                GOODSMVT_ITEM: oItems.map(function (item) {
+
+            // Mapear los ítems a GOODSMVT_ITEM
+            var aGoodsMvtItems = [];
+            var oODataModel = this.getView().getModel("odataModel");
+
+            // Procesar cada ítem
+            Promise.all(oItems.map(function (item) {
+                return this.getOrderPrUnIso(item.entry_uom).then(function (sIsoCode) {
                     return {
                         MATERIAL: item.material,
                         PLANT: item.plant,
@@ -201,51 +280,99 @@ sap.ui.define([
                         MOVE_TYPE: oHeader.move_type,
                         ENTRY_QNT: item.entry_qnt,
                         ENTRY_UOM: item.entry_uom,
-                        ORDERPR_UN_ISO: unitToIsoMap[item.entry_uom] || item.entry_uom,
-                        COSTCENTER: item.costcenter,
-                        ORDERID: item.orderid,
-                        MOVE_REAS: item.move_reas
+                        ORDERPR_UN_ISO: sIsoCode,
+                        RESERV_NO: oHeader.reserv_no || "",
+                        RES_ITEM: oHeader.res_item || "",
+                        COSTCENTER: (oHeader.move_type === "201" || oHeader.move_type === "551") ? item.costcenter : "",
+                        ORDERID: (oHeader.move_type === "261") ? item.orderid : oHeader.orderid || "",
+                        MOVE_REAS: (oHeader.move_type === "551") ? item.move_reas : ""
                     };
-                })
-            };
-        
-            console.log("Datos enviados al backend:", oData);
-            MessageToast.show("Datos enviados al backend (simulado)");
-        
-            // Limpiar el modelo mainModel
-            oModel.setData({
-                header: {
-                    reference_type: "",
-                    reserv_no: "",
-                    res_item: "",
-                    orderid: "",
-                    move_type: "",
-                    pstng_date: new Date().toISOString().split("T")[0],
-                    doc_date: new Date().toISOString().split("T")[0],
-                    ref_doc_no: "",
-                    header_txt: "",
-                    ver_gr_gi_slip: "3",
-                    ver_gr_gi_slipx: "X"
-                },
-                code: {
-                    gm_code: "03"
-                },
-                items: [],
-                currentItem: {
-                    material: "",
-                    plant: "",
-                    stge_loc: "",
-                    batch: "",
-                    entry_qnt: "",
-                    entry_uom: "",
-                    costcenter: "",
-                    orderid: "",
-                    move_reas: ""
-                }
+                }).catch(function (sError) {
+                    console.error(sError);
+                    MessageToast.show(sError);
+                    throw new Error(sError);
+                });
+            }.bind(this))).then(function (aItems) {
+                var oData = {
+                    GOODSMVT_HEADER: {
+                        PSTNG_DATE: oHeader.pstng_date || new Date().toISOString().split('T')[0],
+                        DOC_DATE: oHeader.doc_date || new Date().toISOString().split('T')[0],
+                        REF_DOC_NO: oHeader.ref_doc_no || "",
+                        HEADER_TXT: oHeader.header_txt || "",
+                        VER_GR_GI_SLIP: oHeader.ver_gr_gi_slip || "3",
+                        VER_GR_GI_SLIPX: oHeader.ver_gr_gi_slipx || "X"
+                    },
+                    GOODSMVT_CODE: {
+                        GM_CODE: oModel.getProperty("/code/gm_code") || "03"
+                    },
+                    GOODSMVT_ITEM: aItems
+                };
+
+                console.log("Datos enviados al backend:", oData);
+                MessageToast.show("Datos enviados al backend (simulado)");
+
+                // Limpiar el modelo mainModel
+                oModel.setData({
+                    header: {
+                        reference_type: "",
+                        reserv_no: "",
+                        res_item: "",
+                        orderid: "",
+                        move_type: "",
+                        pstng_date: new Date().toISOString().split("T")[0],
+                        doc_date: new Date().toISOString().split("T")[0],
+                        ref_doc_no: "",
+                        header_txt: "",
+                        ver_gr_gi_slip: "3",
+                        ver_gr_gi_slipx: "X"
+                    },
+                    code: {
+                        gm_code: "03"
+                    },
+                    items: [],
+                    currentItem: {
+                        material: "",
+                        plant: "",
+                        stge_loc: "",
+                        batch: "",
+                        entry_qnt: "",
+                        entry_uom: "",
+                        costcenter: "",
+                        orderid: "",
+                        move_reas: ""
+                    },
+                    motivos: []
+                });
+
+                this.getOwnerComponent().getRouter().navTo("RouteMain");
+            }.bind(this)).catch(function (oError) {
+                console.error("Error al procesar ítems:", oError);
             });
-        
-            // Navegar de regreso a Main
-            this.getOwnerComponent().getRouter().navTo("RouteMain");
+        },
+
+        getOrderPrUnIso: function (sEntryUom) {
+            var oODataModel = this.getView().getModel("odataModel");
+            if (!oODataModel) {
+                return Promise.reject("Modelo OData no disponible");
+            }
+
+            return new Promise(function (resolve, reject) {
+                oODataModel.read("/T006Set", {
+                    filters: [
+                        new sap.ui.model.Filter("MSEHI", sap.ui.model.FilterOperator.EQ, sEntryUom)
+                    ],
+                    success: function (oData) {
+                        if (oData.results && oData.results.length > 0) {
+                            resolve(oData.results[0].ISOCODE);
+                        } else {
+                            reject("Unidad de medida no encontrada en T006");
+                        }
+                    },
+                    error: function (oError) {
+                        reject("Error al consultar T006: " + oError.message);
+                    }
+                });
+            });
         },
 
         onEntryUomChange: function (oEvent) {
@@ -254,7 +381,7 @@ sap.ui.define([
         },
 
         onScanMaterial: function () {
-            var that = this; // Preservar el contexto del controlador
+            var that = this;
             var oComponent = this.getOwnerComponent();
             if (!oComponent) {
                 console.error("Componente no encontrado en onScanMaterial");
@@ -343,7 +470,6 @@ sap.ui.define([
                         var code = result.codeResult.code;
                         console.log("Código detectado:", code);
 
-                        // Usar la variable 'that' para mantener el contexto
                         if (!that.getOwnerComponent()) {
                             console.error("Componente no encontrado en onDetected");
                             MessageToast.show("Error: Componente no encontrado al detectar el código");

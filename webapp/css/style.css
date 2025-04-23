@@ -4,16 +4,6 @@
     background-color: rgba(137, 168, 199, 0.77) !important;
 }
 
-/* Estilo para el título principal */
-.customCenteredTitle {
-    color: rgb(19, 17, 17) !important;
-    background-color: #e1e8f5 !important;
-    justify-content: center;
-    padding: 10px !important;
-    font-size: 2.5rem !important;
-    border-radius: 5px !important;
-    text-align: center !important;
-}
 
 /* Estilo para el DynamicPageHeader */
 .customDynamicHeader {
@@ -32,6 +22,18 @@
     border-radius: 10px !important;
 }
 
+/* Ajustar el logo */
+.customLogo {
+    margin-left: 1rem; /* Espacio a la izquierda del logo */
+}
+
+/* Forzar el ancho completo del DynamicPageTitle */
+.customDynamicPageTitle {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 1rem; /* Espacio a los lados */
+}
+
 
 
 /* Estilo para los Labels */
@@ -42,18 +44,6 @@
 
 
 
-/* Estilo para el footer */
-.customFooter {
-    background-color: #003087 !important;
-    padding: 10px !important;
-}
-
-
-
-/* Estilo para el logo */
-.customLogo {
-    margin-right: 15px !important;
-}
 
 /* Ajustes responsivos */
 @media (max-width: 600px) {
