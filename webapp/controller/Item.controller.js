@@ -33,6 +33,12 @@ sap.ui.define([
                 return;
             }
 
+            // Asegurarse de que /items esté inicializado como un array vacío
+            if (!oMainModel.getProperty("/items")) {
+                oMainModel.setProperty("/items", []);
+                console.log("Inicializando /items como array vacío");
+            }
+
             // Inicializar el modelo OData
             this._initializeODataModel();
         },
@@ -145,6 +151,9 @@ sap.ui.define([
             var oItems = oModel.getProperty("/items") || [];
             var sMoveType = oModel.getProperty("/header/move_type");
 
+            console.log("Current Item antes de guardar:", oCurrentItem);
+            console.log("Items actuales antes de guardar:", oItems);
+
             // Validar campos obligatorios
             var bHasErrors = false;
             if (!oCurrentItem.material) {
@@ -188,11 +197,17 @@ sap.ui.define([
                 bHasErrors = true;
             }
 
-            if (bHasErrors) return;
+            if (bHasErrors) {
+                console.log("Errores de validación, no se guarda el ítem");
+                return;
+            }
 
             // Guardar el ítem
             oItems.push(Object.assign({}, oCurrentItem));
             oModel.setProperty("/items", oItems);
+            console.log("Items después de guardar:", oModel.getProperty("/items"));
+
+            // Limpiar currentItem
             oModel.setProperty("/currentItem", {
                 material: "",
                 plant: "",
@@ -260,18 +275,30 @@ sap.ui.define([
             var oHeader = oModel.getProperty("/header");
             var oItems = oModel.getProperty("/items");
 
+            console.log("Items al intentar enviar:", oItems);
+
             if (!oItems || oItems.length === 0) {
                 MessageToast.show("Por favor, agrega al menos un ítem antes de enviar");
                 return;
             }
 
+            // Mostrar mensaje de que el proceso ha comenzado
+            MessageToast.show("Enviando datos al backend...");
+
             // Mapear los ítems a GOODSMVT_ITEM
             var aGoodsMvtItems = [];
             var oODataModel = this.getView().getModel("odataModel");
+            if (!oODataModel) {
+                MessageToast.show("Error: Modelo OData no configurado");
+                console.error("Modelo OData no disponible en onSubmit");
+                return;
+            }
 
             // Procesar cada ítem
             Promise.all(oItems.map(function (item) {
+                console.log("Procesando ítem:", item);
                 return this.getOrderPrUnIso(item.entry_uom).then(function (sIsoCode) {
+                    console.log("Código ISO obtenido para unidad de medida", item.entry_uom, ":", sIsoCode);
                     return {
                         MATERIAL: item.material,
                         PLANT: item.plant,
@@ -288,8 +315,7 @@ sap.ui.define([
                         MOVE_REAS: (oHeader.move_type === "551") ? item.move_reas : ""
                     };
                 }).catch(function (sError) {
-                    console.error(sError);
-                    MessageToast.show(sError);
+                    console.error("Error al procesar ítem:", sError);
                     throw new Error(sError);
                 });
             }.bind(this))).then(function (aItems) {
@@ -309,7 +335,7 @@ sap.ui.define([
                 };
 
                 console.log("Datos enviados al backend:", oData);
-                MessageToast.show("Datos enviados al backend (simulado)");
+                MessageToast.show("Datos enviados al backend con éxito");
 
                 // Limpiar el modelo mainModel
                 oModel.setData({
@@ -344,9 +370,19 @@ sap.ui.define([
                     motivos: []
                 });
 
-                this.getOwnerComponent().getRouter().navTo("RouteMain");
+                // Navegar a la vista Main
+                var oRouter = this.getOwnerComponent().getRouter();
+                if (oRouter) {
+                    console.log("Navegando a RouteMain desde onSubmit");
+                    oRouter.navTo("RouteMain");
+                    MessageToast.show("Regresando a la vista principal...");
+                } else {
+                    console.error("Router no encontrado en onSubmit");
+                    MessageToast.show("Error: No se pudo navegar a la vista principal");
+                }
             }.bind(this)).catch(function (oError) {
-                console.error("Error al procesar ítems:", oError);
+                console.error("Error al procesar ítems:", oError.message || oError);
+                MessageToast.show("Error al enviar los datos: " + (oError.message || "Error desconocido"));
             });
         },
 
@@ -357,19 +393,22 @@ sap.ui.define([
             }
 
             return new Promise(function (resolve, reject) {
+                console.log("Consultando T006Set para unidad de medida:", sEntryUom);
                 oODataModel.read("/T006Set", {
                     filters: [
                         new sap.ui.model.Filter("MSEHI", sap.ui.model.FilterOperator.EQ, sEntryUom)
                     ],
                     success: function (oData) {
                         if (oData.results && oData.results.length > 0) {
+                            console.log("Unidad de medida encontrada:", oData.results[0]);
                             resolve(oData.results[0].ISOCODE);
                         } else {
-                            reject("Unidad de medida no encontrada en T006");
+                            reject("Unidad de medida '" + sEntryUom + "' no encontrada en T006");
                         }
                     },
                     error: function (oError) {
-                        reject("Error al consultar T006: " + oError.message);
+                        console.error("Error al consultar T006:", oError);
+                        reject("Error al consultar T006 para la unidad de medida '" + sEntryUom + "': " + (oError.message || "Error desconocido"));
                     }
                 });
             });
@@ -407,10 +446,17 @@ sap.ui.define([
                     text: "Cancelar",
                     press: function () {
                         Quagga.stop();
-                        oDialog.close();
+                        if (oDialog && oDialog.isOpen()) {
+                            oDialog.close();
+                        }
                     }
                 }),
                 afterOpen: function () {
+                    // Bandera para evitar múltiples detecciones
+                    var bDetected = false;
+                    // Variable para manejar el timeout
+                    var oTimeout;
+
                     Quagga.init({
                         inputStream: {
                             name: "Live",
@@ -451,14 +497,17 @@ sap.ui.define([
                         if (err) {
                             console.error("Error al inicializar Quagga:", err);
                             MessageToast.show("Error al iniciar el escáner: " + err);
-                            oDialog.close();
+                            if (oDialog && oDialog.isOpen()) {
+                                oDialog.close();
+                            }
                             return;
                         }
                         console.log("Quagga inicializado correctamente");
                         Quagga.start();
 
-                        setTimeout(function () {
-                            if (oDialog.isOpen()) {
+                        // Timeout para cerrar el diálogo después de 60 segundos
+                        oTimeout = setTimeout(function () {
+                            if (oDialog && oDialog.isOpen()) {
                                 Quagga.stop();
                                 oDialog.close();
                                 MessageToast.show("Tiempo de escaneo agotado. Asegúrate de que el código sea claro y esté bien iluminado.");
@@ -466,7 +515,16 @@ sap.ui.define([
                         }, 60000);
                     });
 
-                    Quagga.onDetected(function (result) {
+                    Quagga.onDetected(function handler(result) {
+                        // Evitar múltiples detecciones
+                        if (bDetected) {
+                            return;
+                        }
+                        bDetected = true;
+
+                        // Desregistrar el manejador para evitar más detecciones
+                        Quagga.offDetected(handler);
+
                         var code = result.codeResult.code;
                         console.log("Código detectado:", code);
 
@@ -474,7 +532,9 @@ sap.ui.define([
                             console.error("Componente no encontrado en onDetected");
                             MessageToast.show("Error: Componente no encontrado al detectar el código");
                             Quagga.stop();
-                            oDialog.close();
+                            if (oDialog && oDialog.isOpen()) {
+                                oDialog.close();
+                            }
                             return;
                         }
 
@@ -483,7 +543,9 @@ sap.ui.define([
                             console.error("Modelo mainModel no encontrado en onDetected");
                             MessageToast.show("Error: Modelo mainModel no encontrado al detectar el código");
                             Quagga.stop();
-                            oDialog.close();
+                            if (oDialog && oDialog.isOpen()) {
+                                oDialog.close();
+                            }
                             return;
                         }
 
@@ -491,12 +553,21 @@ sap.ui.define([
                             oMainModel.setProperty("/currentItem/material", code);
                             MessageToast.show("Código escaneado: " + code);
                             Quagga.stop();
-                            oDialog.close();
+                            if (oDialog && oDialog.isOpen()) {
+                                oDialog.close();
+                            }
                         } catch (error) {
                             console.error("Error al setear el código en el modelo:", error);
                             MessageToast.show("Error al guardar el código escaneado");
                             Quagga.stop();
-                            oDialog.close();
+                            if (oDialog && oDialog.isOpen()) {
+                                oDialog.close();
+                            }
+                        } finally {
+                            // Limpiar el timeout para evitar que se ejecute después de cerrar el diálogo
+                            if (oTimeout) {
+                                clearTimeout(oTimeout);
+                            }
                         }
                     });
 
@@ -513,7 +584,10 @@ sap.ui.define([
                 },
                 afterClose: function () {
                     Quagga.stop();
-                    oDialog.destroy();
+                    if (oDialog) {
+                        oDialog.destroy();
+                        oDialog = null; // Asegurarnos de que no se use más
+                    }
                 }
             });
 
