@@ -44,7 +44,7 @@ sap.ui.define([
         },
 
         _initializeODataModel: function () {
-            // Asegúrate de configurar el servicio OData en tu manifest.json
+            
             var oODataModel = this.getView().getModel("odataModel");
             if (!oODataModel) {
                 console.error("Modelo OData no encontrado. Asegúrate de configurarlo en manifest.json");
@@ -86,7 +86,7 @@ sap.ui.define([
             if (sMoveType === "551") {
                 this._loadMoveReasons();
                 if (!oModel.getProperty("/currentItem/move_reas")) {
-                    oModel.setProperty("/currentItem/move_reas", ""); // Valor por defecto vacío para forzar selección
+                    oModel.setProperty("/currentItem/move_reas", ""); 
                 }
             }
 
@@ -112,12 +112,12 @@ sap.ui.define([
                     var aMotivos = [{
                         key: "",
                         text: "Seleccionar..."
-                    }]; // Añadir opción por defecto
+                    }]; 
 
                     if (oData.results && oData.results.length > 0) {
                         aMotivos = aMotivos.concat(oData.results.map(function (oItem) {
                             return {
-                                key: oItem.MOVEREAS, // Ajusta según el nombre del campo en T157D
+                                key: oItem.MOVEREAS, // Ajusta según T157D
                                 text: oItem.MOVEREAS + " - " + (oItem.REASONTEXT || "Sin descripción")
                             };
                         }));
@@ -154,7 +154,7 @@ sap.ui.define([
             console.log("Current Item antes de guardar:", oCurrentItem);
             console.log("Items actuales antes de guardar:", oItems);
 
-            // Validar campos obligatorios
+            
             var bHasErrors = false;
             if (!oCurrentItem.material) {
                 MessageToast.show("Por favor, ingresa el material");
@@ -282,7 +282,7 @@ sap.ui.define([
                 return;
             }
 
-            // Mostrar mensaje de que el proceso ha comenzado
+            
             MessageToast.show("Enviando datos al backend...");
 
             // Mapear los ítems a GOODSMVT_ITEM
@@ -294,7 +294,7 @@ sap.ui.define([
                 return;
             }
 
-            // Procesar cada ítem
+           
             Promise.all(oItems.map(function (item) {
                 console.log("Procesando ítem:", item);
                 return this.getOrderPrUnIso(item.entry_uom).then(function (sIsoCode) {
@@ -370,7 +370,7 @@ sap.ui.define([
                     motivos: []
                 });
 
-                // Navegar a la vista Main
+                
                 var oRouter = this.getOwnerComponent().getRouter();
                 if (oRouter) {
                     console.log("Navegando a RouteMain desde onSubmit");
@@ -452,9 +452,9 @@ sap.ui.define([
                     }
                 }),
                 afterOpen: function () {
-                    // Bandera para evitar múltiples detecciones
+                    
                     var bDetected = false;
-                    // Variable para manejar el timeout
+                    
                     var oTimeout;
 
                     Quagga.init({
@@ -516,13 +516,13 @@ sap.ui.define([
                     });
 
                     Quagga.onDetected(function handler(result) {
-                        // Evitar múltiples detecciones
+                        
                         if (bDetected) {
                             return;
                         }
                         bDetected = true;
 
-                        // Desregistrar el manejador para evitar más detecciones
+                        
                         Quagga.offDetected(handler);
 
                         var code = result.codeResult.code;
@@ -564,7 +564,7 @@ sap.ui.define([
                                 oDialog.close();
                             }
                         } finally {
-                            // Limpiar el timeout para evitar que se ejecute después de cerrar el diálogo
+                            
                             if (oTimeout) {
                                 clearTimeout(oTimeout);
                             }
@@ -586,7 +586,7 @@ sap.ui.define([
                     Quagga.stop();
                     if (oDialog) {
                         oDialog.destroy();
-                        oDialog = null; // Asegurarnos de que no se use más
+                        oDialog = null; 
                     }
                 }
             });

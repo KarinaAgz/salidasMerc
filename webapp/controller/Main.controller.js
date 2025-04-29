@@ -52,7 +52,7 @@ sap.ui.define([
                 });
                 oModel.setDefaultBindingMode("TwoWay");
                 this.getView().setModel(oModel, "mainModel");
-                this.getOwnerComponent().setModel(oModel, "mainModel"); // Propagar al componente
+                this.getOwnerComponent().setModel(oModel, "mainModel"); 
             }
             console.log("Modelo inicializado:", oModel.getData());
 
@@ -130,7 +130,7 @@ sap.ui.define([
             console.log("onSelectionChange ejecutado");
             var oSelect = oEvent.getSource();
             var sSelectedKey = oSelect.getSelectedKey();
-            oSelect.setSelectedKey(sSelectedKey); // Forzar la selección
+            oSelect.setSelectedKey(sSelectedKey); 
             var oModel = this.getView().getModel("mainModel");
             if (!oModel) {
                 console.error("Modelo mainModel no encontrado en onSelectionChange");

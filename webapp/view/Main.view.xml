@@ -50,7 +50,7 @@
                     defaultSpan="XL3 L4 M6 S12"
                     class="sapUiMediumMargin customGrid"
                 >
-                    <!-- Columna 1: Salida Mercancía y Fragmentos -->
+                    
                     <VBox>
                         <Label
                             text="{i18n>salidaMercancia}"
@@ -87,7 +87,7 @@
 
                         <VBox id="claseMovimientoContainer" />
 
-                        <!-- Número de Reserva (con binding) -->
+                        
                         <VBox
                             id="numeroReservaFragment"
                             visible="{= ${mainModel>/header/reference_type} === 'reserva'}"
@@ -106,7 +106,7 @@
                             />
                         </VBox>
 
-                        <!-- Posición de Reserva (con binding) -->
+                        
                         <VBox
                             id="posicionReservaFragment"
                             visible="{= ${mainModel>/header/reference_type} === 'reserva'}"
@@ -192,7 +192,7 @@
                         />
                     </VBox>
 
-                    <!-- Columna 5: Texto Cabecera -->
+                  
                     <VBox>
                         <Label
                             text="Texto Cabecera"
