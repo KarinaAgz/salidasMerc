@@ -2,226 +2,70 @@
     controllerName="logaligroup.mapeobapi.controller.Main"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
-    xmlns:f="sap.f"
-    xmlns:core="sap.ui.core"
-    xmlns:layout="sap.ui.layout"
-    displayBlock="true"
->
-    <Shell>
-        <f:DynamicPage
-    id="dynamicPageId"
-    showFooter="true"
-    class="customDynamicPage"
->
-    <f:title>
-        <f:DynamicPageTitle
-            class="customDynamicPageTitle customDynamicHeader"
-        >
-            <f:heading>
-                <HBox
-                    justifyContent="SpaceBetween"
-                    width="100%"
-                    alignItems="Center"
-                    class="titleHBox"
-                >
-                    <Title
-                        text="{i18n>title}"
-                        level="H1"
-                        class="customTitle"
-                    />
-                    <ToolbarSeparator />
-                    <ToolbarSpacer />
-                    
-                    <Image
-                        src="./img/image.png"
-                        width="150px" 
-                        height="60px"
-                        class="customLogo"
-                    />
-                </HBox>
-            </f:heading>
-        </f:DynamicPageTitle>
-    </f:title>
+    displayBlock="true">
+    <TabContainer id="mainTabContainer" selectedKey="tabCabecera">
+        <items>
+            <!-- Pestaña Cabecera -->
+            <TabContainerItem key="tabCabecera" title="Cabecera">
+                <VBox>
+                    <Select id="referenceType" change="onReferenceTypeChange" width="100%">
+                        <core:Item key="reserva" text="Reserva" />
+                        <core:Item key="orden" text="Orden" />
+                        <core:Item key="otro" text="Otro" />
+                    </Select>
+                    <Input id="refDocNo" placeholder="Referencia" visible="{= ${mainModel>/header/reference_type} === 'reserva' || ${mainModel>/header/reference_type} === 'orden' ? true : false}" />
+                    <DatePicker id="docDate" placeholder="Fecha Documento" value="{path: 'mainModel>/header/doc_date'}" />
+                    <DatePicker id="pstngDate" placeholder="Fecha Contabilización" value="{path: 'mainModel>/header/pstng_date'}" />
+                    <Input id="headerTxt" placeholder="Texto Cabecera" value="{path: 'mainModel>/header/header_txt'}" />
+                    <Button text="Siguiente" press="onNext" />
+                </VBox>
+            </TabContainerItem>
 
-            
+            <!-- Pestaña Datos de Posición -->
+            <TabContainerItem key="tabPosicion" title="Datos de Posición">
+                <VBox>
+                    <Input id="material" placeholder="Material (Escaneo)" value="{path: 'mainModel>/currentItem/material'}" />
+                    <Input id="plant" placeholder="Planta" value="{path: 'mainModel>/currentItem/plant'}" />
+                    <Input id="stgeLoc" placeholder="Almacén" value="{path: 'mainModel>/currentItem/stge_loc'}" />
+                    <Input id="batch" placeholder="Lote" value="{path: 'mainModel>/currentItem/batch'}" />
+                    <Input id="entryQnt" placeholder="Cantidad" value="{path: 'mainModel>/currentItem/entry_qnt'}" />
+                    <Input id="entryUom" placeholder="Unidad Medida" value="{path: 'mainModel>/currentItem/entry_uom'}" />
+                    <Input id="costcenter" placeholder="Centro Costo" visible="{= ${mainModel>/header/move_type} === '201' || ${mainModel>/header/move_type} === '551' ? true : false}" value="{path: 'mainModel>/currentItem/costcenter'}" />
+                    <Input id="orderid" placeholder="Orden" visible="{= ${mainModel>/header/move_type} === '261' ? true : false}" value="{path: 'mainModel>/currentItem/orderid'}" />
+                    <Select id="moveReas" placeholder="Motivo" visible="{= ${mainModel>/header/move_type} === '551' ? true : false}" items="{path: 'mainModel>/motivos'}" change="onMoveReasChange">
+                        <core:Item key="{key}" text="{text}" />
+                    </Select>
+                    <Button text="Guardar" press="onSaveItem" />
+                    <Button text="Nueva Entrada" press="onNewEntry" />
+                </VBox>
+            </TabContainerItem>
 
-            <f:content>
-                <layout:Grid
-                    defaultSpan="XL3 L4 M6 S12"
-                    class="sapUiMediumMargin customGrid"
-                >
-                    
-                    <VBox>
-                        <Label
-                            text="{i18n>salidaMercancia}"
-                            design="Bold"
-                            class="sapUiSmallMarginTop sapUiSmallMarginBottom customLabel"
-                        />
-                        <Select
-                            id="opcionesSelect"
-                            selectedKey="{mainModel>/header/reference_type}"
-                            change="onSelectionChange"
-                            width="100%"
-                            forceSelection="false"
-                            class="customSelect"
-                        >
-                            <items>
-                                <core:Item
-                                    key=""
-                                    text="{i18n>Eligeopcion}"
-                                />
-                                <core:Item
-                                    key="reserva"
-                                    text="{i18n>Reserva}"
-                                />
-                                <core:Item
-                                    key="orden"
-                                    text="{i18n>Orden}"
-                                />
-                                <core:Item
-                                    key="otros"
-                                    text="{i18n>Otros}"
-                                />
-                            </items>
-                        </Select>
-
-                        <VBox id="claseMovimientoContainer" />
-
-                        
-                        <VBox
-                            id="numeroReservaFragment"
-                            visible="{= ${mainModel>/header/reference_type} === 'reserva'}"
-                        >
-                            <Label
-                                text="Número de Reserva"
-                                design="Bold"
-                                class="customLabel"
-                            />
-                            <Input
-                                value="{mainModel>/header/reserv_no}"
-                                width="100%"
-                                placeholder="Ingresa número de reserva"
-                                class="customInput"
-                                change="onReservNoChange"
-                            />
-                        </VBox>
-
-                        
-                        <VBox
-                            id="posicionReservaFragment"
-                            visible="{= ${mainModel>/header/reference_type} === 'reserva'}"
-                        >
-                            <Label
-                                text="Posición de Reserva"
-                                design="Bold"
-                                class="customLabel"
-                            />
-                            <Input
-                                value="{mainModel>/header/res_item}"
-                                width="100%"
-                                placeholder="Ingresa posición"
-                                class="customInput"
-                            />
-                        </VBox>
-
-                        <VBox
-                            id="numeroOrdenFragment"
-                            visible="{= ${mainModel>/header/reference_type} === 'orden'}"
-                        >
-                            <Label
-                                text="Número de Orden"
-                                design="Bold"
-                                class="customLabel"
-                            />
-                            <Input
-                                value="{mainModel>/header/orderid}"
-                                width="100%"
-                                placeholder="Ingresa número de orden"
-                                class="customInput"
-                                change="onOrderIdChange"
-                            />
-                        </VBox>
-                    </VBox>
-
-                    <VBox>
-                        <Label
-                            text="Fecha Documento"
-                            design="Bold"
-                            class="sapUiSmallMarginTop sapUiSmallMarginBottom customLabel"
-                        />
-                        <DatePicker
-                            id="fechaDoc"
-                            value="{mainModel>/header/doc_date}"
-                            valueFormat="yyyy-MM-dd"
-                            displayFormat="dd.MM.yyyy"
-                            width="75%"
-                            placeholder="Selecciona Fecha"
-                            class="customDatePicker"
-                        />
-                    </VBox>
-
-                    <VBox>
-                        <Label
-                            text="Fecha de Contabilización"
-                            design="Bold"
-                            class="sapUiSmallMarginTop sapUiSmallMarginBottom customLabel"
-                        />
-                        <DatePicker
-                            id="fechaContabilizacion"
-                            value="{mainModel>/header/pstng_date}"
-                            valueFormat="yyyy-MM-dd"
-                            displayFormat="dd.MM.yyyy"
-                            width="75%"
-                            placeholder="Selecciona Fecha"
-                            class="customDatePicker"
-                        />
-                    </VBox>
-
-                    <VBox>
-                        <Label
-                            text="Referencia"
-                            design="Bold"
-                            class="sapUiSmallMarginTop sapUiSmallMarginBottom customLabel"
-                        />
-                        <Input
-                            id="referenciaReserva"
-                            value="{mainModel>/header/ref_doc_no}"
-                            width="75%"
-                            placeholder="Ingresa referencia"
-                            class="customInput"
-                        />
-                    </VBox>
-
-                  
-                    <VBox>
-                        <Label
-                            text="Texto Cabecera"
-                            design="Bold"
-                            class="sapUiSmallMarginTop sapUiSmallMarginBottom customLabel"
-                        />
-                        <TextArea
-                            id="textoCabecera"
-                            value="{mainModel>/header/header_txt}"
-                            width="75%"
-                            rows="3"
-                            placeholder="Ingresa el texto cabecera"
-                            class="customTextArea"
-                        />
-                    </VBox>
-                </layout:Grid>
-            </f:content>
-
-            <f:footer>
-                <Toolbar class=" customDynamicHeader ">
-                    <ToolbarSpacer />
-                    <Button
-                        text="{i18n>Siguiente}"
-                        type="Emphasized"
-                        press="onNext"
-                        class="customButton"
-                    />
-                </Toolbar>
-            </f:footer>
-        </f:DynamicPage>
-    </Shell>
+            <!-- Pestaña Orden Completa -->
+            <TabContainerItem key="tabOrden" title="Orden Completa">
+                <VBox>
+                    <Table id="itemsTable" items="{path: 'mainModel>/items'}">
+                        <columns>
+                            <Column><Text text="Material" /></Column>
+                            <Column><Text text="Planta" /></Column>
+                            <Column><Text text="Almacén" /></Column>
+                            <Column><Text text="Cantidad" /></Column>
+                            <Column><Text text="UM" /></Column>
+                        </columns>
+                        <items>
+                            <ColumnListItem>
+                                <cells>
+                                    <Text text="{material}" />
+                                    <Text text="{plant}" />
+                                    <Text text="{stge_loc}" />
+                                    <Text text="{entry_qnt}" />
+                                    <Text text="{entry_uom}" />
+                                </cells>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+                    <Button text="Submit" press="onSubmit" />
+                </VBox>
+            </TabContainerItem>
+        </items>
+    </TabContainer>
 </mvc:View>

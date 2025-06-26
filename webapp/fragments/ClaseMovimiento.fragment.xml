@@ -3,24 +3,23 @@
     xmlns:core="sap.ui.core"
 >
     <Label
-        text="{i18n>Clasemovimiento}"
+        text="{i18n>claseMovimiento}"
         design="Bold"
         class="customLabel"
-        visible="{= ${mainModel>/header/reference_type} === 'otros'}"
+        required="true"
     />
     <Select
+        id="moveTypeSelect"
         selectedKey="{mainModel>/header/move_type}"
         width="100%"
         class="customSelect"
-        forceSelection="false"
-        visible="{= ${mainModel>/header/reference_type} === 'otros'}"
-        change=".onMoveTypeChange"
+        change="onMoveTypeChange"
     >
         <items>
-            <core:Item key="" text="Seleccionar..." />
-            <core:Item key="201" text="201 - Centro de Costo" />
-            <core:Item key="261" text="261 - Orden" />
-            <core:Item key="551" text="551 - Baja" />
+            <core:Item key="" text="{i18n>seleccionar}" />
+            <core:Item key="201" text="{i18n>moveType201}" />
+            <core:Item key="261" text="{i18n>moveType261}" />
+            <core:Item key="551" text="{i18n>moveType551}" />
         </items>
     </Select>
 </core:FragmentDefinition>

@@ -3,14 +3,15 @@
     xmlns:core="sap.ui.core"
 >
     <Label
-        text="Posición de Reserva"
+        text="{i18n>posicionReserva}"
         design="Bold"
         class="customLabel"
+        required="true"
     />
     <Input
         value="{mainModel>/header/res_item}"
         width="100%"
-        placeholder="Ingresa posición"
+        placeholder="{i18n>ingresaPosicion}"
         class="customInput"
     />
 </core:FragmentDefinition>

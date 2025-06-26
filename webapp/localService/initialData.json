@@ -1,0 +1,33 @@
+{
+    "header": {
+      "reference_type": "",
+      "reserv_no": "",
+      "res_item": "",
+      "orderid": "",
+      "move_type": "",
+      "pstng_date": null,
+      "doc_date": null,
+      "ref_doc_no": "",
+      "header_txt": "",
+      "ver_gr_gi_slip": "3",
+      "ver_gr_gi_slipx": "X"
+    },
+    "code": {
+      "gm_code": "03"
+    },
+    "items": [],
+    "currentItem": {
+      "material": "",
+      "plant": "",
+      "stge_loc": "",
+      "batch": "",
+      "entry_qnt": "",
+      "entry_uom": "",
+      "costcenter": "",
+      "orderid": "",
+      "move_reas": ""
+    },
+    "motivos": [
+      { "key": "", "text": "Seleccionar..." }
+    ]
+  }

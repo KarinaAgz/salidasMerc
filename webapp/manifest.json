@@ -11,21 +11,24 @@
     "description": "{{appDescription}}",
     "resources": "resources.json",
     "sourceTemplate": {
-      "id": "@sap/generator-fiori:basic",
+      "id": "@sap.ui.generator-fiori:basic",
       "version": "1.17.1",
-      "toolsId": "5a6aaf08-c162-4082-9de5-7649c2468b8b"
+      "toolsId": "5a6aafbb-c162-4082-9de5-7649c2468b8b"
+    },
+    "dataSources": {
+      "mainDataSource": {
+        "uri": "localService/localData.json",
+        "type": "JSON"
+      },
+      "initialDataSource": {
+        "uri": "localService/initialData.json",
+        "type": "JSON"
+      }
     }
   },
   "sap.ui": {
     "technology": "UI5",
-    "icons": {
-      "icon": "",
-      "favIcon": "",
-      "phone": "",
-      "phone@2": "",
-      "tablet": "",
-      "tablet@2": ""
-    },
+    "icons": {},
     "deviceTypes": {
       "desktop": true,
       "tablet": true,
@@ -35,10 +38,12 @@
   "sap.ui5": {
     "flexEnabled": true,
     "dependencies": {
-      "minUI5Version": "1.134.1",
+      "minUI5Version": "1.134.0",
       "libs": {
         "sap.m": {},
-        "sap.ui.core": {}
+        "sap.ui.core": {},
+        "sap.ui.layout": {},
+        "sap.ui.table": {}
       }
     },
     "contentDensities": {
@@ -53,18 +58,18 @@
         }
       },
       "odataModel": {
-        "type": "sap.ui.model.odata.v2.ODataModel",
+        "type": "sap.ui.model.json.JSONModel",
         "settings": {
-          "serviceUrl": "/sap/opu/odata/sap/ZYOUR_SERVICE_SRV/",
-          "defaultBindingMode": "TwoWay",
-          "useBatch": false
-        }
+          "defaultBindingMode": "TwoWay"
+        },
+        "dataSource": "mainDataSource"
       },
       "mainModel": {
         "type": "sap.ui.model.json.JSONModel",
         "settings": {
           "defaultBindingMode": "TwoWay"
-        }
+        },
+        "dataSource": "initialDataSource"
       }
     },
     "resources": {
@@ -88,31 +93,26 @@
         "type": "View",
         "viewType": "XML",
         "path": "logaligroup.mapeobapi.view",
-        "async": true,
-        "viewPath": "logaligroup.mapeobapi.view"
+        "async": true
       },
       "routes": [
         {
           "name": "RouteMain",
           "pattern": "",
-          "target": [
-            "TargetMain"
-          ]
+          "target": "Main"
         },
         {
           "name": "RouteItem",
           "pattern": "item",
-          "target": [
-            "TargetItem"
-          ]
+          "target": "Item"
         }
       ],
       "targets": {
-        "TargetMain": {
+        "Main": {
           "id": "Main",
           "name": "Main"
         },
-        "TargetItem": {
+        "Item": {
           "id": "Item",
           "name": "Item"
         }
@@ -121,7 +121,7 @@
     "rootView": {
       "viewName": "logaligroup.mapeobapi.view.App",
       "type": "XML",
-      "id": "App",
+      "id": "app",
       "async": true
     }
   }

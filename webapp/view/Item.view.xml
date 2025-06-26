@@ -29,6 +29,7 @@
             </HBox>
 
             <content>
+                <!-- Formulario para entrada de ítems -->
                 <f:SimpleForm
                     id="SimpleFormItem"
                     editable="true"
@@ -37,7 +38,7 @@
                     labelSpanL="4"
                     labelSpanM="4"
                     labelSpanS="12"
-                    adjustLabelSpan="false"
+                    adjustLabelSpan="true"
                     emptySpanXL="0"
                     emptySpanL="0"
                     emptySpanM="0"
@@ -56,9 +57,11 @@
                         <HBox>
                             <Input
                                 id="material"
-                                placeholder="Ingresa o escanea el código de barra"
+                                placeholder="{i18nCode>ingresaMaterial}"
                                 value="{mainModel>/currentItem/material}"
                                 width="100%"
+                                showValueHelp="true"
+                                valueHelpRequest="onMaterialValueHelp"
                             />
                             <Button
                                 icon="sap-icon://bar-code"
@@ -73,10 +76,12 @@
                             required="true"
                         />
                         <Input
-                            id="plant"
-                            placeholder="Ingresa la planta"
+                            id="planta"
+                            placeholder="{i18nCode>ingresaPlanta}"
                             value="{mainModel>/currentItem/plant}"
                             maxLength="4"
+                            showValueHelp="true"
+                            valueHelpRequest="onPlantValueHelp"
                         />
 
                         <Label
@@ -85,10 +90,12 @@
                             required="true"
                         />
                         <Input
-                            id="stgeLoc"
-                            placeholder="Ingresa el Stoge Loc"
-                            value="{mainModel>/currentItem/stge_loc}"
+                            id="almacen"
+                            placeholder="{i18nCode>ingresaAlmacen}"
+                            value="{mainModel}/currentItem/stge_loc"
                             maxLength="4"
+                            showValueHelp="true"
+                            valueHelpRequest="onStorageLocationValueHelp"
                         />
 
                         <Label
@@ -96,8 +103,8 @@
                             design="Bold"
                         />
                         <Input
-                            id="batch"
-                            placeholder="Ingresa el lote"
+                            id="lote"
+                            placeholder="{i18n>ingresaLote}"
                             value="{mainModel>/currentItem/batch}"
                             maxLength="10"
                         />
@@ -108,8 +115,8 @@
                             required="true"
                         />
                         <Input
-                            id="entryQnt"
-                            placeholder="Ingresa la cantidad"
+                            id="cantidad"
+                            placeholder="{i18n>ingresaCantidad}"
                             value="{mainModel>/currentItem/entry_qnt}"
                             type="Number"
                         />
@@ -120,11 +127,13 @@
                             required="true"
                         />
                         <Input
-                            id="entryUom"
-                            placeholder="Ingresa la unidad de medida"
+                            id="unidadMedida"
+                            placeholder="{i18n>ingresaUnidadMedida}"
                             value="{mainModel>/currentItem/entry_uom}"
                             change="onEntryUomChange"
                             maxLength="3"
+                            showValueHelp="true"
+                            valueHelpRequest="onEntryUomValueHelp"
                         />
 
                         <Label
@@ -134,11 +143,13 @@
                             required="{= ${mainModel>/header/move_type} === '201' || ${mainModel>/header/move_type} === '551'}"
                         />
                         <Input
-                            id="costcenter"
-                            placeholder="Ingresa el centro de costo"
+                            id="centroCosto"
+                            placeholder="{i18n>ingresaCentroCosto}"
                             value="{mainModel>/currentItem/costcenter}"
                             visible="{= ${mainModel>/header/move_type} === '201' || ${mainModel>/header/move_type} === '551'}"
                             maxLength="10"
+                            showValueHelp="true"
+                            valueHelpRequest="onCostCenterValueHelp"
                         />
 
                         <Label
@@ -148,11 +159,13 @@
                             required="{= ${mainModel>/header/move_type} === '261'}"
                         />
                         <Input
-                            id="orderid"
-                            placeholder="Ingresa la orden"
+                            id="orden"
+                            placeholder="{i18n>ingresaOrden}"
                             value="{mainModel>/currentItem/orderid}"
                             visible="{= ${mainModel>/header/move_type} === '261'}"
                             maxLength="12"
+                            showValueHelp="true"
+                            valueHelpRequest="onOrderIdValueHelp"
                         />
 
                         <Label
@@ -162,7 +175,7 @@
                             required="{= ${mainModel>/header/move_type} === '551'}"
                         />
                         <Select
-                            id="moveReas"
+                            id="motivo"
                             visible="{= ${mainModel>/header/move_type} === '551'}"
                             selectedKey="{mainModel>/currentItem/move_reas}"
                             items="{mainModel>/motivos}"
@@ -177,20 +190,59 @@
                         </Select>
                     </f:content>
                 </f:SimpleForm>
+
+                <!-- Tabla para mostrar ítems guardados -->
+                <Table
+                    id="itemsTable"
+                    items="{mainModel>/items}"
+                    class="sapUiTopMargin"
+                    noDataText="{i18n>noItems}"
+                >
+                    <headerToolbar>
+                        <Toolbar>
+                            <Title text="{i18n>itemsGuardados}" level="H2" />
+                            <ToolbarSpacer />
+                            <Button
+                                icon="delete"
+                                tooltip="{i18n>eliminarSeleccionado}"
+                                press="onDeleteItem"
+                                enabled="{= ${itemsTable>/selectedItems} > 0}"
+                            />
+                        </Toolbar>
+                    </headerToolbar>
+                    <columns>
+                        <Column>
+                            <Text text="{i18n>material}" />
+                        </Column>
+                        <Column>
+                            <Text text="{i18n>planta}" />
+                        </Column>
+                        <Column>
+                            <Text text="{i18n>almacen}" />
+                        </Column>
+                        <Column>
+                            <Text text="{i18n>cantidad}" />
+                        </Column>
+                        <Column>
+                            <Text text="{i18n>unidadMedida}" />
+                        </Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem>
+                            <cells>
+                                <Text text="{mainModel>material}" />
+                                <Text text="{mainModel>plant}" />
+                                <Text text="{mainModel>stge_loc}" />
+                                <Text text="{mainModel>entry_qnt}" />
+                                <Text text="{mainModel>entry_uom}" />
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
             </content>
-            <Toolbar>
-                <ToolbarSpacer />
-                <Button
-                    text="{i18n>entradasNuevas}"
-                    press="onNewEntry"
-                    class="sapUiSmallMarginBegin customBlueButton"
-                    type="Ghost"
-                />
-                <ToolbarSpacer />
-            </Toolbar>
 
             <footer>
-                <Toolbar class="customDynamicHeader">
+                <Toolbar class="customFooter">
                     <ToolbarSpacer />
                     <Button
                         text="{i18n>guardar}"
@@ -198,14 +250,20 @@
                         press="onSaveItem"
                     />
                     <Button
+                        text="{i18n>nuevoItem}"
+                        type="Default"
+                        press="onNewEntry"
+                    />
+                    <Button
                         text="{i18n>enviar}"
                         type="Success"
                         press="onSubmit"
+                        enabled="{= ${mainModel>/items}.length > 0}"
                     />
                     <Button
                         text="{i18n>cancelar}"
-                        press="onCancel"
                         type="Reject"
+                        press="onCancel"
                     />
                 </Toolbar>
             </footer>

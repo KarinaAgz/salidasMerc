@@ -1,0 +1,24 @@
+{
+    "reservations": [
+        {
+            "RESERV_NO": "0000000001",
+            "RES_ITEM": "0001",
+            "MOVE_TYPE": "201"
+        },
+        {
+            "RESERV_NO": "0000000002",
+            "RES_ITEM": "0001",
+            "MOVE_TYPE": "261"
+        }
+    ],
+    "orders": [
+        {
+            "ORDERID": "000000000001",
+            "MOVE_TYPE": "261"
+        },
+        {
+            "ORDERID": "000000000002",
+            "MOVE_TYPE": "201"
+        }
+    ]
+}
