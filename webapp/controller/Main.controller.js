@@ -1,548 +1,297 @@
 sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "sap/m/MessageToast",
-    "sap/ui/core/Fragment",
     "sap/ui/model/json/JSONModel",
     "sap/ui/model/Filter",
-    "sap/ui/model/FilterOperator",
-    "sap/m/Dialog",
-    "sap/m/Table",
-    "sap/m/Column",
-    "sap/m/ColumnListItem",
-    "sap/m/Text",
-    "sap/m/Button"
-], function (Controller, MessageToast, Fragment, JSONModel, Filter, FilterOperator, Dialog, Table, Column, ColumnListItem, Text, Button) {
+    "sap/ui/model/FilterOperator"
+], function (Controller, MessageToast, JSONModel, Filter, FilterOperator) {
     "use strict";
 
     return Controller.extend("logaligroup.mapeobapi.controller.Main", {
-        _oClaseMovimientoFragmentControls: null,
-
-        /**
-         * Inicializa el controlador y carga los datos iniciales desde un archivo JSON.
-         */
         onInit: function () {
-            // Definir datos predeterminados en caso de que el archivo no se cargue
-            var oDefaultData = {
+            var oModel = new JSONModel({
                 header: {
-                    reference_type: "",
-                    reserv_no: "",
-                    res_item: "",
-                    orderid: "",
-                    move_type: "",
-                    pstng_date: "",
-                    doc_date: "",
+                    pstng_date: new Date().toISOString().split("T")[0],
+                    doc_date: new Date().toISOString().split("T")[0],
                     ref_doc_no: "",
                     header_txt: "",
-                    ver_gr_gi_slip: "3",
-                    ver_gr_gi_slipx: "X"
+                    move_type: "",
+                    reference_type: ""
                 },
-                code: {
-                    gm_code: "03"
+                currentItem: {
+                    material: "", entry_qnt: "", entry_uom: "", batch: "",
+                    plant: "", stge_loc: "", costcenter: "", orderid: "",
+                    move_reas: "", position_txt: ""
                 },
                 items: [],
-                currentItem: {
-                    material: "",
-                    plant: "",
-                    stge_loc: "",
-                    batch: "",
-                    entry_qnt: "",
-                    entry_uom: "",
-                    costcenter: "",
-                    orderid: "",
-                    move_reas: ""
-                },
-                motivos: [
-                    { key: "", text: "Seleccionar..." }
-                ]
-            };
+                itemCount: 0 // Inicializamos el contador
+            });
+            this.getView().setModel(oModel, "mainModel");
+            var oTabBar = this.getView().byId("mainTabBar");
+            if (oTabBar) oTabBar.setSelectedKey("Cabecera");
+            this._loadMoveReasons();
+        },
 
-            // Crear el modelo mainModel
-            var oMainModel = new JSONModel();
-            oMainModel.setDefaultBindingMode("TwoWay");
-
-            // Intentar cargar el archivo JSON initialData
-            try {
-                oMainModel.loadData("localService/initialData.json", {}, false);
-                if (!oMainModel.getData().header) {
-                    oMainModel.setData(oDefaultData);
-                    console.warn("Archivo initialData.json inválido, usando datos predeterminados");
-                }
-            } catch (oError) {
-                console.error("Error al cargar initialData.json:", oError);
-                oMainModel.setData(oDefaultData);
-                MessageToast.show("Error al cargar datos iniciales, usando configuración predeterminada");
-            }
-
-            // Inicializar fechas con la fecha del sistema
-            var sCurrentDate = new Date().toISOString().split("T")[0];
-            oMainModel.setProperty("/header/pstng_date", sCurrentDate);
-            oMainModel.setProperty("/header/doc_date", sCurrentDate);
-
-            // Establecer el modelo mainModel
-            this.getView().setModel(oMainModel, "mainModel");
-            this.getOwnerComponent().setModel(oMainModel, "mainModel");
-
-            // Crear e inicializar odataModel con localData.json
-            var oODataModel = new JSONModel();
-            try {
-                oODataModel.loadData("localService/localData.json", {}, false);
-                this.getView().setModel(oODataModel, "odataModel");
-                this.getOwnerComponent().setModel(oODataModel, "odataModel");
-                console.log("Datos cargados en odataModel:", oODataModel.getData());
-            } catch (oError) {
-                console.error("Error al cargar localData.json:", oError);
-                MessageToast.show("Error al cargar datos locales, usando datos vacíos");
-                oODataModel.setData({ reservations: [], orders: [] });
-                this.getView().setModel(oODataModel, "odataModel");
-                this.getOwnerComponent().setModel(oODataModel, "odataModel");
-            }
-
-            // Forzar posición válida para MessageToast
-            MessageToast._mSettings = MessageToast._mSettings || {};
-            MessageToast._mSettings.my = "center center";
-            MessageToast._mSettings.at = "center center";
-
-            // Inicializar router
-            var oRouter = this.getOwnerComponent().getRouter();
-            if (oRouter) {
-                oRouter.getRoute("RouteMain").attachPatternMatched(this._onObjectMatched, this);
-            } else {
-                console.error("Router no encontrado en Main.onInit");
-                MessageToast.show("Error: Router no encontrado");
+        onTabSelect: function (oEvent) {
+            var sKey = oEvent.getParameter("key");
+            if (sKey === "Orden Completa" && !this.getView().getModel("mainModel").getProperty("/items").length) {
+                MessageToast.show("Agrega al menos un ítem antes de ver la orden completa");
+                oEvent.preventDefault();
+                var oTabBar = this.getView().byId("mainTabBar");
+                if (oTabBar) oTabBar.setSelectedKey("Datos de Posición");
             }
         },
 
-        /**
-         * Maneja la navegación a la vista Main, reinicia los campos y actualiza la visibilidad.
-         */
-        _onObjectMatched: function () {
-            var oModel = this.getView().getModel("mainModel");
-            if (!oModel) {
-                console.error("Modelo mainModel no encontrado en _onObjectMatched");
-                MessageToast.show("Error: Modelo mainModel no encontrado");
-                return;
-            }
-
-            // Reiniciar campos
-            oModel.setProperty("/header/reference_type", "");
-            oModel.setProperty("/header/reserv_no", "");
-            oModel.setProperty("/header/res_item", "");
-            oModel.setProperty("/header/orderid", "");
-            oModel.setProperty("/header/move_type", "");
-            oModel.setProperty("/header/ref_doc_no", "");
-            oModel.setProperty("/header/header_txt", "");
-
-            // Actualizar visibilidad de campos
-            this._updateFieldVisibility("");
-            oModel.refresh(true);
-
-            // Limpiar estilos de validación
-            this._clearRequiredFieldStyles();
-        },
-
-        /**
-         * Maneja el cambio en la selección del tipo de referencia (reserva, orden, otros).
-         */
         onReferenceTypeChange: function (oEvent) {
-            var oSelect = oEvent.getSource();
-            var sSelectedKey = oSelect.getSelectedKey();
+            var sKey = oEvent.getParameter("selectedItem").getKey();
             var oModel = this.getView().getModel("mainModel");
-            if (!oModel) {
-                console.error("Modelo mainModel no encontrado en onReferenceTypeChange");
-                MessageToast.show("Error: Modelo mainModel no encontrado");
-                return;
-            }
-
-            // Actualizar tipo de referencia y limpiar campos relacionados
-            oModel.setProperty("/header/reference_type", sSelectedKey);
-            oModel.setProperty("/header/reserv_no", "");
-            oModel.setProperty("/header/res_item", "");
-            oModel.setProperty("/header/orderid", "");
+            oModel.setProperty("/header/reference_type", sKey);
             oModel.setProperty("/header/move_type", "");
-            oModel.refresh(true);
-
-            // Actualizar visibilidad de campos
-            this._updateFieldVisibility(sSelectedKey);
-            MessageToast.show("Seleccionaste: " + (sSelectedKey || "Ninguna opción"));
-            this._clearRequiredFieldStyles();
-
-            // Depuración
-            console.log("SelectedKey:", sSelectedKey);
-            console.log("Modelo después de cambio:", oModel.getData());
+            this.getView().byId("moveTypeManual").setValue("");
+            this.getView().byId("refDocNo").setValue("");
+            if (sKey === "reserva") oModel.setProperty("/header/move_type", "201");
+            else if (sKey === "orden") oModel.setProperty("/header/move_type", "601");
+            else if (sKey === "otro") oModel.setProperty("/header/move_type", "");
+            this._updatePositionFields();
         },
 
-        /**
-         * Actualiza la visibilidad de los campos según el tipo de referencia seleccionado.
-         * @param {string} sReferenceType - Tipo de referencia (reserva, orden, otros)
-         */
-        _updateFieldVisibility: function (sReferenceType) {
+        _loadMoveReasons: function () {
+            var oModel = this.getView().getModel("mainModel");
+            oModel.setProperty("/motivos", [
+                { key: "", text: "Selecciona..." },
+                { key: "0001", text: "Motivo 1" },
+                { key: "0002", text: "Motivo 2" }
+            ]);
+        },
+
+        _updatePositionFields: function () {
+            var oModel = this.getView().getModel("mainModel");
+            var sMoveType = oModel.getProperty("/header/move_type");
             var oView = this.getView();
-            var oContainer = oView.byId("claseMovimientoContainer");
-
-            if (!oContainer) {
-                console.error("Contenedor claseMovimientoContainer no encontrado");
-                MessageToast.show("Error: Contenedor claseMovimientoContainer no encontrado");
-                return;
-            }
-
-            // Mostrar u ocultar el fragmento ClaseMovimiento
-            oContainer.removeAllItems();
-            if (sReferenceType === "otros") {
-                Fragment.load({
-                    id: oView.getId(),
-                    name: "logaligroup.mapeobapi.fragments.ClaseMovimiento",
-                    controller: this
-                }).then(function (oFragment) {
-                    oContainer.addItem(oFragment);
-                    oView.invalidate();
-                }.bind(this)).catch(function (oError) {
-                    console.error("Error al cargar ClaseMovimientoFragment:", oError);
-                    MessageToast.show("Error al cargar el fragmento ClaseMovimiento");
-                });
+            oView.byId("costcenter").setValue("");
+            oView.byId("orderid").setValue("");
+            oView.byId("moveReas").setValue("");
+            if (sMoveType === "201" || sMoveType === "551") {
+                oView.byId("costcenter").setVisible(true);
+                oView.byId("orderid").setVisible(false);
+                oView.byId("moveReas").setVisible(sMoveType === "551");
+            } else if (sMoveType === "601" || sMoveType === "261") {
+                oView.byId("costcenter").setVisible(false);
+                oView.byId("orderid").setVisible(true);
+                oView.byId("moveReas").setVisible(false);
+            } else {
+                oView.byId("costcenter").setVisible(false);
+                oView.byId("orderid").setVisible(false);
+                oView.byId("moveReas").setVisible(false);
             }
         },
 
-        /**
-         * Maneja el cambio en el número de reserva y consulta el MOVE_TYPE desde el backend.
-         */
-        onReservNoChange: function (oEvent) {
-            var sReservNo = oEvent.getSource().getValue();
+        onSaveHeader: function () {
             var oModel = this.getView().getModel("mainModel");
-            if (!oModel) {
-                console.error("Modelo mainModel no encontrado en onReservNoChange");
-                MessageToast.show("Error: Modelo mainModel no encontrado");
-                return;
-            }
-
-            if (!sReservNo) {
-                oModel.setProperty("/header/move_type", "");
-                oModel.setProperty("/header/res_item", "");
-                return;
-            }
-
-            // Validar la reserva en el backend
-            this._validateReservation(sReservNo).then(function (oReservation) {
-                oModel.setProperty("/header/move_type", oReservation.move_type || "");
-                oModel.setProperty("/header/res_item", oReservation.res_item || "");
-                MessageToast.show("Reserva validada: MOVE_TYPE = " + (oReservation.move_type || "No encontrado"));
-            }).catch(function (oError) {
-                MessageToast.show("Error al validar la reserva: " + oError.message);
-                oModel.setProperty("/header/move_type", "");
-                oModel.setProperty("/header/res_item", "");
-            });
-        },
-
-        /**
-         * Abre un diálogo de ayuda de búsqueda para el número de reserva.
-         */
-        onReservNoValueHelp: function () {
-            var oView = this.getView();
-            var oModel = this.getView().getModel("odataModel");
-
-            if (!oModel) {
-                console.error("Modelo odataModel no disponible");
-                MessageToast.show("Error: No se puede acceder al modelo de datos");
-                return;
-            }
-
-            if (!this._oReservDialog) {
-                this._oReservDialog = new Dialog({
-                    title: "{i18n>seleccionarReserva}",
-                    content: [
-                        new Table({
-                            id: oView.createId("reservTable"),
-                            mode: "SingleSelectMaster",
-                            columns: [
-                                new Column({ header: new Text({ text: "{i18n>numeroReserva}" }) }),
-                                new Column({ header: new Text({ text: "{i18n>posicion}" }) }),
-                                new Column({ header: new Text({ text: "{i18n>moveType}" }) })
-                            ],
-                            items: {
-                                path: "/reservations",
-                                template: new ColumnListItem({
-                                    cells: [
-                                        new Text({ text: "{RESERV_NO}" }),
-                                        new Text({ text: "{RES_ITEM}" }),
-                                        new Text({ text: "{MOVE_TYPE}" })
-                                    ],
-                                    press: function (oEvent) {
-                                        var oContext = oEvent.getSource().getBindingContext("odataModel");
-                                        var oMainModel = this.getView().getModel("mainModel");
-                                        oMainModel.setProperty("/header/reserv_no", oContext.getProperty("RESERV_NO"));
-                                        oMainModel.setProperty("/header/res_item", oContext.getProperty("RES_ITEM"));
-                                        oMainModel.setProperty("/header/move_type", oContext.getProperty("MOVE_TYPE"));
-                                        this._oReservDialog.close();
-                                        MessageToast.show("Reserva seleccionada: " + oContext.getProperty("RESERV_NO"));
-                                    }.bind(this)
-                                })
-                            }
-                        })
-                    ],
-                    beginButton: new Button({
-                        text: "{i18n>cerrar}",
-                        press: function () {
-                            this._oReservDialog.close();
-                        }.bind(this)
-                    }),
-                    afterClose: function () {
-                        this._oReservDialog.destroy();
-                        this._oReservDialog = null;
-                    }.bind(this)
-                });
-                oView.addDependent(this._oReservDialog);
-            }
-
-            this._oReservDialog.open();
-        },
-
-        /**
-         * Maneja el cambio en el número de orden y consulta el MOVE_TYPE desde el backend.
-         */
-        onOrderIdChange: function (oEvent) {
-            var sOrderId = oEvent.getSource().getValue();
-            var oModel = this.getView().getModel("mainModel");
-            if (!oModel) {
-                console.error("Modelo mainModel no encontrado en onOrderIdChange");
-                MessageToast.show("Error: Modelo mainModel no encontrado");
-                return;
-            }
-
-            if (!sOrderId) {
-                oModel.setProperty("/header/move_type", "");
-                return;
-            }
-
-            // Validar la orden en el backend
-            this._validateOrder(sOrderId).then(function (oOrder) {
-                oModel.setProperty("/header/move_type", oOrder.move_type || "");
-                MessageToast.show("Orden validada: MOVE_TYPE = " + (oOrder.move_type || "No encontrado"));
-            }).catch(function (oError) {
-                MessageToast.show("Error al validar la orden: " + oError.message);
-                oModel.setProperty("/header/move_type", "");
-            });
-        },
-
-        /**
-         * Abre un diálogo de ayuda de búsqueda para el número de orden.
-         */
-        onOrderIdValueHelp: function () {
-            var oView = this.getView();
-            var oModel = this.getView().getModel("odataModel");
-
-            if (!oModel) {
-                console.error("Modelo odataModel no disponible");
-                MessageToast.show("Error: No se puede acceder al modelo de datos");
-                return;
-            }
-
-            if (!this._oOrderDialog) {
-                this._oOrderDialog = new Dialog({
-                    title: "{i18n>seleccionarOrden}",
-                    content: [
-                        new Table({
-                            id: oView.createId("orderTable"),
-                            mode: "SingleSelectMaster",
-                            columns: [
-                                new Column({ header: new Text({ text: "{i18n>numeroOrden}" }) }),
-                                new Column({ header: new Text({ text: "{i18n>moveType}" }) })
-                            ],
-                            items: {
-                                path: "/orders",
-                                template: new ColumnListItem({
-                                    cells: [
-                                        new Text({ text: "{ORDERID}" }),
-                                        new Text({ text: "{MOVE_TYPE}" })
-                                    ],
-                                    press: function (oEvent) {
-                                        var oContext = oEvent.getSource().getBindingContext("odataModel");
-                                        var oMainModel = this.getView().getModel("mainModel");
-                                        oMainModel.setProperty("/header/orderid", oContext.getProperty("ORDERID"));
-                                        oMainModel.setProperty("/header/move_type", oContext.getProperty("MOVE_TYPE"));
-                                        this._oOrderDialog.close();
-                                        MessageToast.show("Orden seleccionada: " + oContext.getProperty("ORDERID"));
-                                    }.bind(this)
-                                })
-                            }
-                        })
-                    ],
-                    beginButton: new Button({
-                        text: "{i18n>cerrar}",
-                        press: function () {
-                            this._oOrderDialog.close();
-                        }.bind(this)
-                    }),
-                    afterClose: function () {
-                        this._oOrderDialog.destroy();
-                        this._oOrderDialog = null;
-                    }.bind(this)
-                });
-                oView.addDependent(this._oOrderDialog);
-            }
-
-            this._oOrderDialog.open();
-        },
-
-        /**
-         * Valida una reserva en el backend y obtiene el MOVE_TYPE.
-         * @param {string} sReservNo - Número de reserva
-         * @returns {Promise} - Promesa con los datos de la reserva
-         */
-        _validateReservation: function (sReservNo) {
-            var oODataModel = this.getView().getModel("odataModel");
-            if (!oODataModel) {
-                return Promise.reject(new Error("Modelo odataModel no disponible"));
-            }
-            return new Promise(function (resolve, reject) {
-                var aReservations = oODataModel.getProperty("/reservations") || [];
-                var oReservation = aReservations.find(function (item) {
-                    return item.RESERV_NO === sReservNo;
-                });
-                if (oReservation) {
-                    resolve({
-                        move_type: oReservation.MOVE_TYPE || "",
-                        res_item: oReservation.RES_ITEM || ""
-                    });
-                } else {
-                    reject(new Error("Reserva no encontrada: " + sReservNo));
-                }
-            });
-        },
-
-        /**
-         * Valida una orden en el backend y obtiene el MOVE_TYPE.
-         * @param {string} sOrderId - Número de orden
-         * @returns {Promise} - Promesa con los datos de la orden
-         */
-        _validateOrder: function (sOrderId) {
-            var oODataModel = this.getView().getModel("odataModel");
-            if (!oODataModel) {
-                return Promise.reject(new Error("Modelo odataModel no disponible"));
-            }
-            return new Promise(function (resolve, reject) {
-                var aOrders = oODataModel.getProperty("/orders") || [];
-                var oOrder = aOrders.find(function (item) {
-                    return item.ORDERID === sOrderId;
-                });
-                if (oOrder) {
-                    resolve({
-                        move_type: oOrder.MOVE_TYPE || ""
-                    });
-                } else {
-                    reject(new Error("Orden no encontrada: " + sOrderId));
-                }
-            });
-        },
-
-        /**
-         * Maneja el cambio en los campos de fecha.
-         */
-        onDateChange: function (oEvent) {
-            var oDatePicker = oEvent.getSource();
-            var sValue = oDatePicker.getValue();
-            var oModel = this.getView().getModel("mainModel");
-            var sProperty = oDatePicker.getId().includes("fechaDoc") ? "/header/doc_date" : "/header/pstng_date";
-            oModel.setProperty(sProperty, sValue);
-            oDatePicker.removeStyleClass("requiredFieldEmpty");
-        },
-
-        /**
-         * Maneja el cambio en la selección de MOVE_TYPE en el fragmento ClaseMovimiento.
-         */
-        onMoveTypeChange: function (oEvent) {
-            var sSelectedKey = oEvent.getSource().getSelectedKey();
-            var oModel = this.getView().getModel("mainModel");
-            if (!oModel) {
-                console.error("Modelo mainModel no encontrado en onMoveTypeChange");
-                MessageToast.show("Error: Modelo mainModel no encontrado");
-                return;
-            }
-            oModel.setProperty("/header/move_type", sSelectedKey);
-            MessageToast.show("Clase de movimiento seleccionada: " + sSelectedKey);
-        },
-
-        /**
-         * Valida los datos de cabecera y navega a la vista de ítems.
-         */
-        onNext: function () {
-            var oModel = this.getView().getModel("mainModel");
-            if (!oModel) {
-                console.error("Modelo mainModel no encontrado en onNext");
-                MessageToast.show("Error: Modelo mainModel no encontrado");
-                return;
-            }
-
             var oHeader = oModel.getProperty("/header");
-            var bHasErrors = false;
-
-            // Validar tipo de referencia
             if (!oHeader.reference_type) {
-                MessageToast.show("Por favor, selecciona un tipo de referencia");
-                this.byId("opcionesSelect").addStyleClass("requiredFieldEmpty");
-                bHasErrors = true;
+                MessageToast.show("Selecciona una operación de almacén");
+                return;
             }
+            if (!oHeader.doc_date || !oHeader.pstng_date || !oHeader.header_txt) {
+                MessageToast.show("Completa todos los campos obligatorios");
+                return;
+            }
+            if ((oHeader.reference_type === "reserva" || oHeader.reference_type === "orden") && !oHeader.ref_doc_no) {
+                MessageToast.show("Ingresa el documento de referencia");
+                return;
+            }
+            if (oHeader.reference_type === "otro" && !oHeader.move_type) {
+                MessageToast.show("Ingresa la clase de movimiento");
+                return;
+            }
+            MessageToast.show("Cabecera guardada correctamente");
+            this._updatePositionFields();
+            var oTabBar = this.getView().byId("mainTabBar");
+            if (oTabBar) oTabBar.setSelectedKey("Datos de Posición");
+        },
 
-            // Validar reserva
-            if (oHeader.reference_type === "reserva") {
-                if (!oHeader.reserv_no) {
-                    MessageToast.show("Por favor, ingresa el número de reserva");
-                    this.byId("numeroReservaContainer").getItems()[1].addStyleClass("requiredFieldEmpty");
-                    bHasErrors = true;
+        onCancelHeader: function () {
+            var oModel = this.getView().getModel("mainModel");
+            oModel.setProperty("/header", {
+                pstng_date: new Date().toISOString().split("T")[0],
+                doc_date: new Date().toISOString().split("T")[0],
+                ref_doc_no: "",
+                header_txt: "",
+                move_type: "",
+                reference_type: ""
+            });
+            MessageToast.show("Cancelado, formulario reiniciado");
+        },
+
+        onSaveItem: function () {
+            var oModel = this.getView().getModel("mainModel");
+            var oCurrentItem = oModel.getProperty("/currentItem");
+            var oHeader = oModel.getProperty("/header");
+            var sMoveType = oHeader.move_type;
+
+            console.log("Datos antes de guardar:", oCurrentItem);
+            // Validación de campos obligatorios básicos
+            if (!oCurrentItem.material || !oCurrentItem.entry_qnt || !oCurrentItem.entry_uom ||
+                !oCurrentItem.plant || !oCurrentItem.stge_loc) {
+                MessageToast.show("Completa los campos obligatorios: Material, Cantidad, UM, Centro, Almacén");
+                return;
+            }
+            // Validación de campos condicionales según move_type
+            if (sMoveType === "201" || sMoveType === "551") {
+                if (!oCurrentItem.costcenter) {
+                    MessageToast.show("El Centro de Costo es obligatorio para esta clase de movimiento");
+                    return;
                 }
-                if (!oHeader.res_item) {
-                    MessageToast.show("Por favor, ingresa la posición de reserva");
-                    this.byId("posicionReservaContainer").getItems()[1].addStyleClass("requiredFieldEmpty");
-                    bHasErrors = true;
+            }
+            if (sMoveType === "261" || sMoveType === "601") {
+                if (!oCurrentItem.orderid) {
+                    MessageToast.show("La Orden es obligatoria para esta clase de movimiento");
+                    return;
+                }
+            }
+            if (sMoveType === "551") {
+                if (!oCurrentItem.move_reas) {
+                    MessageToast.show("El Motivo es obligatorio para esta clase de movimiento");
+                    return;
                 }
             }
 
-            // Validar orden
-            if (oHeader.reference_type === "orden" && !oHeader.orderid) {
-                MessageToast.show("Por favor, ingresa el número de orden");
-                this.byId("numeroOrdenContainer").getItems()[1].addStyleClass("requiredFieldEmpty");
-                bHasErrors = true;
+            var oItems = oModel.getProperty("/items") || [];
+            var oNewItem = Object.assign({}, oCurrentItem);
+            console.log("Nuevo ítem a guardar:", oNewItem);
+            oItems.push(oNewItem);
+            oModel.setProperty("/items", oItems);
+            // Actualizar contador
+            var iItemCount = oItems.length;
+            oModel.setProperty("/itemCount", iItemCount);
+            // Forzar actualización del binding
+            var oTable = this.getView().byId("itemsTable");
+            if (oTable) {
+                var oBinding = oTable.getBinding("items");
+                if (oBinding) {
+                    oBinding.refresh(true);
+                    oTable.rerender();
+                    this.getView().rerender();
+                }
+                var oItemsInTable = oTable.getItems();
+                if (oItemsInTable.length > 0) {
+                    var oFirstItem = oItemsInTable[0];
+                    var aCells = oFirstItem.getCells();
+                    aCells.forEach((cell, index) => {
+                        console.log(`Celda ${index}: ${cell.getText() || 'Sin texto'}`);
+                    });
+                }
+                console.log("Ítems en el modelo:", oModel.getProperty("/items"));
+                console.log("Binding info:", oBinding ? oBinding.getContexts() : "No binding");
+                console.log("Ítems en la tabla:", oTable.getItems());
+            } else {
+                console.log("Tabla no encontrada con id 'itemsTable'");
             }
+            // Reiniciar campos
+            oModel.setProperty("/currentItem", {
+                material: "", entry_qnt: "", entry_uom: "", batch: "",
+                plant: "", stge_loc: "", costcenter: "", orderid: "",
+                move_reas: "", position_txt: ""
+            });
+            MessageToast.show("Ítem guardado correctamente");
+            this._updatePositionFields();
+            var oTabBar = this.getView().byId("mainTabBar");
+            if (oTabBar) oTabBar.setSelectedKey("Orden Completa");
+        },
 
-            // Validar MOVE_TYPE para "otros"
-            if (oHeader.reference_type === "otros" && !oHeader.move_type) {
-                MessageToast.show("Por favor, selecciona una clase de movimiento");
-                var oSelect = this.byId("claseMovimientoContainer").getItems()[0]?.getItems()[1];
-                if (oSelect) oSelect.addStyleClass("requiredFieldEmpty");
-                bHasErrors = true;
-            }
+        onCancelItem: function () {
+            var oModel = this.getView().getModel("mainModel");
+            oModel.setProperty("/currentItem", {
+                material: "", entry_qnt: "", entry_uom: "", batch: "",
+                plant: "", stge_loc: "", costcenter: "", orderid: "",
+                move_reas: "", position_txt: ""
+            });
+            MessageToast.show("Cancelado, formulario reiniciado");
+        },
 
-            // Validar fechas
-            if (!oHeader.doc_date) {
-                MessageToast.show("Por favor, completa la fecha de documento");
-                this.byId("fechaDoc").addStyleClass("requiredFieldEmpty");
-                bHasErrors = true;
+        onMoveReasValueHelp: function (oEvent) {
+            var oInput = oEvent.getSource();
+            if (!this._oValueHelpDialog) {
+                this._oValueHelpDialog = new sap.m.SelectDialog({
+                    title: "Seleccionar Motivo",
+                    items: {
+                        path: "mainModel>/motivos",
+                        template: new sap.m.StandardListItem({
+                            title: "{mainModel>text}",
+                            key: "{mainModel>key}"
+                        })
+                    },
+                    confirm: function (oEvent) {
+                        var oSelectedItem = oEvent.getParameter("selectedItem");
+                        if (oSelectedItem) {
+                            oInput.setValue(oSelectedItem.getTitle());
+                            var oModel = this.getView().getModel("mainModel");
+                            oModel.setProperty("/currentItem/move_reas", oSelectedItem.getKey());
+                        }
+                    }.bind(this)
+                });
+                this.getView().addDependent(this._oValueHelpDialog);
             }
-            if (!oHeader.pstng_date) {
-                MessageToast.show("Por favor, completa la fecha de contabilización");
-                this.byId("fechaContabilizacion").addStyleClass("requiredFieldEmpty");
-                bHasErrors = true;
-            }
+            this._oValueHelpDialog.open();
+        },
 
-            if (!bHasErrors) {
-                MessageToast.show("Validación exitosa, navegando a ítems");
-                this.getOwnerComponent().getRouter().navTo("RouteItem");
+        onDeleteItem: function (oEvent) {
+            var oItem = oEvent.getSource().getParent();
+            var oBinding = oItem.getBindingContext("mainModel");
+            var oModel = this.getView().getModel("mainModel");
+            var aItems = oModel.getProperty("/items");
+            if (oBinding && oBinding.getPath()) {
+                var index = parseInt(oBinding.getPath().split("/").pop(), 10);
+                aItems.splice(index, 1);
+                oModel.setProperty("/items", aItems);
+                // Actualizar contador tras eliminar
+                var iItemCount = aItems.length;
+                oModel.setProperty("/itemCount", iItemCount);
+                var oTable = this.getView().byId("itemsTable");
+                if (oTable) oTable.getBinding("items").refresh();
+                MessageToast.show("Ítem eliminado");
             }
         },
 
-        /**
-         * Limpia los estilos de validación de los campos requeridos.
-         */
-        _clearRequiredFieldStyles: function () {
-            var oView = this.getView();
-            ["opcionesSelect", "numeroReservaContainer", "posicionReservaContainer", "numeroOrdenContainer", "claseMovimientoContainer", "fechaDoc", "fechaContabilizacion"].forEach(function (sId) {
-                var oControl = oView.byId(sId);
-                if (oControl) {
-                    oControl.removeStyleClass("requiredFieldEmpty");
-                    if (sId.endsWith("Container")) {
-                        var oInput = oControl.getItems()[1];
-                        if (oInput) oInput.removeStyleClass("requiredFieldEmpty");
-                    }
-                }
-            });
+        onSubmit: function () {
+            var oModel = this.getView().getModel("mainModel");
+            var oHeader = oModel.getProperty("/header");
+            var oItems = oModel.getProperty("/items");
+            if (!oItems.length) {
+                MessageToast.show("Agrega al menos un ítem");
+                return;
+            }
+            var oData = {
+                GOODSMVT_HEADER: {
+                    PSTNG_DATE: oHeader.pstng_date,
+                    DOC_DATE: oHeader.doc_date,
+                    REF_DOC_NO: oHeader.ref_doc_no,
+                    HEADER_TXT: oHeader.header_txt
+                },
+                GOODSMVT_CODE: { gm_code: "03" },
+                GOODSMVT_ITEM: oItems.map(item => ({
+                    MATERIAL: item.material,
+                    ENTRY_QNT: item.entry_qnt,
+                    ENTRY_UOM: item.entry_uom,
+                    BATCH: item.batch,
+                    PLANT: item.plant,
+                    STGE_LOC: item.stge_loc,
+                    COSTCENTER: item.costcenter || "",
+                    ORDERID: item.orderid || "",
+                    MOVE_REAS: item.move_reas || ""
+                }))
+            };
+            console.log("Datos enviados:", oData);
+            MessageToast.show("Movimiento creado exitosamente (simulación)");
+            oModel.setProperty("/items", []);
+            oModel.setProperty("/itemCount", 0); // Reiniciar contador al enviar
+            var oTabBar = this.getView().byId("mainTabBar");
+            if (oTabBar) oTabBar.setSelectedKey("Cabecera");
+        },
+
+        onExit: function () {
+            MessageToast.show("Saliendo de la aplicación");
         }
     });
 });

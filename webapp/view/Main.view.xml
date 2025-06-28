@@ -1,71 +1,435 @@
-<mvc:View
+<mvc:XMLView
     controllerName="logaligroup.mapeobapi.controller.Main"
     xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m"
-    displayBlock="true">
-    <TabContainer id="mainTabContainer" selectedKey="tabCabecera">
-        <items>
-            <!-- Pestaña Cabecera -->
-            <TabContainerItem key="tabCabecera" title="Cabecera">
-                <VBox>
-                    <Select id="referenceType" change="onReferenceTypeChange" width="100%">
-                        <core:Item key="reserva" text="Reserva" />
-                        <core:Item key="orden" text="Orden" />
-                        <core:Item key="otro" text="Otro" />
-                    </Select>
-                    <Input id="refDocNo" placeholder="Referencia" visible="{= ${mainModel>/header/reference_type} === 'reserva' || ${mainModel>/header/reference_type} === 'orden' ? true : false}" />
-                    <DatePicker id="docDate" placeholder="Fecha Documento" value="{path: 'mainModel>/header/doc_date'}" />
-                    <DatePicker id="pstngDate" placeholder="Fecha Contabilización" value="{path: 'mainModel>/header/pstng_date'}" />
-                    <Input id="headerTxt" placeholder="Texto Cabecera" value="{path: 'mainModel>/header/header_txt'}" />
-                    <Button text="Siguiente" press="onNext" />
-                </VBox>
-            </TabContainerItem>
+    xmlns:m="sap.m"
+    xmlns:f="sap.f"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout.form"
+>
+    <f:DynamicPage
+        id="dynamicPage"
+        headerExpanded="true"
+        showFooter="false"
+    >
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <m:Title
+                        text="Gestión de Movimientos de Mercancías"
+                        level="H1"
+                    />
+                </f:heading>
+                <f:actions>
+                    <m:Button
+                        icon="sap-icon://log"
+                        text="Salir"
+                        type="Reject"
+                        press="onExit"
+                    />
+                </f:actions>
+            </f:DynamicPageTitle>
+        </f:title>
 
-            <!-- Pestaña Datos de Posición -->
-            <TabContainerItem key="tabPosicion" title="Datos de Posición">
-                <VBox>
-                    <Input id="material" placeholder="Material (Escaneo)" value="{path: 'mainModel>/currentItem/material'}" />
-                    <Input id="plant" placeholder="Planta" value="{path: 'mainModel>/currentItem/plant'}" />
-                    <Input id="stgeLoc" placeholder="Almacén" value="{path: 'mainModel>/currentItem/stge_loc'}" />
-                    <Input id="batch" placeholder="Lote" value="{path: 'mainModel>/currentItem/batch'}" />
-                    <Input id="entryQnt" placeholder="Cantidad" value="{path: 'mainModel>/currentItem/entry_qnt'}" />
-                    <Input id="entryUom" placeholder="Unidad Medida" value="{path: 'mainModel>/currentItem/entry_uom'}" />
-                    <Input id="costcenter" placeholder="Centro Costo" visible="{= ${mainModel>/header/move_type} === '201' || ${mainModel>/header/move_type} === '551' ? true : false}" value="{path: 'mainModel>/currentItem/costcenter'}" />
-                    <Input id="orderid" placeholder="Orden" visible="{= ${mainModel>/header/move_type} === '261' ? true : false}" value="{path: 'mainModel>/currentItem/orderid'}" />
-                    <Select id="moveReas" placeholder="Motivo" visible="{= ${mainModel>/header/move_type} === '551' ? true : false}" items="{path: 'mainModel>/motivos'}" change="onMoveReasChange">
-                        <core:Item key="{key}" text="{text}" />
-                    </Select>
-                    <Button text="Guardar" press="onSaveItem" />
-                    <Button text="Nueva Entrada" press="onNewEntry" />
-                </VBox>
-            </TabContainerItem>
+        <f:content>
+            <m:IconTabBar
+                id="mainTabBar"
+                select="onTabSelect"
+            >
+                <m:items>
+                    <!-- CABECERA -->
+                    <m:IconTabFilter text="Cabecera">
+                        <m:VBox
+                            width="100%"
+                            fitContainer="true"
+                        >
+                            <layout:SimpleForm
+                                editable="true"
+                                layout="ResponsiveGridLayout"
+                                labelSpanL="4"
+                                labelSpanM="4"
+                                labelSpanS="12"
+                                emptySpanL="0"
+                                emptySpanM="0"
+                                emptySpanS="0"
+                                columnsL="1"
+                                columnsM="1"
+                            >
+                                <m:Label text="Operación de Almacén" />
+                                <m:Select
+                                    id="referenceType"
+                                    change="onReferenceTypeChange"
+                                    selectedKey="{mainModel>/header/reference_type}"
+                                >
+                                    <core:Item
+                                        key=""
+                                        text="Selecciona..."
+                                    />
+                                    <core:Item
+                                        key="reserva"
+                                        text="Reserva"
+                                    />
+                                    <core:Item
+                                        key="orden"
+                                        text="Orden"
+                                    />
+                                    <core:Item
+                                        key="otro"
+                                        text="Otro"
+                                    />
+                                </m:Select>
 
-            <!-- Pestaña Orden Completa -->
-            <TabContainerItem key="tabOrden" title="Orden Completa">
-                <VBox>
-                    <Table id="itemsTable" items="{path: 'mainModel>/items'}">
-                        <columns>
-                            <Column><Text text="Material" /></Column>
-                            <Column><Text text="Planta" /></Column>
-                            <Column><Text text="Almacén" /></Column>
-                            <Column><Text text="Cantidad" /></Column>
-                            <Column><Text text="UM" /></Column>
-                        </columns>
-                        <items>
-                            <ColumnListItem>
-                                <cells>
-                                    <Text text="{material}" />
-                                    <Text text="{plant}" />
-                                    <Text text="{stge_loc}" />
-                                    <Text text="{entry_qnt}" />
-                                    <Text text="{entry_uom}" />
-                                </cells>
-                            </ColumnListItem>
-                        </items>
-                    </Table>
-                    <Button text="Submit" press="onSubmit" />
-                </VBox>
-            </TabContainerItem>
-        </items>
-    </TabContainer>
-</mvc:View>
+                                <m:Label text="Clase de Movimiento" />
+                                <m:Input
+                                    id="moveTypeManual"
+                                    value="{mainModel>/header/move_type}"
+                                    editable="{= ${mainModel>/header/reference_type} === 'otro' }"
+                                    placeholder="Ej. 601 para Orden"
+                                />
+
+                                <m:Label text="Fecha Documento" />
+                                <m:DatePicker
+                                    id="docDate"
+                                    value="{mainModel>/header/doc_date}"
+                                />
+
+                                <m:Label text="Fecha Contabilización" />
+                                <m:DatePicker
+                                    id="pstngDate"
+                                    value="{mainModel>/header/pstng_date}"
+                                />
+
+                                <m:Label text="Documento Referencia" />
+                                <m:Input
+                                    id="refDocNo"
+                                    value="{mainModel>/header/ref_doc_no}"
+                                    placeholder="Ej. 500"
+                                />
+
+                                <m:Label text="Texto Cabecera" />
+                                <m:TextArea
+                                    id="headerTxt"
+                                    value="{mainModel>/header/header_txt}"
+                                    rows="3"
+                                    growing="true"
+                                />
+                            </layout:SimpleForm>
+
+                            <m:HBox
+                                justifyContent="End"
+                                width="100%"
+                                class="sapUiSmallMarginTop"
+                            >
+                                <m:Button
+                                    text="Guardar"
+                                    type="Emphasized"
+                                    press="onSaveHeader"
+                                    icon="sap-icon://save"
+                                />
+                                <m:Button
+                                    text="Cancelar"
+                                    type="Reject"
+                                    press="onCancelHeader"
+                                    icon="sap-icon://decline"
+                                />
+                            </m:HBox>
+                        </m:VBox>
+                    </m:IconTabFilter>
+                    <m:IconTabFilter text="Datos de Posición">
+                        <m:VBox
+                            width="100%"
+                            fitContainer="true"
+                        >
+                            <layout:SimpleForm
+                                editable="true"
+                                layout="ResponsiveGridLayout"
+                                title="Datos de Posición"
+                                labelSpanL="4"
+                                labelSpanM="4"
+                                labelSpanS="12"
+                                emptySpanL="0"
+                                emptySpanM="0"
+                                emptySpanS="0"
+                                columnsL="1"
+                                columnsM="1"
+                            >
+                                <m:Label text="Material" />
+                                <m:Input
+                                    id="material"
+                                    value="{mainModel>/currentItem/material}"
+                                />
+
+                                <m:Label text="Cantidad" />
+                                <m:Input
+                                    id="entryQnt"
+                                    value="{mainModel>/currentItem/entry_qnt}"
+                                />
+
+                                <m:Label text="Unidad de Medida" />
+                                <m:Input
+                                    id="entryUom"
+                                    value="{mainModel>/currentItem/entry_uom}"
+                                />
+
+                                <m:Label text="Lote" />
+                                <m:Input
+                                    id="batch"
+                                    value="{mainModel>/currentItem/batch}"
+                                />
+
+                                <m:Label text="Centro" />
+                                <m:Input
+                                    id="plant"
+                                    value="{mainModel>/currentItem/plant}"
+                                />
+
+                                <m:Label text="Almacén" />
+                                <m:Input
+                                    id="stgeLoc"
+                                    value="{mainModel>/currentItem/stge_loc}"
+                                />
+
+                                <m:Label text="Centro de Costo" />
+                                <m:Input
+                                    id="costcenter"
+                                    value="{mainModel>/currentItem/costcenter}"
+                                    visible="{= ${mainModel>/header/move_type} === '201' || ${mainModel>/header/move_type} === '551' }"
+                                />
+
+                                <m:Label text="Orden de Compra" />
+                                <m:Input
+                                    id="orderid"
+                                    value="{mainModel>/currentItem/orderid}"
+                                    placeholder="Ej. 4500001234"
+                                    visible="{= ${mainModel>/header/move_type} === '261' || ${mainModel>/header/move_type} === '601' }"
+                                    tooltip="Orden de compra relacionada"
+                                />
+
+                                <m:Label text="Motivo" />
+                                <m:Input
+                                    id="moveReas"
+                                    value="{mainModel>/currentItem/move_reas}"
+                                    visible="{= ${mainModel>/header/move_type} === '551' }"
+                                    showValueHelp="true"
+                                    valueHelpRequest="onMoveReasValueHelp"
+                                />
+
+                                <m:Label text="Texto Posición" />
+                                <m:TextArea
+                                    id="positionTxt"
+                                    value="{mainModel>/currentItem/position_txt}"
+                                    rows="3"
+                                    growing="true"
+                                />
+                            </layout:SimpleForm>
+
+                            <m:HBox
+                                justifyContent="End"
+                                width="100%"
+                                class="sapUiSmallMarginTop"
+                            >
+                                <m:Button
+                                    text="Guardar"
+                                    type="Emphasized"
+                                    press="onSaveItem"
+                                    icon="sap-icon://save"
+                                />
+                                <m:Button
+                                    text="Cancelar"
+                                    type="Reject"
+                                    press="onCancelItem"
+                                    icon="sap-icon://decline"
+                                />
+                            </m:HBox>
+                        </m:VBox>
+                    </m:IconTabFilter>
+
+                    <!--orden completa-->
+
+                    <m:IconTabFilter text="Orden Completa">
+                        <m:VBox
+                            width="100%"
+                            class="sapUiContentPadding"
+                        >
+                            <layout:SimpleForm
+                                editable="false"
+                                layout="ResponsiveGridLayout"
+                                labelSpanL="4"
+                                labelSpanM="4"
+                                labelSpanS="12"
+                                columnsL="1"
+                                columnsM="1"
+                                adjustLabelSpan="false"
+                                emptySpanL="1"
+                                emptySpanM="1"
+                                emptySpanS="0"
+                                width="100%"
+                                class="sapUiContentPadding sapUiMediumMarginTop sapUiMediumMarginBottom"
+                            >
+                                <m:Label text="Operación de Almacén" />
+                                <m:Text
+                                    text="{mainModel>/header/reference_type}"
+                                    wrapping="true"
+                                />
+
+                                <m:Label text="Fecha Documento" />
+                                <m:Text
+                                    text="{mainModel>/header/doc_date}"
+                                    wrapping="true"
+                                />
+
+                                <m:Label text="Fecha Contabilización" />
+                                <m:Text
+                                    text="{mainModel>/header/pstng_date}"
+                                    wrapping="true"
+                                />
+
+                                <m:Label text="Documento Referencia" />
+                                <m:Text
+                                    text="{mainModel>/header/ref_doc_no}"
+                                    wrapping="true"
+                                />
+
+                                <m:Label text="Texto Cabecera" />
+                                <m:Text
+                                    text="{mainModel>/header/header_txt}"
+                                    wrapping="true"
+                                />
+
+                                <m:Label text="Orden de Compra" />
+                                <m:Text
+                                    text="{mainModel>/header/orderid}"
+                                    wrapping="true"
+                                />
+
+                                <m:Label text="Total de Ítems" />
+                                <m:Text
+                                    text="{mainModel>/itemCount}"
+                                    wrapping="true"
+                                />
+                            </layout:SimpleForm>
+
+                            <m:Table
+                                id="itemsTable"
+                                items="{path: 'mainModel>/items', parameters: {array: true}}"
+                                width="100%"
+                                class="sapUiSmallMarginTop"
+                            >
+                                <m:columns>
+                                    <m:Column
+                                        demandPopin="true"
+                                        minScreenWidth="Tablet"
+                                    >
+                                        <m:Text text="Material" />
+                                    </m:Column>
+                                    <m:Column
+                                        demandPopin="true"
+                                        minScreenWidth="Tablet"
+                                    >
+                                        <m:Text text="Cantidad" />
+                                    </m:Column>
+                                    <m:Column
+                                        demandPopin="true"
+                                        minScreenWidth="Tablet"
+                                    >
+                                        <m:Text text="UM" />
+                                    </m:Column>
+                                    <m:Column
+                                        demandPopin="true"
+                                        minScreenWidth="Tablet"
+                                    >
+                                        <m:Text text="Lote" />
+                                    </m:Column>
+                                    <m:Column
+                                        demandPopin="true"
+                                        minScreenWidth="Tablet"
+                                    >
+                                        <m:Text text="Centro" />
+                                    </m:Column>
+                                    <m:Column
+                                        demandPopin="true"
+                                        minScreenWidth="Tablet"
+                                    >
+                                        <m:Text text="Almacén" />
+                                    </m:Column>
+                                    <m:Column
+                                        demandPopin="true"
+                                        minScreenWidth="Tablet"
+                                    >
+                                        <m:Text text="Centro de Costo" />
+                                    </m:Column>
+                                    <m:Column
+                                        demandPopin="true"
+                                        minScreenWidth="Tablet"
+                                    >
+                                        <m:Text text="Orden" />
+                                    </m:Column>
+                                    <m:Column
+                                        demandPopin="true"
+                                        minScreenWidth="Tablet"
+                                    >
+                                        <m:Text text="Motivo" />
+                                    </m:Column>
+                                    <m:Column
+                                        demandPopin="true"
+                                        minScreenWidth="Tablet"
+                                    >
+                                        <m:Text text="Texto Posición" />
+                                    </m:Column>
+                                    <m:Column>
+                                        <m:Text text="Acción" />
+                                    </m:Column>
+                                </m:columns>
+                                <m:items>
+                                    <m:ColumnListItem>
+                                        <m:cells>
+                                            <m:Text
+                                                text="{mainModel>material}"
+                                            />
+                                            <m:Text
+                                                text="{mainModel>entry_qnt}"
+                                            />
+                                            <m:Text
+                                                text="{mainModel>entry_uom}"
+                                            />
+                                            <m:Text text="{mainModel>batch}" />
+                                            <m:Text text="{mainModel>plant}" />
+                                            <m:Text
+                                                text="{mainModel>stge_loc}"
+                                            />
+                                            <m:Text
+                                                text="{mainModel>costcenter}"
+                                            />
+                                            <m:Text
+                                                text="{mainModel>orderid}"
+                                            />
+                                            <m:Text
+                                                text="{mainModel>move_reas}"
+                                            />
+                                            <m:Text
+                                                text="{mainModel>position_txt}"
+                                            />
+                                            <m:Button
+                                                icon="sap-icon://delete"
+                                                type="Reject"
+                                                tooltip="Eliminar"
+                                                press="onDeleteItem"
+                                            />
+                                        </m:cells>
+                                    </m:ColumnListItem>
+                                </m:items>
+                            </m:Table>
+
+                            <m:HBox
+                                justifyContent="End"
+                                width="100%"
+                                class="sapUiSmallMarginTop"
+                            >
+                                
+                            </m:HBox>
+                        </m:VBox>
+                    </m:IconTabFilter>
+                </m:items>
+            </m:IconTabBar>
+        </f:content>
+    </f:DynamicPage>
+</mvc:XMLView>
