@@ -6,10 +6,7 @@
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}",
-      "runtimeExecutable": "npx",
-      "windows": {
-        "runtimeExecutable": "npx.cmd"
-      },
+      "runtimeExecutable": "/usr/bin/npx",
       "runtimeArgs": [
         "fiori",
         "run"

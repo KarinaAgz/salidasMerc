@@ -16,10 +16,10 @@
       "toolsId": "5a6aafbb-c162-4082-9de5-7649c2468b8b"
     },
     "dataSources": {
-      "mainDataSource": {
-        "uri": "localService/localData.json",
-        "type": "JSON"
-      },
+      "mainService": {
+      "uri": "/localService/",
+      "type": "OData"
+    },
       "initialDataSource": {
         "uri": "localService/initialData.json",
         "type": "JSON"
@@ -69,7 +69,7 @@
         "settings": {
           "defaultBindingMode": "TwoWay"
         },
-        "dataSource": "initialDataSource"
+        "dataSource": "mainService"
       }
     },
     "resources": {
