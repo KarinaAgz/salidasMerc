@@ -43,7 +43,7 @@
               text="Datos de Posición"
               key="Posicion"
             >
-              <core:Fragment fragmentName="logaligroup.mapeobapi.fragments.Posicion" type="XML"/>
+              <core:Fragment fragmentName="logaligroup.mapeobapi.fragments.PosicionFragment" type="XML"/>
             </m:IconTabFilter>
             <!-- Pestaña: Orden Completa -->
             <m:IconTabFilter
@@ -51,7 +51,7 @@
               key="OrdenCompleta"
               iconColor="Neutral"
             >
-              <core:Fragment fragmentName="logaligroup.mapeobapi.fragments.OrdenCompleta" type="XML"/>
+              <core:Fragment fragmentName="logaligroup.mapeobapi.fragments.OrdenCompletaFragment" type="XML"/>
             </m:IconTabFilter>
           </m:items>
         </m:IconTabBar>

@@ -12,9 +12,8 @@
     "quagga": "^0.12.1"
   },
   "devDependencies": {
-    "@sap/ux-ui5-fe-mockserver-middleware": "^1.6.5",
-    "@sap/ux-ui5-tooling": "^1.18.1",
-    "@ui5/cli": "^3.11.9"
+    "@sap/ux-ui5-tooling": "1",
+    "@ui5/cli": "^3.0.0"
   },
   "scripts": {
     "start": "fiori run --open \"test/flpSandbox.html?sap-ui-xx-viewCache=false#logaligroupmapeobapi-display\"",

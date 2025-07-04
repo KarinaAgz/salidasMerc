@@ -3,8 +3,6 @@
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m">
     <App id="app">
-    <pages>
-            <!-- el router inyectará aquí la vista Main -->
-        </pages>
+    
     </App>
 </mvc:View>

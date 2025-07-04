@@ -1,52 +1,26 @@
 sap.ui.define([
   "sap/ui/core/UIComponent",
-  "sap/ui/Device",
-  "logaligroup/mapeobapi/model/models",
-  "logaligroup/mapeobapi/localService/mockServer",
-  "sap/m/library",
-  "sap/f/library"
-], function (UIComponent, Device, models, MockServer, mLibrary, fLibrary) {
+  "logaligroup/mapeobapi/model/models"
+], (UIComponent, models) => {
   "use strict";
 
   return UIComponent.extend("logaligroup.mapeobapi.Component", {
-    metadata: {
-      manifest: "json"
-    },
+      metadata: {
+          manifest: "json",
+          interfaces: [
+              "sap.ui.core.IAsyncContentCreation"
+          ]
+      },
 
-    init: function () {
-      // Precargar librerías
-      sap.ui.getCore().loadLibrary("sap.m", true).then(() => {
-        console.log("sap.m cargado correctamente");
-      }).catch(err => {
-        console.error("Error al cargar sap.m:", err);
-      });
-      sap.ui.getCore().loadLibrary("sap.f", true).then(() => {
-        console.log("sap.f cargado correctamente");
-      }).catch(err => {
-        console.error("Error al cargar sap.f:", err);
-      });
+      init() {
+          // call the base component's init function
+          UIComponent.prototype.init.apply(this, arguments);
 
-      // Iniciar el MockServer
-      try {
-        MockServer.init();
-        console.log("MockServer inicializado correctamente");
-      } catch (e) {
-        console.error("Error al inicializar MockServer:", e);
+          // set the device model
+          this.setModel(models.createDeviceModel(), "device");
+
+          // enable routing
+          this.getRouter().initialize();
       }
-
-      // Llamar al init del padre
-      UIComponent.prototype.init.apply(this, arguments);
-
-      // Crear los modelos
-      this.setModel(models.createDeviceModel(), "device");
-      this.setModel(models.createMainModel(), "mainModel");
-
-      // Inicializar el router
-      this.getRouter().initialize();
-    },
-
-    getContentDensityClass: function () {
-      return Device.support.touch ? "sapUiSizeCozy" : "sapUiSizeCompact";
-    }
   });
 });
