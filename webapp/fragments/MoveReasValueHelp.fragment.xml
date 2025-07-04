@@ -1,0 +1,17 @@
+<core:FragmentDefinition
+  xmlns="sap.m"
+  xmlns:core="sap.ui.core"
+>
+  <SelectDialog
+    title="Seleccionar Motivo"
+    contentWidth="400px"
+  >
+    <items>
+      <StandardListItem
+        title="{mainModel>text}"
+        description="{mainModel>key}"
+        key="{mainModel>key}"
+      />
+    </items>
+  </SelectDialog>
+</core:FragmentDefinition>

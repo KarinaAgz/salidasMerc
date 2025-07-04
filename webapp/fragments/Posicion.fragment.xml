@@ -1,0 +1,170 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout.form"
+>
+
+    <VBox
+        width="100%"
+        fitContainer="true"
+    >
+        <!-- Formulario para datos de ítem -->
+        <layout:SimpleForm
+            editable="true"
+            layout="ResponsiveGridLayout"
+            labelSpanL="4"
+            labelSpanM="4"
+            labelSpanS="12"
+            emptySpanL="0"
+            emptySpanM="0"
+            emptySpanS="0"
+            columnsL="1"
+            columnsM="1"
+            backgroundDesign="Translucent"
+        >
+            <Label
+                text="Material"
+                design="Bold"
+            />
+            <Input
+                id="material"
+                value="{mainModel>/currentItem/material}"
+                submit="onMaterialScanned"
+                placeholder="Escanea o ingresa el material"
+                type="Text"
+            />
+            <Label
+                text="Cantidad"
+                design="Bold"
+            />
+            <Input
+                id="entryQnt"
+                value="{mainModel>/currentItem/entry_qnt}"
+                type="Number"
+            />
+            <Label
+                text="UM"
+                design="Bold"
+            />
+            <Input
+                id="entryUom"
+                value="{mainModel>/currentItem/entry_uom}"
+                type="Text"
+            />
+            <Label
+                text="Lote"
+                design="Bold"
+            />
+            <Input
+                id="batch"
+                value="{mainModel>/currentItem/batch}"
+                type="Text"
+            />
+            <Label
+                text="Centro"
+                design="Bold"
+            />
+            <Input
+                id="plant"
+                value="{mainModel>/currentItem/plant}"
+                type="Text"
+            />
+            <Label
+                text="Almacén"
+                design="Bold"
+            />
+            <Input
+                id="stgeLoc"
+                value="{mainModel>/currentItem/stge_loc}"
+                type="Text"
+            />
+            <Label
+                text="Centro de Costo"
+                design="Bold"
+            />
+            <Input
+                id="costcenter"
+                value="{mainModel>/currentItem/costcenter}"
+                visible="{= ${mainModel>/savedHeader/move_type} === '201' || ${mainModel>/savedHeader/move_type} === '551' }"
+                type="Text"
+            />
+            <Label
+                text="Orden de Compra"
+                design="Bold"
+            />
+            <Input
+                id="orderid"
+                value="{mainModel>/currentItem/orderid}"
+                visible="{= ${mainModel>/savedHeader/move_type} === '261' }"
+                type="Text"
+            />
+            <Label
+                text="Motivo"
+                design="Bold"
+            />
+            <Input
+                id="moveReas"
+                value="{mainModel>/currentItem/move_reas}"
+                visible="{= ${mainModel>/savedHeader/move_type} === '551' }"
+                showValueHelp="true"
+                valueHelpRequest="onMoveReasValueHelp"
+                type="Text"
+            />
+            <Label
+                text="Reserva No"
+                design="Bold"
+            />
+            <Input
+                id="reservNo"
+                value="{mainModel>/currentItem/reserv_no}"
+                visible="{= ${mainModel>/savedHeader/move_type} === '201' }"
+                type="Text"
+            />
+            <Label
+                text="Ítem Reserva"
+                design="Bold"
+            />
+            <Input
+                id="resItem"
+                value="{mainModel>/currentItem/res_item}"
+                visible="{= ${mainModel>/savedHeader/move_type} === '201' }"
+                type="Text"
+            />
+            <Label
+                text="Texto Posición"
+                design="Bold"
+            />
+            <TextArea
+                id="positionTxt"
+                value="{mainModel>/currentItem/position_txt}"
+                rows="3"
+                growing="true"
+            />
+        </layout:SimpleForm>
+        <!-- Botones de acción -->
+        <HBox
+            justifyContent="End"
+            width="100%"
+            class="sapUiSmallMarginTop"
+        >
+            <Button
+                text="Escanear"
+                type="Emphasized"
+                press="onScanMaterial"
+                icon="sap-icon://bar-code"
+            />
+            <Button
+                text="Guardar"
+                type="Accept"
+                press="onSaveItem"
+                icon="sap-icon://save"
+            />
+            <Button
+                text="Cancelar"
+                type="Reject"
+                press="onCancelItem"
+                icon="sap-icon://decline"
+            />
+        </HBox>
+    </VBox>
+</core:FragmentDefinition>
