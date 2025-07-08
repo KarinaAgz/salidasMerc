@@ -64,7 +64,8 @@
             />
         </layout:SimpleForm>
         <m:HBox justifyContent="End" width="100%" class="sapUiSmallMarginTop">
-            <m:Button text="Continuar" type="Accept" press=".onSaveHeader" icon="sap-icon://save" />
+            <m:Button text="Continuar" type="Emphasized" press=".onContinueHeader" icon="sap-icon://navigation-right-arrow"/>
+            
             <m:Button text="Cancelar" type="Reject" press=".onCancelHeader" icon="sap-icon://decline"/>
         </m:HBox>
     </m:VBox>

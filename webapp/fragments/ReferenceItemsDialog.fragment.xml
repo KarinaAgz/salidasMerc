@@ -7,12 +7,12 @@
         title="{i18n>referenceItemsDialogTitle}"
         contentHeight="auto"
         contentWidth="auto"
-        afterClose=".onScannerDialogClosed"
+        afterClose=".onCloseItemsDialog"
     >
         <VBox class="sapUiSmallMargin">
             <Table
                 id="tableReferenceItems"
-                items="{ path: 'localModel>/ReferenceItems' }"
+                items="{ path: 'mainModel>/ReferenceItems' }"
                 inset="false"
                 fixedLayout="false"
                 class="sapUiResponsiveMargin sapUiSizeCompact"
@@ -87,36 +87,36 @@
                     <ColumnListItem>
                         <cells>
                             <Text
-                                text="{localModel>material}"
+                                text="{mainModel>material}"
                                 width="70px"
                             />
                             <Text
-                                text="{localModel>txt_material}"
+                                text="{mainModel>txt_material}"
                                 width="100px"
                             />
                             <Text
-                                text="{localModel>cantidad}"
+                                text="{mainModel>cantidad}"
                                 width="70px"
                             />
                             <Text
-                                text="{localModel>um}"
+                                text="{mainModel>um}"
                                 width="30px"
                             />
                             <Text
-                                text="{localModel>isBatchRequired_txt}"
+                                text="{mainModel>isBatchRequired_txt}"
                                 width="30px"
                             />
                             <Text
-                                text="{localModel>centro}"
+                                text="{mainModel>centro}"
                                 width="50px"
                             />
                             <Text
-                                text="{localModel>almacen}"
+                                text="{mainModel>almacen}"
                                 width="50px"
                             />
                             <Button
                                 icon="sap-icon://touch"
-                                type="Reject"
+                                type="Accept"
                                 tooltip="{i18n>columnProcesar}"
                                 press=".onProcesarItem"
                             />
