@@ -1,0 +1,21 @@
+{
+    "Header": {
+        "operacion_almacen": true,
+        "claseMov": false,
+        "fecha_doc": true,
+        "fecha_cont": true,
+        "referencia": true,
+        "texto_cabecera": true
+    },
+    "Posiciones": {
+        "material": true,
+        "cantidad": true,
+        "um": true,
+        "lote": true,
+        "centro": true,
+        "almacen": true,
+        "ceco": true,
+        "motivo": true,
+        "txt_posicion": true
+    }
+}

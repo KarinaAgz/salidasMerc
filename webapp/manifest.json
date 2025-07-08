@@ -17,11 +17,11 @@
     },
     "dataSources": {
       "mainService": {
-        "uri": "/sap/opu/odata/sap/Z_GOODSMVT_SRV/",
+        "uri": "sap/opu/odata/sap/ZSB_HANDHELD_V2/",
         "type": "OData",
         "settings": {
           "odataVersion": "2.0",
-          "localUri": "localService/metadata.xml"
+          "localUri": "localService/mainService/metadata.xml"
         }
       },
       "initialDataSource": {

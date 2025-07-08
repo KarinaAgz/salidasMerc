@@ -21,29 +21,30 @@
             <m:Select
                 id="referenceType"
                 change=".onReferenceTypeChange"
-                selectedKey="{mainModel>/header/reference_type}"
+                items="{odataModel>/Z_C_CLASEMOV}"
             >
-                <core:Item key="" text="Selecciona..."/>
-                <core:Item key="reserva" text="Reserva"/>
-                <core:Item key="orden" text="Orden"/>
-                <core:Item key="otro" text="Otro"/>
+                <core:Item key="{odataModel>ClaseMovimiento}" text="{odataModel>Descripcion}"/>
             </m:Select>
             <m:Label text="Clase de Movimiento" design="Bold"/>
             <m:Input
                 id="moveTypeManual"
                 value="{mainModel>/header/move_type}"
-                editable="{= ${mainModel>/header/reference_type} === 'otro' }"
+                editable="false"
                 type="Text"
             />
             <m:Label text="Fecha Documento" design="Bold"/>
             <m:DatePicker
                 id="docDate"
                 value="{mainModel>/header/doc_date}"
+                valueFormat="yyyy-MM-dd"
+                displayFormat="yyyy-MM-dd"
             />
             <m:Label text="Fecha Contabilización" design="Bold"/>
             <m:DatePicker
                 id="pstngDate"
                 value="{mainModel>/header/pstng_date}"
+                valueFormat="yyyy-MM-dd"
+                displayFormat="yyyy-MM-dd"
             />
             <m:Label text="Referencia" design="Bold"/>
             <m:Input
@@ -51,6 +52,7 @@
                 value="{mainModel>/header/ref_doc_no}"
                 placeholder="Ej. 500"
                 type="Text"
+                maxLength="16"
             />
             <m:Label text="Texto Cabecera" design="Bold"/>
             <m:TextArea
@@ -58,10 +60,11 @@
                 value="{mainModel>/header/header_txt}"
                 rows="3"
                 growing="true"
+                maxLength="25"
             />
         </layout:SimpleForm>
         <m:HBox justifyContent="End" width="100%" class="sapUiSmallMarginTop">
-            <m:Button text="Guardar" type="Accept" press=".onSaveHeader" icon="sap-icon://save"/>
+            <m:Button text="Continuar" type="Accept" press=".onSaveHeader" icon="sap-icon://save" />
             <m:Button text="Cancelar" type="Reject" press=".onCancelHeader" icon="sap-icon://decline"/>
         </m:HBox>
     </m:VBox>
