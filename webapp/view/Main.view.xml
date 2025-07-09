@@ -1,61 +1,73 @@
 <mvc:XMLView
-  controllerName="logaligroup.mapeobapi.controller.Main"
-  xmlns:mvc="sap.ui.core.mvc"
-  xmlns:m="sap.m"
-  xmlns:f="sap.f"
-  xmlns:core="sap.ui.core"
-  xmlns:layout="sap.ui.layout.form"
+    controllerName="logaligroup.mapeobapi.controller.Main"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:m="sap.m"
+    xmlns:f="sap.f"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout.form"
 >
-  <!-- Contenedor principal de la aplicación -->
-  <m:Shell>
-    <!-- Página dinámica con encabezado y contenido -->
-    <f:DynamicPage
-      id="dynamicPage"
-      headerExpanded="true"
-      showFooter="false"
-      backgroundDesign="Solid"
-    >
-      <!-- Título y acciones del encabezado -->
-      <f:title>
-        <f:DynamicPageTitle>
-          <f:heading>
-            <m:Title
-              text="Gestión de Movimientos de Mercancías"
-              level="H1"
-            />
-          </f:heading>
-        </f:DynamicPageTitle>
-      </f:title>
-      <!-- Contenido principal con pestañas -->
-      <f:content>
-        <m:IconTabBar
-          id="mainTabBar"
-          select="onTabSelect"
-          backgroundDesign="Solid"
+    <!-- Contenedor principal de la aplicación -->
+    <m:Shell>
+        <!-- Página dinámica con encabezado y contenido -->
+        <f:DynamicPage
+            id="dynamicPage"
+            headerExpanded="true"
+            showFooter="false"
+            toggleHeaderOnTitleClick="true"
         >
-          <m:items>
-            <!-- Pestaña: Datos de Cabecera -->
-            <m:IconTabFilter text="Datos de Cabecera" key="Cabecera">
-              <core:Fragment fragmentName="logaligroup.mapeobapi.fragments.CabeceraFragment" type="XML"/>
-            </m:IconTabFilter>
-            <!-- Pestaña: Datos de Posición -->
-            <m:IconTabFilter
-              text="Datos de Posición"
-              key="Posicion"
-            >
-              <core:Fragment fragmentName="logaligroup.mapeobapi.fragments.PosicionFragment" type="XML"/>
-            </m:IconTabFilter>
-            <!-- Pestaña: Orden Completa -->
-            <m:IconTabFilter
-              text="Orden Completa"
-              key="OrdenCompleta"
-              iconColor="Neutral"
-            >
-              <core:Fragment fragmentName="logaligroup.mapeobapi.fragments.OrdenCompletaFragment" type="XML"/>
-            </m:IconTabFilter>
-          </m:items>
-        </m:IconTabBar>
-      </f:content>
-    </f:DynamicPage>
-  </m:Shell>
+            <!-- Título y acciones del encabezado -->
+            <f:title>
+                <f:DynamicPageTitle backgroundDesign="Solid">
+                    <f:heading>
+                        <m:Title
+                            text="Gestión de Movimientos de Mercancías"
+                            level="H1"
+                        />
+                    </f:heading>
+                </f:DynamicPageTitle>
+            </f:title>
+            <!-- Contenido principal con pestañas -->
+            <f:content>
+                <m:IconTabBar
+                    id="mainTabBar"
+                    select="onTabSelect"
+                    backgroundDesign="Solid"
+                >
+                    <m:items>
+                        <!-- Pestaña: Datos de Cabecera -->
+                        <m:IconTabFilter
+                            text="Datos de Cabecera"
+                            key="Cabecera"
+                        >
+                            <core:Fragment
+                                fragmentName="logaligroup.mapeobapi.fragments.CabeceraFragment"
+                                type="XML"
+                            />
+                        </m:IconTabFilter>
+                        <!-- Pestaña: Datos de Posición -->
+                        <m:IconTabFilter
+                            text="Datos de Posición"
+                            key="Posicion"
+                        >
+                            <core:Fragment
+                                fragmentName="logaligroup.mapeobapi.fragments.PosicionFragment"
+                                type="XML"
+                            />
+                        </m:IconTabFilter>
+                        <!-- Pestaña: Orden Completa -->
+                        <m:IconTabFilter
+                            text="Orden Completa"
+                            key="OrdenCompleta"
+                            iconColor="Neutral"
+                        >
+                            <core:Fragment
+                                fragmentName="logaligroup.mapeobapi.fragments.OrdenCompletaFragment"
+                                type="XML"
+                            />
+                        </m:IconTabFilter>
+                    </m:items>
+                </m:IconTabBar>
+            </f:content>
+        </f:DynamicPage>
+    </m:Shell>
 </mvc:XMLView>

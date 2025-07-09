@@ -14,15 +14,6 @@ framework:
     - name: themelib_sap_horizon
 server:
   customMiddleware:
-    - name: fiori-tools-proxy
-      afterMiddleware: compression
-      configuration:
-        ignoreCertError: false # If set to true, certificate errors will be ignored. E.g. self-signed certificates will be accepted
-        backend:
-          - path: /sap/opu/odata/sap/ZSB_HANDHELD_V2
-            destination: zsb_handheld_v2_destination
-          - path: /sap/opu/odata/sap/API_PRODUCTION_ORDER_2_SRV
-            destination: production_order_destination
     - name: fiori-tools-appreload
       afterMiddleware: compression
       configuration:
@@ -34,3 +25,7 @@ server:
       configuration:
         component: logaligroup.mapeobapi
         ui5Theme: sap_horizon
+    - name: fiori-tools-proxy
+      afterMiddleware: compression
+      configuration:
+        ignoreCertError: false # If set to true, certificate errors will be ignored. E.g. self-signed certificates will be accepted

@@ -9,6 +9,8 @@ sap.ui.define([
 
     return BaseController.extend("logaligroup.mapeobapi.controller.Main", {
         onInit: function () {
+
+            
             const oModel = new JSONModel({
                 header: {
                     pstng_date: new Date().toISOString().split("T")[0], // PostingDate
@@ -240,7 +242,7 @@ sap.ui.define([
                 if (!this.oItemsDialog) {
                     this.oItemsDialog = await Fragment.load({
                         id: this.getView().getId(),
-                        name: "logaligroup.mapeobapi.view.fragments.ReferenceItemsDialog",
+                        name: "logaligroup.mapeobapi.fragments.ItemsDialog",
                         controller: this
                     });
                     this.getView().addDependent(this.oItemsDialog);

@@ -15,11 +15,6 @@ server:
             - /resources
             - /test-resources
           url: https://ui5.sap.com
-        backend:
-          - path: /sap/opu/odata/sap/ZSB_HANDHELD_V2
-            destination: zsb_handheld_v2_destination
-          - path: /sap/opu/odata/sap/API_PRODUCTION_ORDER_2_SRV
-            destination: production_order_destination
     - name: fiori-tools-appreload
       afterMiddleware: compression
       configuration:
