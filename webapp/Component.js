@@ -1,26 +1,29 @@
-sap.ui.define([
-  "sap/ui/core/UIComponent",
-  "logaligroup/mapeobapi/model/models"
-], (UIComponent, models) => {
-  "use strict";
 
-  return UIComponent.extend("logaligroup.mapeobapi.Component", {
-      metadata: {
-          manifest: "json",
-          interfaces: [
-              "sap.ui.core.IAsyncContentCreation"
-          ]
-      },
+     sap.ui.define([
+         "sap/ui/core/UIComponent",
+         "sap/ui/Device",
+         "logaligroup/mapeobapi/model/models"
+     ], function (UIComponent, Device, models) {
+         "use strict";
 
-      init() {
-          // call the base component's init function
-          UIComponent.prototype.init.apply(this, arguments);
+         return UIComponent.extend("logaligroup.mapeobapi.Component", {
+             metadata: {
+                 manifest: "json"
+             },
 
-          // set the device model
-          this.setModel(models.createDeviceModel(), "device");
+             init: function () {
+                 // Call the base component's init function
+                 UIComponent.prototype.init.apply(this, arguments);
 
-          // enable routing
-          this.getRouter().initialize();
-      }
-  });
-});
+                 // Initialize the router
+                 this.getRouter().initialize();
+
+                 // Set the device model
+                 this.setModel(models.createDeviceModel(), "device");
+
+                 // Log for debugging
+                 console.log("mockModel en Component.init:", this.getModel("mockModel"));
+             }
+         });
+     });
+   

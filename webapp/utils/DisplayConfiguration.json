@@ -1,7 +1,7 @@
 {
     "Header": {
         "operacion_almacen": true,
-        "claseMov": false,
+        "claseMov": true,
         "fecha_doc": true,
         "fecha_cont": true,
         "referencia": true,

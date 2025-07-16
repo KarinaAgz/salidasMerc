@@ -1,0 +1,26 @@
+{
+    "d": {
+        "results": [
+            {
+                "ProductionOrder": "ORD123",
+                "Material": "MAT001",
+                "RequiredQuantity": "100",
+                "WithdrawnQuantity": "20",
+                "BaseUnitSAPCode": "ST",
+                "Plant": "PL01",
+                "StorageLocation": "SL01",
+                "GoodsMovementType": "261"
+            },
+            {
+                "ProductionOrder": "ORD123",
+                "Material": "MAT002",
+                "RequiredQuantity": "50",
+                "WithdrawnQuantity": "10",
+                "BaseUnitSAPCode": "KG",
+                "Plant": "PL01",
+                "StorageLocation": "SL02",
+                "GoodsMovementType": "261"
+            }
+        ]
+    }
+}

@@ -1,0 +1,16 @@
+{
+    "d": {
+        "results": [
+            {
+                "Material": "MAT001",
+                "MaterialDescription": "Material de prueba 1",
+                "IsBatchManagementRequired": true
+            },
+            {
+                "Material": "MAT002",
+                "MaterialDescription": "Material de prueba 2",
+                "IsBatchManagementRequired": false
+            }
+        ]
+    }
+}

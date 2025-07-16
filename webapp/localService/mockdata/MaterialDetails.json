@@ -1,0 +1,28 @@
+{
+    "results": [
+        {
+            "MaterialID": "MAT001",
+            "Batch": "BATCH001",
+            "UnitOfMeasure": "ST",
+            "Plant": "PL01",
+            "StorageLocation": "SL01"
+        },
+        {
+            "MaterialID": "MAT002",
+            "Batch": "BATCH002",
+            "UnitOfMeasure": "KG",
+            "Plant": "PL01",
+            "StorageLocation": "SL02"
+        },
+        {
+            "Material": "MAT003",
+            "MaterialDescription": "Material de prueba",
+            "RequiredQuantity": "100",
+            "WithdrawnQuantity": "50",
+            "BaseUnitSAPCode": "UN",
+            "Plant": "1000",
+            "StorageLocation": "0001",
+            "IsBatchManagementRequired": false
+        }
+    ]
+}

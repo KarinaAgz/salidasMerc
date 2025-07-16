@@ -1,17 +1,27 @@
 <core:FragmentDefinition
-  xmlns="sap.m"
-  xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
 >
-  <SelectDialog
-    title="Seleccionar Motivo"
-    contentWidth="400px"
-  >
-    <items>
-      <StandardListItem
-        title="{mainModel>text}"
-        description="{mainModel>key}"
-        key="{mainModel>key}"
-      />
-    </items>
-  </SelectDialog>
+    <SelectDialog
+        id="moveReasValueHelp"
+        title="{i18n>seleccionarMotivo}"
+        contentWidth="90%"
+        contentHeight="400px"
+        stretch="{device>/system/phone}"
+        confirm=".onMoveReasConfirm"
+        search=".onMoveReasSearch"
+        items="{mainModel>/config/moveReasons}"
+        noDataText="{i18n>noMotivosEncontrados}"
+        icon="sap-icon://filter"
+    >
+        <items>
+            <StandardListItem
+                title="{mainModel>text}"
+                description="{mainModel>key}"
+                key="{mainModel>key}"
+                type="Active"
+                tooltip="{i18n>seleccionarMotivoTooltip}"
+            />
+        </items>
+    </SelectDialog>
 </core:FragmentDefinition>

@@ -1,0 +1,11 @@
+specVersion: "2.6"
+metadata:
+  name: logaligroup.mapeobapi
+type: application
+server:
+  customMiddleware:
+    - name: fiori-tools-mock
+      afterMiddleware: compression
+      configuration:
+        mockdataRootPath: webapp/localService/mockdata
+        utilsRootPath: webapp/utils

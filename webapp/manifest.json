@@ -17,12 +17,16 @@
     },
     "dataSources": {
       "mainService": {
-        "uri": "sap/opu/odata/sap/ZSB_HANDHELD_V2/",
+        "uri": "/sap/opu/odata/sap/ZSB_HANDHELD_V2/",
         "type": "OData",
         "settings": {
           "odataVersion": "2.0",
           "localUri": "localService/mainService/metadata.xml"
         }
+      },
+      "mockDataSource": {
+        "uri": "/localService/mockdata/",
+        "type": "JSON"
       },
       "productionOrderService": {
         "uri": "/sap/opu/odata/dap/API_PRODUCTION_ORDER_2_SRV/",
@@ -65,6 +69,19 @@
           "bundleName": "logaligroup.mapeobapi.i18n.i18n"
         }
       },
+      "mainModel": {
+        "type": "sap.ui.model.json.JSONModel",
+        "settings": {
+          "defaultBindingMode": "TwoWay"
+        }
+      },
+      "mockModel": {
+        "dataSource": "mockDataSource",
+        "type": "sap.ui.model.json.JSONModel",
+        "settings": {
+          "defaultBindingMode": "OneWay"
+        }
+      },
       "odataModel": {
         "type": "sap.ui.model.odata.v2.ODataModel",
         "settings": {
@@ -83,60 +100,66 @@
           "defaultCountMode": "None"
         },
         "dataSource": "productionOrderService"
+      },
+      "claseMovModel": {
+        "type": "sap.ui.model.json.JSONModel",
+        "uri": "/localService/mockdata/Z_C_CLASEMOV.json",
+        "settings": {
+          "defaultBindingMode": "OneWay"
+        }
       }
-    
-  },
-  "resources": {
-    "js": [
-      {
-        "uri": "thirdparty/quagga.min.js"
-      }
-    ],
-    "css": [
-      {
-        "uri": "css/style.css"
-      }
-    ]
-  },
-  "routing": {
-    "config": {
-      "routerClass": "sap.m.routing.Router",
-      "controlAggregation": "pages",
-      "controlId": "app",
-      "transition": "slide",
-      "type": "View",
-      "viewType": "XML",
-      "path": "logaligroup.mapeobapi.view",
-      "async": true
     },
-    "routes": [
-      {
-        "name": "RouteMain",
-        "pattern": "",
-        "target": "Main"
+    "resources": {
+      "js": [
+        {
+          "uri": "thirdparty/quagga.min.js"
+        }
+      ],
+      "css": [
+        {
+          "uri": "css/style.css"
+        }
+      ]
+    },
+    "routing": {
+      "config": {
+        "routerClass": "sap.m.routing.Router",
+        "controlAggregation": "pages",
+        "controlId": "app",
+        "transition": "slide",
+        "type": "View",
+        "viewType": "XML",
+        "path": "logaligroup.mapeobapi.view",
+        "async": true
       },
-      {
-        "name": "RouteItem",
-        "pattern": "item",
-        "target": "Item"
+      "routes": [
+        {
+          "name": "RouteMain",
+          "pattern": "",
+          "target": "Main"
+        },
+        {
+          "name": "RouteItem",
+          "pattern": "item",
+          "target": "Item"
+        }
+      ],
+      "targets": {
+        "Main": {
+          "id": "Main",
+          "name": "Main"
+        },
+        "Item": {
+          "id": "Item",
+          "name": "Item"
+        }
       }
-    ],
-    "targets": {
-      "Main": {
-        "id": "Main",
-        "name": "Main"
-      },
-      "Item": {
-        "id": "Item",
-        "name": "Item"
-      }
+    },
+    "rootView": {
+      "viewName": "logaligroup.mapeobapi.view.App",
+      "type": "XML",
+      "id": "app",
+      "async": true
     }
-  },
-  "rootView": {
-    "viewName": "logaligroup.mapeobapi.view.App",
-    "type": "XML",
-    "id": "app",
-    "async": true
   }
-}
 }

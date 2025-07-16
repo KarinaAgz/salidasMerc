@@ -3,9 +3,16 @@
     xmlns:core="sap.ui.core"
     xmlns:layout="sap.ui.layout.form"
 >
-    <VBox id="_IDGenVBox1" width="100%" fitContainer="true" class="sapUiMediumMargin">
-        <!-- Formulario para datos de ítem -->
-        <layout:SimpleForm id="_IDGenSimpleForm1"
+    <!-- Contenedor principal vertical -->
+    <VBox
+        id="_IDGenVBox2"
+        width="100%"
+        fitContainer="true"
+        class="sapUiMediumMargin"
+    >
+        <!-- Formulario para datos de posición -->
+        <layout:SimpleForm
+            id="_IDGenSimpleForm1"
             editable="true"
             layout="ResponsiveGridLayout"
             labelSpanL="4"
@@ -17,187 +24,211 @@
             emptySpanS="0"
             columnsL="1"
             columnsM="1"
-            backgroundDesign="Solid"
+            singleContainerFullSize="true"
             class="sapUiForm sapUiSizeCompact"
+            title="{i18n>datosPosicion}"
         >
             <layout:content>
-                <Label id="_IDGenLabel" text="Material" design="Bold" />
-                <HBox id="_IDGenHBox1" class="sapUiSmallMarginBottom" alignItems="Center" fitContainer="true">
+                <!-- Material -->
+                <Label
+                    id="materialLabel"
+                    text="{i18n>material}"
+                    design="Bold"
+                    required="true"
+                />
+                <HBox
+                    id="_IDGenHBox2"
+                    alignItems="Center"
+                    class="sapUiMediumMarginBottom"
+                >
                     <Input
                         id="material"
                         value="{mainModel>/currentItem/material}"
-                        submit="onMaterialScanned"
-                        placeholder="Escanea o ingresa el material"
-                        type="Text"
-                        class="sapUiTinyMarginEnd"
-                        width="100%"
-                    >
-                        <layoutData>
-                            <FlexItemData id="_IDGenFlexItemData1" growFactor="1" />
-                        </layoutData>
-                    </Input>
-                    <Button id="_IDGenButton4"
-                        
-                        type="Emphasized"
-                        press="onScanMaterial"
+                        valueState="{mainModel>/currentItem/materialState}"
+                        valueStateText="{mainModel>/currentItem/materialStateText}"
+                        submit=".onMaterialScanned"
+                        placeholder="{i18n>ingreseMaterial}"
+                    />
+                    <Button
+                        id="scanMaterial"
                         icon="sap-icon://bar-code"
-                        width="1rem"
+                        tooltip="{i18n>scanMaterial}"
+                        press=".onScanMaterial"
+                        type="Transparent"
+                        class="sapUiSmallMarginBegin"
                     />
                 </HBox>
 
-                <Label id="_IDGenLabel7" text="Cantidad" design="Bold" />
+                <!-- Cantidad -->
+                <Label
+                    id="entryQntLabel"
+                    text="{i18n>cantidad}"
+                    design="Bold"
+                    required="true"
+                />
                 <Input
                     id="entryQnt"
                     value="{mainModel>/currentItem/entry_qnt}"
+                    valueState="{mainModel>/currentItem/quantityState}"
+                    valueStateText="{mainModel>/currentItem/quantityStateText}"
+                    change=".onQuantityChange"
+                    placeholder="{i18n>ingreseCantidad}"
                     type="Number"
-                    width="100%"
-                    class="sapUiSmallMarginBottom"
+                    class="sapUiMediumMarginBottom"
                 />
 
-                <Label id="_IDGenLabel8" text="UM" design="Bold" />
+                <!-- Unidad de medida -->
+                <Label
+                    id="entryUomLabel"
+                    text="{i18n>um}"
+                    design="Bold"
+                    required="true"
+                />
                 <Input
                     id="entryUom"
                     value="{mainModel>/currentItem/entry_uom}"
-                    type="Text"
-                    width="100%"
-                    class="sapUiSmallMarginBottom"
+                    placeholder="{i18n>ingreseUM}"
+                    enabled="false"
+                    class="sapUiMediumMarginBottom"
                 />
 
-                <Label id="_IDGenLabel9" text="Lote" design="Bold" />
+                <!-- Lote -->
+                <Label
+                    id="batchLabel"
+                    text="{i18n>lote}"
+                    design="Bold"
+                    required="{mainModel>/currentItem/isBatchRequired}"
+                />
                 <Input
                     id="batch"
                     value="{mainModel>/currentItem/batch}"
-                    type="Text"
-                    width="100%"
-                    class="sapUiSmallMarginBottom"
+                    enabled="{mainModel>/currentItem/isBatchRequired}"
+                    placeholder="{i18n>ingreseLote}"
+                    class="sapUiMediumMarginBottom"
                 />
 
-                <Label id="_IDGenLabel10" text="Centro" design="Bold" />
+                <!-- Centro -->
+                <Label
+                    id="plantLabel"
+                    text="{i18n>centro}"
+                    design="Bold"
+                    required="true"
+                />
                 <Input
                     id="plant"
                     value="{mainModel>/currentItem/plant}"
-                    type="Text"
-                    width="100%"
-                    class="sapUiSmallMarginBottom"
+                    placeholder="{i18n>ingreseCentro}"
+                    enabled="false"
+                    class="sapUiMediumMarginBottom"
                 />
 
-                <Label id="_IDGenLabel11" text="Almacén" design="Bold" />
+                <!-- Almacén -->
+                <Label
+                    id="stgeLocLabel"
+                    text="{i18n>almacen}"
+                    design="Bold"
+                    required="true"
+                />
                 <Input
                     id="stgeLoc"
                     value="{mainModel>/currentItem/stge_loc}"
-                    type="Text"
-                    width="100%"
-                    class="sapUiSmallMarginBottom"
+                    placeholder="{i18n>ingreseAlmacen}"
+                    enabled="false"
+                    class="sapUiMediumMarginBottom"
                 />
 
-                <Label id="_IDGenLabel12" text="Centro de Costo" design="Bold" />
+                <!-- Centro de costo -->
+                <Label
+                    id="costcenterLabel"
+                    text="{i18n>ceco}"
+                    design="Bold"
+                    required="{= ${mainModel>/savedHeader/move_type} === '201' || ${mainModel>/savedHeader/move_type} === '551'}"
+                />
                 <Input
                     id="costcenter"
                     value="{mainModel>/currentItem/costcenter}"
-                    visible="{= ${mainModel>/savedHeader/move_type} === '201' || ${mainModel>/savedHeader/move_type} === '551' }"
-                    type="Text"
-                    width="100%"
-                    class="sapUiSmallMarginBottom"
+                    visible="{= ${mainModel>/savedHeader/move_type} === '201' || ${mainModel>/savedHeader/move_type} === '551'}"
+                    placeholder="{i18n>ingreseCeco}"
+                    class="sapUiMediumMarginBottom"
                 />
 
-                <Label id="_IDGenLabel13" text="Orden de Compra" design="Bold" />
-                <Input
-                    id="orderid"
-                    value="{mainModel>/currentItem/orderid}"
-                    visible="{= ${mainModel>/savedHeader/move_type} === '261' }"
-                    type="Text"
-                    width="100%"
-                    class="sapUiSmallMarginBottom"
+                <!-- Motivo -->
+                <Label
+                    id="moveReasLabel"
+                    text="{i18n>motivo}"
+                    design="Bold"
                 />
-
-                <Label id="_IDGenLabel14" text="Motivo" design="Bold" />
                 <Input
                     id="moveReas"
                     value="{mainModel>/currentItem/move_reas}"
-                    visible="{= ${mainModel>/savedHeader/move_type} === '551' }"
-                    showValueHelp="true"
-                    valueHelpRequest="onMoveReasValueHelp"
-                    type="Text"
-                    width="100%"
-                    class="sapUiSmallMarginBottom"
+                    placeholder="{i18n>seleccionarMotivo}"
+                    class="sapUiMediumMarginBottom"
                 />
 
-                <Label id="_IDGenLabel15" text="Reserva No" design="Bold" />
-                <Input
-                    id="reservNo"
-                    value="{mainModel>/currentItem/reserv_no}"
-                    visible="{= ${mainModel>/savedHeader/move_type} === '201' }"
-                    type="Text"
-                    width="100%"
-                    class="sapUiSmallMarginBottom"
+                <!-- Texto de posición -->
+                <Label
+                    id="positionTxtLabel"
+                    text="{i18n>txt_posicion}"
+                    design="Bold"
                 />
-
-                <Label id="_IDGenLabel16" text="Ítem Reserva" design="Bold" />
-                <Input
-                    id="resItem"
-                    value="{mainModel>/currentItem/res_item}"
-                    visible="{= ${mainModel>/savedHeader/move_type} === '201' }"
-                    type="Text"
-                    width="100%"
-                    class="sapUiSmallMarginBottom"
-                />
-
-                <Label id="_IDGenLabel17" text="Texto Posición" design="Bold" />
                 <TextArea
                     id="positionTxt"
                     value="{mainModel>/currentItem/position_txt}"
                     rows="3"
                     growing="true"
-                    width="100%"
-                    class="sapUiSmallMarginBottom"
+                    maxLength="40"
+                    placeholder="{i18n>ingreseTextoPosicion}"
+                    class="sapUiMediumMarginBottom"
                 />
 
+                <!-- Historial de texto de posición -->
+                <Label
+                    id="positionTxtHistoryLabel"
+                    text="{i18n>historial_texto_posicion}"
+                    design="Bold"
+                />
+                <TextArea
+                    id="positionTxtHistory"
+                    value="{mainModel>/currentItem/position_txt_history}"
+                    editable="false"
+                    rows="5"
+                    class="sapUiMediumMarginBottom"
+                />
             </layout:content>
         </layout:SimpleForm>
 
         <!-- Botones de acción -->
-        <FlexBox id="_IDGenFlexBox"
+        <HBox
+            id="_IDGenHBox1"
             justifyContent="End"
             alignItems="Center"
-            wrap="Wrap"
-            direction="Row"
-            width="50%"
-            class="sapUiResponsiveMargin"
+            width="95%"
+            class="sapUiMediumMargin"
         >
-            <Button id="_IDGenButton5"
-                text="Guardar"
+            <Button
+                id="fetchDetails"
+                text="{i18n>fetchDetails}"
+                type="Emphasized"
+                press=".onFetchDetails"
+                icon="sap-icon://detail-view"
+                class="sapUiTinyMarginEnd customCompactButton"
+            />
+            <Button
+                id="saveItem"
+                text="{i18n>contabilizar}"
                 type="Accept"
-                press="onSaveItem"
-                icon="sap-icon://save"
-                width="auto"
-                class="sapUiTinyMarginEnd sapUiTinyMarginBottom  customGreen"
+                press=".onSaveItem"
+                icon="sap-icon://sys-enter"
+                class="sapUiTinyMarginEnd customCompactButton"
             />
-            <Button id="_IDGenButton6"
-                text="Cancelar"
+            <Button
+                id="cancelItem"
+                text="{i18n>cancelar}"
                 type="Reject"
-                press="onCancelItem"
+                press=".onCancelItem"
                 icon="sap-icon://decline"
-                width="auto"
-                class="sapUiTinyMarginBottom customRed"
+                class="sapUiTinyMarginEnd customCompactButton"
             />
-             <Button 
-                text="Contabilizar"
-                type="Attention"
-                press="onCancelItem"
-                icon="sap-icon://decline"
-                width="auto"
-                class="sapUiTinyMarginBottom"
-            />
-             <Button 
-                text="Buscar detalles"
-                style="background-color: green; color: white;"
-
-                press="onCancelItem"
-                icon="sap-icon://decline"
-                width="auto"
-                class="sapUiTinyMarginBottom"
-            />
-        </FlexBox>
-
+        </HBox>
     </VBox>
 </core:FragmentDefinition>

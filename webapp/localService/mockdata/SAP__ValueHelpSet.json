@@ -1,0 +1,16 @@
+{
+    "results": [
+        {
+            "VALUEHELP": "MoveReason",
+            "FIELD_VALUE": "0001",
+            "DESCRIPTION": "Motivo 1 - Scrap",
+            "FIELD_NAME": "551"
+        },
+        {
+            "VALUEHELP": "MoveReason",
+            "FIELD_VALUE": "0002",
+            "DESCRIPTION": "Motivo 2 - Obsolescencia",
+            "FIELD_NAME": "551"
+        }
+    ]
+}

@@ -1,0 +1,14 @@
+[
+    {
+        "ClaseMovimiento": "201",
+        "Descripcion": "Consumo para orden"
+    },
+    {
+        "ClaseMovimiento": "261",
+        "Descripcion": "Consumo para orden de producción"
+    },
+    {
+        "ClaseMovimiento": "551",
+        "Descripcion": "Desguace"
+    }
+]

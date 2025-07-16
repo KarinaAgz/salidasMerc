@@ -1,124 +1,340 @@
+<!-- Definición del fragmento XML para la pestaña "Orden Completa" -->
 <core:FragmentDefinition
     xmlns="sap.m"
     xmlns:core="sap.ui.core"
     xmlns:layout="sap.ui.layout.form"
 >
+    <!-- Contenedor principal vertical -->
     <VBox
+        id="_IDGenVBox1"
         width="100%"
         fitContainer="true"
+        class="sapUiMediumMargin"
     >
-        <!-- Resumen de la cabecera -->
+        <!-- Resumen de la cabecera en un formulario de solo lectura -->
         <layout:SimpleForm
+            id="headerSummaryForm"
             editable="false"
             layout="ResponsiveGridLayout"
-            labelSpanL="4"
-            labelSpanM="4"
+            labelSpanL="3" 
+            labelSpanM="3"
             labelSpanS="12"
-            emptySpanL="0"
-            emptySpanM="0"
+            adjustLabelSpan="false"
+            emptySpanL="5" 
+            emptySpanM="5"
             emptySpanS="0"
             columnsL="1"
             columnsM="1"
-            backgroundDesign="Translucent"
+            singleContainerFullSize="true"
+            class="sapUiForm sapUiSizeCompact"
+            
         >
-            <Label
-                text="Operación de Almacén"
-                design="Bold"
-            />
-            <Text text="{mainModel>/savedHeader/reference_type}" />
-            <Label
-                text="Clase de Movimiento"
-                design="Bold"
-            />
-            <Text text="{mainModel>/savedHeader/move_type}" />
-            <Label
-                text="Fecha Documento"
-                design="Bold"
-            />
-            <Text text="{mainModel>/savedHeader/doc_date}" />
-            <Label
-                text="Fecha Contabilización"
-                design="Bold"
-            />
-            <Text text="{mainModel>/savedHeader/pstng_date}" />
-            <Label
-                text="Referencia"
-                design="Bold"
-            />
-            <Text text="{mainModel>/savedHeader/ref_doc_no}" />
-            <Label
-                text="Texto Cabecera"
-                design="Bold"
-            />
-            <Text text="{mainModel>/savedHeader/header_txt}" />
+            <layout:content>
+                <!-- Etiqueta y texto para el tipo de movimiento -->
+                <Label
+                    id="moveTypeLabel"
+                    text="{i18n>salida_mercancia}"
+                    design="Bold"
+                    
+                />
+                
+                <ToolbarSpacer ></ToolbarSpacer>
+                <Text
+                    id="moveTypeText"
+                    text="{mainModel>/savedHeader/movementDescription}"
+                    class="sapUiSmallMarginBottom"
+                />
+                
+                <!-- Etiqueta y texto para la fecha del documento -->
+                <Label
+                    id="docDateLabel"
+                    text="{i18n>fecha_doc}"
+                    design="Bold"
+                />
+                <ToolbarSpacer ></ToolbarSpacer>
+                <Text
+                    id="docDateText"
+                    text="{mainModel>/savedHeader/doc_date}"
+                    class="sapUiSmallMarginBottom"
+                    
+                />
+                <!-- Etiqueta y texto para la fecha de contabilización -->
+                <Label
+                    id="pstngDateLabel"
+                    text="{i18n>fecha_cont}"
+                    design="Bold"
+                />
+                <ToolbarSpacer ></ToolbarSpacer>
+                <Text
+                    id="pstngDateText"
+                    text="{mainModel>/savedHeader/pstng_date}"
+                    class="sapUiSmallMarginBottom"
+                />
+                <!-- Etiqueta y texto para el documento de referencia -->
+                <Label
+                    id="refDocNoLabel"
+                    text="{i18n>referencia}"
+                    design="Bold"
+                />
+                <ToolbarSpacer ></ToolbarSpacer>
+                <Text
+                    id="refDocNoText"
+                    text="{mainModel>/savedHeader/ref_doc_no}"
+                    class="sapUiSmallMarginBottom"
+                />
+                <!-- Etiqueta y texto para el texto de cabecera -->
+                <Label
+                    id="headerTxtLabel"
+                    text="{i18n>texto_cabecera}"
+                    design="Bold"
+                />
+                <ToolbarSpacer ></ToolbarSpacer>
+                <Text
+                    id="headerTxtText"
+                    text="{mainModel>/savedHeader/header_txt}"
+                    class="sapUiSmallMarginBottom"
+                />
+                <!-- Contenedor para botones de acción -->
+                <Label text=""></Label>
+                <HBox
+                    id="actionButtonsBox"
+                    justifyContent="Center"
+                    alignItems="Center"
+                    width="100%"
+                    class="sapUiMediumMarginTop sapUiSizeCompact"
+                >
+                    <!-- Botón para agregar un nuevo componente -->
+                    <Button
+                        id="addComponentButton"
+                        text="{i18n>agregar}"
+                        type="Success"
+                        press=".onAddComponent"
+                        icon="sap-icon://sys-add"
+                        iconFirst="true"
+                        width="95px"
+                        class="sapUiTinyMarginEnd customCompactButton"
+                        tooltip="{i18n>agregar_componente_tooltip}"
+                    />
+                    <!-- Separador visual -->
+                    <ToolbarSeparator />
+                    <!-- Botón para reiniciar el proceso -->
+                    <Button
+                        id="resetProcessButton"
+                        text="{i18n>reiniciar}"
+                        type="Reject"
+                        press=".onResetProcess"
+                        icon="sap-icon://refresh"
+                        iconFirst="true"
+                        width="95px"
+                        class="sapUiTinyMarginStart customCompactButton"
+                        tooltip="{i18n>reiniciar_proceso_tooltip}"
+                    />
+                </HBox>
+            </layout:content>
         </layout:SimpleForm>
-        <!-- Tabla de ítems -->
+
+        <!-- Contador de ítems registrados -->
+        <HBox
+            id="itemCountBox"
+            alignItems="Center"
+            class="sapUiSmallMarginTop"
+        >
+            <!-- Etiqueta para el contador -->
+            <Label
+                id="itemCountLabel"
+                text="{i18n>total_items}"
+                design="Bold"
+            />
+            <!-- Texto que muestra el número de ítems -->
+            <Text
+                id="itemCountText"
+                text="{mainModel>/itemCount}"
+                class="sapUiTinyMarginBegin"
+            />
+        </HBox>
+
+       
+        <!-- Tabla que muestra todos los ítems registrados -->
         <Table
             id="itemsTable"
             items="{mainModel>/items}"
-            mode="Delete"
-            delete="onDeleteItem"
+            class="sapUiSmallMarginBottom"
+            mode="SingleSelectMaster"
             growing="true"
             growingThreshold="10"
+            noDataText="{i18n>noItemsFound}"
+            selectionChange=".onItemSelected"
         >
-            <headerToolbar>
-                <Toolbar>
-                    <Title text="Ítems ({mainModel>/itemCount})" />
-                </Toolbar>
-            </headerToolbar>
             <columns>
-                <Column>
-                    <Text text="Material" />
+                <!-- Columna para el material -->
+                <Column
+                    id="materialColumn"
+                    width="auto"
+                    hAlign="Left"
+                >
+                    <Label
+                        id="materialColumnText"
+                        text="{i18n>material}"
+                        design="Bold"
+                    />
                 </Column>
-                <Column>
-                    <Text text="Cantidad" />
+                <!-- Columna para la cantidad -->
+                <Column
+                    id="entryQntColumn"
+                    width="auto"
+                    hAlign="Right"
+                >
+                    <Label
+                        id="entryQntColumnText"
+                        text="{i18n>cantidad}"
+                        design="Bold"
+                    />
                 </Column>
-                <Column>
-                    <Text text="UM" />
+                <!-- Columna para la unidad de medida -->
+                <Column
+                    id="entryUomColumn"
+                    width="auto"
+                    hAlign="Center"
+                >
+                    <Label
+                        id="entryUomColumnText"
+                        text="{i18n>um}"
+                        design="Bold"
+                    />
                 </Column>
-                <Column>
-                    <Text text="Centro" />
+                <!-- Columna para el lote -->
+                <Column
+                    id="batchColumn"
+                    width="auto"
+                    hAlign="Center"
+                >
+                    <Label
+                        id="batchColumnText"
+                        text="{i18n>lote}"
+                        design="Bold"
+                    />
                 </Column>
-                <Column>
-                    <Text text="Almacén" />
+                <!-- Columna para el centro -->
+                <Column
+                    id="plantColumn"
+                    width="auto"
+                    hAlign="Center"
+                >
+                    <Label
+                        id="plantColumnText"
+                        text="{i18n>centro}"
+                        design="Bold"
+                    />
                 </Column>
-                <Column>
-                    <Text text="Centro de Costo" />
+                <!-- Columna para el almacén -->
+                <Column
+                    id="stgeLocColumn"
+                    width="auto"
+                    hAlign="Center"
+                >
+                    <Label
+                        id="stgeLocColumnText"
+                        text="{i18n>almacen}"
+                        design="Bold"
+                    />
                 </Column>
-                <Column>
-                    <Text text="Orden de Compra" />
+                <!-- Columna para el centro de costo -->
+                <Column
+                    id="costcenterColumn"
+                    width="auto"
+                    hAlign="Center"
+                >
+                    <Label
+                        id="costcenterColumnText"
+                        text="{i18n>ceco}"
+                        design="Bold"
+                    />
                 </Column>
-                <Column>
-                    <Text text="Motivo" />
+                <!-- Columna para el motivo -->
+                <Column
+                    id="moveReasColumn"
+                    width="auto"
+                    hAlign="Left"
+                >
+                    <Label
+                        id="moveReasColumnText"
+                        text="{i18n>motivo}"
+                        design="Bold"
+                    />
+                </Column>
+                <!-- Columna para la acción de eliminar -->
+                <Column
+                    id="actionColumn"
+                    width="120px"
+                    hAlign="Center"
+                >
+                    <Label
+                        id="actionColumnText"
+                        text="{i18n>accion}"
+                        design="Bold"
+                    />
                 </Column>
             </columns>
             <items>
-                <ColumnListItem>
+                <!-- Fila de la tabla para cada ítem -->
+                <ColumnListItem
+                    id="itemRow"
+                    type="Active"
+                    press=".onItemSelected"
+                >
                     <cells>
-                        <Text text="{mainModel>material}" />
-                        <Text text="{mainModel>entry_qnt}" />
-                        <Text text="{mainModel>entry_uom}" />
-                        <Text text="{mainModel>plant}" />
-                        <Text text="{mainModel>stge_loc}" />
-                        <Text text="{mainModel>costcenter}" />
-                        <Text text="{mainModel>orderid}" />
-                        <Text text="{mainModel>move_reas}" />
+                        <!-- Celda para el material -->
+                        <Text
+                            id="materialCell"
+                            text="{mainModel>material}"
+                        />
+                        <!-- Celda para la cantidad -->
+                        <Text
+                            id="entryQntCell"
+                            text="{mainModel>entry_qnt}"
+                        />
+                        <!-- Celda para la unidad de medida -->
+                        <Text
+                            id="entryUomCell"
+                            text="{mainModel>entry_uom}"
+                        />
+                        <!-- Celda para el lote -->
+                        <Text
+                            id="batchCell"
+                            text="{mainModel>batch}"
+                        />
+                        <!-- Celda para el centro -->
+                        <Text
+                            id="plantCell"
+                            text="{mainModel>plant}"
+                        />
+                        <!-- Celda para el almacén -->
+                        <Text
+                            id="stgeLocCell"
+                            text="{mainModel>stge_loc}"
+                        />
+                        <!-- Celda para el centro de costo -->
+                        <Text
+                            id="costcenterCell"
+                            text="{mainModel>costcenter}"
+                        />
+                        <!-- Celda para el motivo -->
+                        <Text
+                            id="moveReasCell"
+                            text="{mainModel>move_reas}"
+                        />
+                        <!-- Botón para eliminar el ítem -->
+                        <Button
+                            id="deleteButton"
+                            icon="sap-icon://delete"
+                            press=".onDeleteItem"
+                            type="Reject"
+                            tooltip="{i18n>eliminar_item}"
+                        />
                     </cells>
                 </ColumnListItem>
             </items>
         </Table>
-        <!-- Botones de acción -->
-        <HBox
-            justifyContent="End"
-            width="100%"
-            class="sapUiSmallMarginTop"
-        >
-            <Button
-                text="Enviar Orden"
-                type="Accept"
-                press="onSubmit"
-                icon="sap-icon://accept"
-            />
-        </HBox>
     </VBox>
 </core:FragmentDefinition>
+

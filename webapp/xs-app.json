@@ -1,0 +1,20 @@
+{
+    "welcomeFile": "/index.html",
+    "routes": [
+        {
+            "source": "^/localService/mockdata/(.*)$",
+            "target": "/localService/mockdata/$1",
+            "localDir": "webapp"
+        },
+        {
+            "source": "^/utils/(.*)$",
+            "target": "/utils/$1",
+            "localDir": "webapp"
+        },
+        {
+            "source": "^/sap/opu/odata/(.*)$",
+            "target": "/sap/opu/odata/$1",
+            "destination": "backend"
+        }
+    ]
+}

@@ -1,11 +1,18 @@
 <core:FragmentDefinition
+    xmlns:vk="sap.ui.vk"
     xmlns:core="sap.ui.core"
     xmlns:m="sap.m"
     xmlns:layout="sap.ui.layout.form"
 >
-    <m:VBox id="_IDGenVBox" width="100%" fitContainer="true" class="sapUiMediumMargin">
-        
-        <layout:SimpleForm id="_IDGenSimpleForm"
+    <!--formulario  responsive -->
+    <m:VBox
+        id="_IDGenVBox"
+        width="100%"
+        fitContainer="true"
+        class="sapUiMediumMargin"
+    >
+        <layout:SimpleForm
+            id="_IDGenSimpleForm"
             editable="true"
             layout="ResponsiveGridLayout"
             labelSpanL="4"
@@ -19,21 +26,35 @@
             columnsM="1"
             singleContainerFullSize="true"
             backgroundDesign="Solid"
-            
             class="sapUiForm sapUiSizeCompact"
         >
-            <layout:content >
-                <m:Label id="_IDGenLabel1" text="{i18n>salidaMercancia}" design="Bold" />
+            <layout:content>
+                <m:Label
+                    id="_IDGenLabel1"
+                    text="{i18n>salidaMercancia}"
+                    design="Bold"
+                />
+                <!--Selector para elegir el tipo de movimiento (201, 261, 551)-->
                 <m:Select
                     id="referenceType"
                     change=".onReferenceTypeChange"
-                    items="{odataModel>/Z_C_CLASEMOV}"
+                    items="{claseMovModel>/}"
+                    selectedKey="{mainModel>/header/move_type}"
                     width="100%"
                     class="sapUiSmallMarginBottom"
+                    required="true"
                 >
-                    <core:Item id="_IDGenItem" key="{odataModel>ClaseMovimiento}" text="{odataModel>Descripcion}"/>
+                    <core:Item
+                        key="{claseMovModel>ClaseMovimiento}"
+                        text="{claseMovModel>Descripcion}"
+                    />
                 </m:Select>
-                <m:Label id="_IDGenLabel2" text="{i18n>claseMovimiento}" design="Bold"/>
+
+                <m:Label
+                    id="_IDGenLabel2"
+                    text="{i18n>claseMovimiento}"
+                    design="Bold"
+                />
                 <m:Input
                     id="moveTypeManual"
                     value="{mainModel>/header/move_type}"
@@ -42,7 +63,12 @@
                     width="100%"
                     class="sapUiSmallMarginBottom"
                 />
-                <m:Label id="_IDGenLabel3" text="{i18n>fechaDocumento}" design="Bold" />
+
+                <m:Label
+                    id="_IDGenLabel3"
+                    text="{i18n>fechaDocumento}"
+                    design="Bold"
+                />
                 <m:DatePicker
                     id="docDate"
                     value="{mainModel>/header/doc_date}"
@@ -50,8 +76,15 @@
                     displayFormat="MMM dd, yyyy"
                     width="100%"
                     class="sapUiSmallMarginBottom"
+                    required="true"
                 />
-                <m:Label id="_IDGenLabel4" text="{i18n>fechaContabilizacion}" design="Bold" />
+
+                <!-->fecha de contabilización-->
+                <m:Label
+                    id="_IDGenLabel4"
+                    text="{i18n>fechaContabilizacion}"
+                    design="Bold"
+                />
                 <m:DatePicker
                     id="pstngDate"
                     value="{mainModel>/header/pstng_date}"
@@ -59,8 +92,14 @@
                     displayFormat="MMM dd, yyyy"
                     width="100%"
                     class="sapUiSmallMarginBottom"
+                    required="true"
                 />
-                <m:Label id="_IDGenLabel5" text="{i18n>referencia}" design="Bold" />
+
+                <m:Label
+                    id="_IDGenLabel5"
+                    text="{i18n>referencia}"
+                    design="Bold"
+                />
                 <m:Input
                     id="refDocNo"
                     value="{mainModel>/header/ref_doc_no}"
@@ -69,8 +108,14 @@
                     maxLength="16"
                     width="100%"
                     class="sapUiSmallMarginBottom"
+                    required="{= ${mainModel>/header/move_type} === '201' || ${mainModel>/header/move_type} === '261'}"
                 />
-                <m:Label id="_IDGenLabel6" text="{i18n>textoCabecera}" design="Bold" />
+
+                <m:Label
+                    id="_IDGenLabel6"
+                    text="{i18n>textoCabecera}"
+                    design="Bold"
+                />
                 <m:TextArea
                     id="headerTxt"
                     value="{mainModel>/header/header_txt}"
@@ -79,36 +124,34 @@
                     maxLength="25"
                     width="100%"
                     class="sapUiSmallMarginBottom"
+                    required="true"
                 />
+                <m:Label text="" />               
+                <m:HBox
+                    justifyContent="Center"
+                    alignItems="Center"
+                    width="100%"
+                    
+                    class="sapUiMediumMarginTop sapUiSizeCompact "
+                >
+                    <m:Button
+                        text="{i18n>continuar}"
+                        type="Success"
+                        press=".onContinueHeader"
+                        icon="sap-icon://navigation-right-arrow"
+                        width="100px"
+                        class="sapUiTinyMarginEnd sapUiTinyMarginBottom"
+                    />
+                    <m:Button
+                        text="{i18n>cancelar}"
+                        type="Reject"
+                        press=".onCancelHeader"
+                        icon="sap-icon://decline"
+                        width="100px"
+                        class="sapUiTinyMarginBottom sapUiTinyMarginEnd"
+                    />
+                </m:HBox>
             </layout:content>
         </layout:SimpleForm>
-       <m:FlexBox
-            id="_IDGenHBox"
-            justifyContent="End"
-            alignItems="Center"
-            wrap="Wrap"
-            direction="Row"
-            width="95%"
-            class="sapUiResponsiveMargin"
-        >
-            <m:Button
-                id="_IDGenButton"
-                text="{i18n>continuar}"
-                type="Accept"
-                press=".onContinueHeader"
-                icon="sap-icon://navigation-right-arrow"
-                width="auto"
-                class="sapUiTinyMarginEnd sapUiTinyMarginBottom"
-            />
-            <m:Button
-                id="_IDGenButton1"
-                text="{i18n>cancelar}"
-                type="Reject"
-                press=".onCancelHeader"
-                icon="sap-icon://decline"
-                width="auto"
-                class="sapUiTinyMarginBottom sapUiTinyMarginEnd"
-            />
-        </m:FlexBox>
     </m:VBox>
 </core:FragmentDefinition>
