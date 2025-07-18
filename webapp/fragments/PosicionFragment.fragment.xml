@@ -3,14 +3,12 @@
     xmlns:core="sap.ui.core"
     xmlns:layout="sap.ui.layout.form"
 >
-    <!-- Contenedor principal vertical -->
     <VBox
         id="_IDGenVBox2"
         width="100%"
         fitContainer="true"
         class="sapUiMediumMargin"
     >
-        <!-- Formulario para datos de posición -->
         <layout:SimpleForm
             id="_IDGenSimpleForm1"
             editable="true"
@@ -26,49 +24,52 @@
             columnsM="1"
             singleContainerFullSize="true"
             class="sapUiForm sapUiSizeCompact"
-            title="{i18n>datosPosicion}"
         >
             <layout:content>
-                <!-- Material -->
+                
                 <Label
                     id="materialLabel"
                     text="{i18n>material}"
                     design="Bold"
                     required="true"
+                    
                 />
-                <HBox
-                    id="_IDGenHBox2"
-                    alignItems="Center"
+               
+                <Input
+                    id="material"
+                    value="{mainModel>/currentItem/material}"
+                    valueState="{mainModel>/currentItem/materialState}"
+                    valueStateText="{mainModel>/currentItem/materialStateText}"
+                    submit=".onMaterialScanned"
+                    liveChange=".onLiveChangeMaterial"
+                    placeholder="{i18n>ingreseMaterial}"
                     class="sapUiMediumMarginBottom"
-                >
-                    <Input
-                        id="material"
-                        value="{mainModel>/currentItem/material}"
-                        valueState="{mainModel>/currentItem/materialState}"
-                        valueStateText="{mainModel>/currentItem/materialStateText}"
-                        submit=".onMaterialScanned"
-                        placeholder="{i18n>ingreseMaterial}"
-                    />
-                    <Button
-                        id="scanMaterial"
-                        icon="sap-icon://bar-code"
-                        tooltip="{i18n>scanMaterial}"
-                        press=".onScanMaterial"
-                        type="Transparent"
-                        class="sapUiSmallMarginBegin"
-                    />
-                </HBox>
+                />
+
+                <!-- Descripción del material -->
+                <Label
+                    id="materialDescLabel"
+                    text="{i18n>descripcion_material}"
+                    design="Bold"
+                />
+                <Input
+                    id="materialDesc"
+                    value="{mainModel>/currentItem/txt_material}"
+                    enabled="false"
+                    placeholder="{i18n>descripcionMaterial}"
+                    class="sapUiMediumMarginBottom"
+                />
 
                 <!-- Cantidad -->
                 <Label
-                    id="entryQntLabel"
+                    id="cantidadLabel"
                     text="{i18n>cantidad}"
                     design="Bold"
                     required="true"
                 />
                 <Input
-                    id="entryQnt"
-                    value="{mainModel>/currentItem/entry_qnt}"
+                    id="cantidad"
+                    value="{mainModel>/currentItem/cantidad}"
                     valueState="{mainModel>/currentItem/quantityState}"
                     valueStateText="{mainModel>/currentItem/quantityStateText}"
                     change=".onQuantityChange"
@@ -79,14 +80,14 @@
 
                 <!-- Unidad de medida -->
                 <Label
-                    id="entryUomLabel"
+                    id="umLabel"
                     text="{i18n>um}"
                     design="Bold"
                     required="true"
                 />
                 <Input
-                    id="entryUom"
-                    value="{mainModel>/currentItem/entry_uom}"
+                    id="um"
+                    value="{mainModel>/currentItem/um}"
                     placeholder="{i18n>ingreseUM}"
                     enabled="false"
                     class="sapUiMediumMarginBottom"
@@ -103,20 +104,22 @@
                     id="batch"
                     value="{mainModel>/currentItem/batch}"
                     enabled="{mainModel>/currentItem/isBatchRequired}"
+                    submit=".onBuscarDetalle"
+                    liveChange=".onLiveChangeLote"
                     placeholder="{i18n>ingreseLote}"
                     class="sapUiMediumMarginBottom"
                 />
 
                 <!-- Centro -->
                 <Label
-                    id="plantLabel"
+                    id="centroLabel"
                     text="{i18n>centro}"
                     design="Bold"
                     required="true"
                 />
                 <Input
-                    id="plant"
-                    value="{mainModel>/currentItem/plant}"
+                    id="centro"
+                    value="{mainModel>/currentItem/centro}"
                     placeholder="{i18n>ingreseCentro}"
                     enabled="false"
                     class="sapUiMediumMarginBottom"
@@ -124,14 +127,14 @@
 
                 <!-- Almacén -->
                 <Label
-                    id="stgeLocLabel"
+                    id="almacenLabel"
                     text="{i18n>almacen}"
                     design="Bold"
                     required="true"
                 />
                 <Input
-                    id="stgeLoc"
-                    value="{mainModel>/currentItem/stge_loc}"
+                    id="almacen"
+                    value="{mainModel>/currentItem/almacen}"
                     placeholder="{i18n>ingreseAlmacen}"
                     enabled="false"
                     class="sapUiMediumMarginBottom"
@@ -142,38 +145,44 @@
                     id="costcenterLabel"
                     text="{i18n>ceco}"
                     design="Bold"
-                    required="{= ${mainModel>/savedHeader/move_type} === '201' || ${mainModel>/savedHeader/move_type} === '551'}"
+                    required="{oDisplayModel>/Posiciones/ceco}"
+                    visible="{oDisplayModel>/Posiciones/ceco}"
                 />
                 <Input
                     id="costcenter"
                     value="{mainModel>/currentItem/costcenter}"
-                    visible="{= ${mainModel>/savedHeader/move_type} === '201' || ${mainModel>/savedHeader/move_type} === '551'}"
+                    editable="{oDisplayModel>/Posiciones/ceco}"
+                    visible="{oDisplayModel>/Posiciones/ceco}"
                     placeholder="{i18n>ingreseCeco}"
                     class="sapUiMediumMarginBottom"
                 />
 
                 <!-- Motivo -->
                 <Label
-                    id="moveReasLabel"
+                    id="motivoLabel"
                     text="{i18n>motivo}"
                     design="Bold"
+                    required="{oDisplayModel>/Posiciones/motivo}"
+                    visible="{oDisplayModel>/Posiciones/motivo}"
                 />
                 <Input
-                    id="moveReas"
-                    value="{mainModel>/currentItem/move_reas}"
+                    id="motivo"
+                    value="{mainModel>/currentItem/motivo}"
+                    editable="{oDisplayModel>/Posiciones/motivo}"
+                    visible="{oDisplayModel>/Posiciones/motivo}"
                     placeholder="{i18n>seleccionarMotivo}"
+                    showValueHelp="true"
+                    valueHelpRequest=".onMoveReasValueHelp"
                     class="sapUiMediumMarginBottom"
                 />
-
-                <!-- Texto de posición -->
                 <Label
-                    id="positionTxtLabel"
+                    id="txtPosicionLabel"
                     text="{i18n>txt_posicion}"
                     design="Bold"
                 />
                 <TextArea
-                    id="positionTxt"
-                    value="{mainModel>/currentItem/position_txt}"
+                    id="txtPosicion"
+                    value="{mainModel>/currentItem/txt_posicion}"
                     rows="3"
                     growing="true"
                     maxLength="40"
@@ -181,15 +190,14 @@
                     class="sapUiMediumMarginBottom"
                 />
 
-                <!-- Historial de texto de posición -->
                 <Label
-                    id="positionTxtHistoryLabel"
+                    id="txtPosicionHistoricoLabel"
                     text="{i18n>historial_texto_posicion}"
                     design="Bold"
                 />
                 <TextArea
-                    id="positionTxtHistory"
-                    value="{mainModel>/currentItem/position_txt_history}"
+                    id="txtPosicionHistorico"
+                    value="{mainModel>/currentItem/txt_posicion_historico}"
                     editable="false"
                     rows="5"
                     class="sapUiMediumMarginBottom"

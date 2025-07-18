@@ -4,55 +4,53 @@
 >
     <Dialog
         id="itemsDialog"
-        title="Seleccionar Ítem para Referencia {mainModel>/savedHeader/ref_doc_no}"
+        title="Seleccionar Ítem para Referencia {mainModel>/header/ref_doc_no}"
         contentWidth="1000px"
         afterClose=".onCloseItemsDialog"
     >
-        <Table
-            
+        <Table id="_IDGenTable1"
             items="{mainModel>/ReferenceItems}"
             mode="SingleSelectMaster"
             growing="true"
             growingThreshold="10"
         >
             <columns>
-                <Column>
-                    <Text text="Material"/>
+                <Column id="_IDGenColumn">
+                    <Text id="_IDGenText" text="Material"/>
                 </Column>
-                <Column>
-                    <Text text="Descripción"/>
+                <Column id="_IDGenColumn1">
+                    <Text id="_IDGenText1" text="Descripción"/>
                 </Column>
-                <Column>
-                    <Text text="Cantidad"/>
+                <Column id="_IDGenColumn2">
+                    <Text id="_IDGenText2" text="Cantidad"/>
                 </Column>
-                <Column>
-                    <Text text="UM"/>
+                <Column id="_IDGenColumn3">
+                    <Text id="_IDGenText3" text="UM"/>
                 </Column>
-                <Column>
-                    <Text text="Centro"/>
+                <Column id="_IDGenColumn4">
+                    <Text id="_IDGenText4" text="Centro"/>
                 </Column>
-                <Column>
-                    <Text text="Almacén"/>
+                <Column id="_IDGenColumn5">
+                    <Text id="_IDGenText5" text="Almacén"/>
                 </Column>
-                <Column>
-                    <Text text="Lote Requerido"/>
+                <Column id="_IDGenColumn6">
+                    <Text id="_IDGenText6" text="Lote Requerido"/>
                 </Column>
-                <Column width="100px">
-                    <Text text="Acción"/>
+                <Column id="_IDGenColumn7" width="100px">
+                    <Text id="_IDGenText7" text="Acción"/>
                 </Column>
             </columns>
             <items>
-                <ColumnListItem>
+                <ColumnListItem id="_IDGenColumnListItem">
                     <cells>
-                        <Text text="{mainModel>material}"/>
-                        <Text text="{mainModel>txt_material}"/>
-                        <Text text="{mainModel>cantidad}"/>
-                        <Text text="{mainModel>um}"/>
-                        <Text text="{mainModel>centro}"/>
-                        <Text text="{mainModel>almacen}"/>
-                        <Text text="{mainModel>isBatchRequired_txt}"/>
-                        <Button
-                            
+                        <Text id="_IDGenText8" text="{mainModel>material}"/>
+                        <Text id="_IDGenText9" text="{mainModel>txt_material}"/>
+                        <Text id="_IDGenText10" text="{mainModel>cantidad}"/>
+                        <Text id="_IDGenText11" text="{mainModel>um}"/>
+                        <Text id="_IDGenText12" text="{mainModel>centro}"/>
+                        <Text id="_IDGenText13" text="{mainModel>almacen}"/>
+                        <Text id="_IDGenText14" text="{mainModel>isBatchRequired_txt}"/>
+                        <Button id="_IDGenButton"
                             press=".onProcesarItem"
                             type="Emphasized"
                             icon="sap-icon://inspection"
@@ -63,7 +61,7 @@
             </items>
         </Table>
         <beginButton>
-            <Button
+            <Button id="_IDGenButton1"
                 text="Cancelar"
                 type="Reject"
                 press=".onCloseItemsDialog"

@@ -4,7 +4,6 @@
     xmlns:m="sap.m"
     xmlns:layout="sap.ui.layout.form"
 >
-    <!--formulario  responsive -->
     <m:VBox
         id="_IDGenVBox"
         width="100%"
@@ -34,7 +33,6 @@
                     text="{i18n>salidaMercancia}"
                     design="Bold"
                 />
-                <!--Selector para elegir el tipo de movimiento (201, 261, 551)-->
                 <m:Select
                     id="referenceType"
                     change=".onReferenceTypeChange"
@@ -57,7 +55,7 @@
                 />
                 <m:Input
                     id="moveTypeManual"
-                    value="{mainModel>/header/move_type}"
+                    value="{= ${mainModel>/header/move_type} + ' - ' + ${mainModel>/header/textClaseMov}}"
                     editable="false"
                     type="Text"
                     width="100%"
@@ -79,7 +77,6 @@
                     required="true"
                 />
 
-                <!-->fecha de contabilización-->
                 <m:Label
                     id="_IDGenLabel4"
                     text="{i18n>fechaContabilizacion}"
@@ -108,7 +105,7 @@
                     maxLength="16"
                     width="100%"
                     class="sapUiSmallMarginBottom"
-                    required="{= ${mainModel>/header/move_type} === '201' || ${mainModel>/header/move_type} === '261'}"
+                    required="{oDisplayModel>/Header/referencia}"
                 />
 
                 <m:Label
@@ -131,8 +128,7 @@
                     justifyContent="Center"
                     alignItems="Center"
                     width="100%"
-                    
-                    class="sapUiMediumMarginTop sapUiSizeCompact "
+                    class="sapUiMediumMarginTop sapUiSizeCompact"
                 >
                     <m:Button
                         text="{i18n>continuar}"

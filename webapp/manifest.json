@@ -16,34 +16,41 @@
       "toolsId": "5a6aafbb-c162-4082-9de5-7649c2468b8b"
     },
     "dataSources": {
-      "mainService": {
+      "ZSB_HANDHELD_V2": {
         "uri": "/sap/opu/odata/sap/ZSB_HANDHELD_V2/",
         "type": "OData",
         "settings": {
-          "odataVersion": "2.0",
-          "localUri": "localService/mainService/metadata.xml"
+          "odataVersion": "2.0"
         }
       },
-      "mockDataSource": {
-        "uri": "/localService/mockdata/",
-        "type": "JSON"
+      "API_PRODUCTION_ORDER_2_SRV": {
+        "uri": "/sap/opu/odata/sap/API_PRODUCTION_ORDER_2_SRV/",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "2.0"
+        }
       },
-      "productionOrderService": {
-        "uri": "/sap/opu/odata/dap/API_PRODUCTION_ORDER_2_SRV/",
+      "productApi": {
+        "uri": "/sap/opu/odata/sap/productApi/",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "2.0"
+        }
+      },
+      "apiBatch": {
+        "uri": "/sap/opu/odata/sap/apiBatch/",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "2.0"
+        }
+      },
+      "API_MATERIAL_DOCUMENT_SRV": {
+        "uri": "/sap/opu/odata/sap/API_MATERIAL_DOCUMENT_SRV/",
         "type": "OData",
         "settings": {
           "odataVersion": "2.0"
         }
       }
-    }
-  },
-  "sap.ui": {
-    "technology": "UI5",
-    "icons": {},
-    "deviceTypes": {
-      "desktop": true,
-      "tablet": true,
-      "phone": true
     }
   },
   "sap.ui5": {
@@ -71,48 +78,55 @@
       },
       "mainModel": {
         "type": "sap.ui.model.json.JSONModel",
-        "settings": {
-          "defaultBindingMode": "TwoWay"
-        }
-      },
-      "mockModel": {
-        "dataSource": "mockDataSource",
-        "type": "sap.ui.model.json.JSONModel",
-        "settings": {
-          "defaultBindingMode": "OneWay"
-        }
-      },
-      "odataModel": {
-        "type": "sap.ui.model.odata.v2.ODataModel",
-        "settings": {
-          "defaultBindingMode": "TwoWay",
-          "defaultCountMode": "None",
-          "defaultOperationMode": "Server",
-          "useBatch": true
-        },
-        "dataSource": "mainService"
-      },
-      "productionOrderModel": {
-        "type": "sap.ui.model.odata.v2.ODataModel",
-        "settings": {
-          "defaultOperationMode": "Client",
-          "defaultBindingMode": "TwoWay",
-          "defaultCountMode": "None"
-        },
-        "dataSource": "productionOrderService"
+        "settings": {}
       },
       "claseMovModel": {
         "type": "sap.ui.model.json.JSONModel",
-        "uri": "/localService/mockdata/Z_C_CLASEMOV.json",
+        "settings": {}
+      },
+      "oDisplayModel": {
+        "type": "sap.ui.model.json.JSONModel",
+        "uri": "/utils/DisplayConfiguration.json"
+      },
+      "ZSB_HANDHELD_V2": {
+        "dataSource": "ZSB_HANDHELD_V2",
         "settings": {
-          "defaultBindingMode": "OneWay"
+          "defaultBindingMode": "TwoWay",
+          "useBatch": true
+        }
+      },
+      "API_PRODUCTION_ORDER_2_SRV": {
+        "dataSource": "API_PRODUCTION_ORDER_2_SRV",
+        "settings": {
+          "defaultBindingMode": "TwoWay",
+          "useBatch": true
+        }
+      },
+      "productApi": {
+        "dataSource": "productApi",
+        "settings": {
+          "defaultBindingMode": "TwoWay",
+          "useBatch": true
+        }
+      },
+      "apiBatch": {
+        "dataSource": "apiBatch",
+        "settings": {
+          "defaultBindingMode": "TwoWay",
+          "useBatch": true
+        }
+      },
+      "API_MATERIAL_DOCUMENT_SRV": {
+        "dataSource": "API_MATERIAL_DOCUMENT_SRV",
+        "settings": {
+          "defaultBindingMode": "TwoWay",
+          "useBatch": true
         }
       }
     },
     "resources": {
       "js": [
-        {
-          "uri": "thirdparty/quagga.min.js"
+        { "uri": "thirdparty/quagga.min.js"
         }
       ],
       "css": [
