@@ -11,55 +11,55 @@ sap.ui.define([
          * Inicializa la vista, configura modelos y carga datos iniciales
          */
         onInit: async function () {
-            // Definir estructura inicial de modelos JSON
+
             const oJSONModels = {
                 mainModel: {
                     header: {
-                        pstng_date: new Date().toISOString().split("T")[0], // Fecha de contabilización (hoy)
-                        doc_date: new Date().toISOString().split("T")[0], // Fecha de documento (hoy)
-                        ref_doc_no: "", // Número de referencia
-                        header_txt: "", // Texto de cabecera
-                        move_type: "", // Tipo de movimiento
-                        reference_type: "", // Tipo de referencia
-                        textClaseMov: "" // Descripción del tipo de movimiento
+                        pstng_date: new Date().toISOString().split("T")[0],
+                        doc_date: new Date().toISOString().split("T")[0],
+                        ref_doc_no: "",
+                        header_txt: "",
+                        move_type: "",
+                        reference_type: "",
+                        textClaseMov: ""
                     },
-                    savedHeader: {}, // Cabecera guardada
+                    savedHeader: {},
                     currentItem: {
-                        material: "", // Material
-                        txt_material: "", // Descripción del material
-                        cantidad: "", // Cantidad
-                        um: "", // Unidad de medida
-                        batch: "", // Lote
-                        centro: "", // Centro
-                        almacen: "", // Almacén
-                        costcenter: "", // Centro de costo
-                        motivo: "", // Motivo
-                        txt_posicion: "", // Texto de posición
-                        txt_posicion_historico: "", // Texto histórico
-                        MaterialDocument: "", // Documento de material
-                        isBatchRequired: false, // Indicador de lote requerido
-                        materialState: "None", // Estado del material
-                        materialStateText: "", // Texto de estado
-                        quantityState: "None", // Estado de cantidad
-                        quantityStateText: "" // Texto de estado
+                        material: "",
+                        txt_material: "",
+                        cantidad: "",
+                        um: "",
+                        batch: "",
+                        centro: "",
+                        almacen: "",
+                        costcenter: "",
+                        motivo: "",
+                        txt_posicion: "",
+                        txt_posicion_historico: "",
+                        MaterialDocument: "",
+                        isBatchRequired: false,
+                        materialState: "None",
+                        materialStateText: "",
+                        quantityState: "None",
+                        quantityStateText: ""
                     },
-                    ReferenceItems: [], // Ítems de referencia
-                    Positions: [], // Posiciones guardadas
-                    itemCount: 0, // Contador de ítems
+                    ReferenceItems: [],
+                    Positions: [],
+                    itemCount: 0,
                     config: {
-                        displayConfig: {} // Configuración de visualización
+                        displayConfig: {}
                     }
                 },
-                claseMovModel: [] // Modelo para tipos de movimiento
+                claseMovModel: []
             };
 
-            // Inicializar modelos JSON usando función del BaseController
+
             this.initializeModels(this.getView(), oJSONModels);
 
-            // Navegar a la pestaña "Cabecera" por defecto
+
             this.navigateToTab("Cabecera");
 
-            // Cargar datos iniciales y aplicar configuración
+
             await this._loadODataData();
             this._applyDisplayConfiguration();
         },
@@ -69,21 +69,21 @@ sap.ui.define([
          */
         _loadODataData: async function () {
             try {
-                // Leer clases de movimiento desde el servicio ZSB_HANDHELD_V2
+
                 const aClaseMovimientos = await this.readOData("ZSB_HANDHELD_V2", "ClaseMov");
-                // Añadir opción por defecto "Selecciona..." al inicio
+
                 const aResults = [{ ClaseMovimiento: "", Descripcion: "Selecciona..." }].concat(
                     aClaseMovimientos.map(item => ({
                         ClaseMovimiento: item.ClaseMovimiento,
                         Descripcion: item.Descripcion
                     }))
                 );
-                // Asignar datos al modelo claseMovModel
+
                 this.getView().getModel("claseMovModel").setData(aResults);
                 console.log("Clases de movimiento cargadas correctamente");
             } catch (error) {
                 console.error("Error al cargar datos OData:", error);
-                // En caso de error, asignar lista vacía
+
                 this.getView().getModel("claseMovModel").setData([]);
                 this.showErrorMessage("Error al cargar clases de movimiento. El selector puede no funcionar.");
             }
@@ -93,14 +93,14 @@ sap.ui.define([
          * Aplica configuraciones de visualización a controles de cabecera y posiciones
          */
         _applyDisplayConfiguration: function () {
-            // Definir controles de cabecera 
+
             const aHeaderControls = [
-                { id: "referenceType", key: "operacion_almacen" }, // Dropdown de tipo de movimiento
-                { id: "moveTypeManual", key: "claseMov" }, // Campo de texto no editable
-                { id: "docDate", key: "fecha_doc" }, // Fecha de documento
-                { id: "pstngDate", key: "fecha_cont" }, // Fecha de contabilización
-                { id: "refDocNo", key: "referencia" }, // Número de referencia
-                { id: "headerTxt", key: "texto_cabecera" } // Texto de cabecera
+                { id: "referenceType", key: "operacion_almacen" },
+                { id: "moveTypeManual", key: "claseMov" },
+                { id: "docDate", key: "fecha_doc" },
+                { id: "pstngDate", key: "fecha_cont" },
+                { id: "refDocNo", key: "referencia" },
+                { id: "headerTxt", key: "texto_cabecera" }
             ];
             // Definir controles de posiciones
             const aPosicionControls = [
@@ -117,7 +117,7 @@ sap.ui.define([
                 { id: "materialDocument", key: "num_docto" }
             ];
 
-            // Aplicar configuraciones usando función del BaseController
+
             this.applyDisplayConfiguration(aHeaderControls, "Header");
             this.applyDisplayConfiguration(aPosicionControls, "Posiciones");
             this.updateBatchField(); // Actualizar campo de lote
@@ -127,9 +127,9 @@ sap.ui.define([
          * Maneja el cambio de selección en el dropdown de tipo de movimiento
          */
         onReferenceTypeChange: function (oEvent) {
-            const oModel = this.getView().getModel("mainModel"); // Obtener modelo principal
-            const sClaseMovimiento = oEvent.getParameter("selectedItem")?.getKey() || ""; // Obtener clave seleccionada
-            const sDescription = oEvent.getParameter("selectedItem")?.getText() || ""; // Obtener descripción
+            const oModel = this.getView().getModel("mainModel");
+            const sClaseMovimiento = oEvent.getParameter("selectedItem")?.getKey() || "";
+            const sDescription = oEvent.getParameter("selectedItem")?.getText() || "";
 
             // Actualizar datos de la cabecera en el modelo
             oModel.setProperty("/header/move_type", sClaseMovimiento);
@@ -139,38 +139,38 @@ sap.ui.define([
                 movementDescription: sClaseMovimiento ? `${sClaseMovimiento} - ${sDescription}` : ""
             });
 
-            const oDisplayModel = this.getView().getModel("oDisplayModel"); // Obtener modelo de configuración
+            const oDisplayModel = this.getView().getModel("oDisplayModel");
             const c_601 = "601", c_602 = "602", c_261 = "261", c_262 = "262";
             const c_551 = "551", c_552 = "552", c_201 = "201", c_202 = "202", c_999 = "999";
 
             // Ajustar visibilidad de campos según el tipo de movimiento
             if ([c_601, c_602, c_261, c_262].includes(sClaseMovimiento)) {
-                oDisplayModel.setProperty("/Posiciones/ceco", false); // Ocultar centro de costo
-                oDisplayModel.setProperty("/Posiciones/motivo", false); // Ocultar motivo
-                oDisplayModel.setProperty("/Header/referencia", true); // Mostrar campo de referencia
+                oDisplayModel.setProperty("/Posiciones/ceco", false);
+                oDisplayModel.setProperty("/Posiciones/motivo", false);
+                oDisplayModel.setProperty("/Header/referencia", true);
             } else if ([c_551, c_552, c_201, c_202, c_999].includes(sClaseMovimiento)) {
-                oDisplayModel.setProperty("/Header/referencia", false); // Ocultar referencia
-                oDisplayModel.setProperty("/Posiciones/ceco", true); // Mostrar centro de costo
-                oDisplayModel.setProperty("/Posiciones/motivo", true); // Mostrar motivo
+                oDisplayModel.setProperty("/Header/referencia", false);
+                oDisplayModel.setProperty("/Posiciones/ceco", true);
+                oDisplayModel.setProperty("/Posiciones/motivo", true);
             } else if (sClaseMovimiento === c_999) {
-                oDisplayModel.setProperty("/Posiciones/ceco", true); // Mostrar centro de costo
-                oDisplayModel.setProperty("/Posiciones/motivo", true); // Mostrar motivo
-                oDisplayModel.setProperty("/Header/referencia", true); // Mostrar referencia
+                oDisplayModel.setProperty("/Posiciones/ceco", true);
+                oDisplayModel.setProperty("/Posiciones/motivo", true);
+                oDisplayModel.setProperty("/Header/referencia", true);
             }
 
             // Actualizar campo de texto no editable y limpiar referencia
             this.getView().byId("moveTypeManual").setValue(sClaseMovimiento);
             this.getView().byId("refDocNo").setValue("");
-            this._resetCurrentItem(); // Reiniciar datos del ítem actual
-            this._applyDisplayConfiguration(); // Reaplicar configuraciones de visibilidad
+            this._resetCurrentItem();
+            this._applyDisplayConfiguration();
         },
 
         /**
          * Valida los campos de la cabecera antes de continuar
          */
         validateHeaderFields: function () {
-            const oDisplayModel = this.getView().getModel("oDisplayModel").getData(); // Obtener configuración
-            // Definir campos de la cabecera (corresponden al fragmento XML)
+            const oDisplayModel = this.getView().getModel("oDisplayModel").getData();
+
             const aFields = [
                 { id: "referenceType", prop: "move_type", label: this.getResourceBundle().getText("salidaMercancia") },
                 { id: "docDate", prop: "doc_date", label: this.getResourceBundle().getText("fechaDocumento") },
@@ -179,10 +179,10 @@ sap.ui.define([
                 { id: "headerTxt", prop: "header_txt", label: this.getResourceBundle().getText("textoCabecera") }
             ];
 
-            this.getView().setBusy(true); // Mostrar indicador de carga
-            // Validar campos usando función del BaseController
+            this.getView().setBusy(true);
+
             const bValid = this.validateFields(aFields, "/header", oDisplayModel.Header);
-            this.getView().setBusy(false); // Ocultar indicador
+            this.getView().setBusy(false);
             return bValid;
         },
 
@@ -190,7 +190,7 @@ sap.ui.define([
          * Maneja el evento del botón "Continuar" en la cabecera
          */
         onContinueHeader: async function () {
-            this.getView().setBusy(true); // Mostrar indicador de carga
+            this.getView().setBusy(true);
 
             // Validar campos de la cabecera
             if (!this.validateHeaderFields()) {
@@ -198,9 +198,9 @@ sap.ui.define([
                 return;
             }
 
-            const oModel = this.getView().getModel("mainModel"); // Obtener modelo principal
-            const oDisplayModel = this.getView().getModel("oDisplayModel").getData(); // Obtener configuración
-            const sReference = oModel.getProperty("/header/ref_doc_no"); // Obtener número de referencia
+            const oModel = this.getView().getModel("mainModel");
+            const oDisplayModel = this.getView().getModel("oDisplayModel").getData();
+            const sReference = oModel.getProperty("/header/ref_doc_no");
 
             // Verificar si la referencia es requerida y está vacía
             if (oDisplayModel.Header.referencia && !sReference) {
@@ -211,18 +211,18 @@ sap.ui.define([
             }
 
             try {
-                const iPageSize = 5000; // Límite de registros
-                const oBundle = this.getResourceBundle(); // Obtener textos traducibles
-                // Consultar ítems de la orden de producción
+                const iPageSize = 5000;
+                const oBundle = this.getResourceBundle();
+
                 const oRefItems = await this.readOData("API_PRODUCTION_ORDER_2_SRV", "A_ProductionOrderComponent_4", [
                     new Filter("ManufacturingOrder", FilterOperator.EQ, sReference)
                 ], { "$top": iPageSize });
 
-                // Procesar ítems obtenidos
+
                 const oItems = await Promise.all(oRefItems.map(async element => {
                     const oCantDisponible = parseFloat(element.RequiredQuantity) - parseFloat(element.WithdrawnQuantity);
-                    const isBatchRequired = await this.searchBatchRequired(element); // Verificar si requiere lote
-                    const sMaterialText = await this.onSearchMaterialText(element); // Obtener descripción del material
+                    const isBatchRequired = await this.searchBatchRequired(element);
+                    const sMaterialText = await this.onSearchMaterialText(element);
                     return {
                         material: element.Material,
                         txt_material: sMaterialText,
@@ -241,7 +241,7 @@ sap.ui.define([
                 oModel.setProperty("/ReferenceItems", oItems);
                 oModel.setProperty("/savedHeader", {
                     ...oModel.getProperty("/header"),
-                    movementDescription: oModel.getProperty("/header/move_type") ? 
+                    movementDescription: oModel.getProperty("/header/move_type") ?
                         `${oModel.getProperty("/header/move_type")} - ${oModel.getProperty("/header/textClaseMov")}` : ""
                 });
 
@@ -252,7 +252,7 @@ sap.ui.define([
             } catch (error) {
                 this.showErrorMessage("Error al cargar ítems: " + (error.message || "Desconocido"));
             } finally {
-                this.getView().setBusy(false); // Ocultar indicador
+                this.getView().setBusy(false);
             }
         },
 
@@ -261,7 +261,7 @@ sap.ui.define([
          */
         searchBatchRequired: async function (element) {
             try {
-                // Consultar datos del producto
+
                 const oData = await this.readOData("productApi", "Product", [
                     new Filter("ManufacturingOrder", FilterOperator.EQ, element.ManufacturingOrder),
                     new Filter("Material", FilterOperator.EQ, element.Material)
@@ -278,7 +278,7 @@ sap.ui.define([
          */
         onSearchMaterialText: async function (element) {
             try {
-                // Consultar descripción del producto
+
                 const oData = await this.readOData("productApi", "ProductDescription", [
                     new Filter("ManufacturingOrder", FilterOperator.EQ, element.ManufacturingOrder),
                     new Filter("Material", FilterOperator.EQ, element.Material)
@@ -295,16 +295,16 @@ sap.ui.define([
          */
         onSearchBatchList: async function (element) {
             try {
-                // Consultar lotes disponibles
+
                 const oData = await this.readOData("apiBatch", "Batch", [
                     new Filter("Material", FilterOperator.EQ, element.material)
                 ]);
-                const oBatchModel = this.getView().getModel("BatchList"); // Obtener modelo de lotes
+                const oBatchModel = this.getView().getModel("BatchList");
                 if (!oBatchModel) {
-                    // Crear modelo si no existe
+
                     this.getView().setModel(new sap.ui.model.json.JSONModel(oData), "BatchList");
                 } else {
-                    // Actualizar datos
+
                     oBatchModel.setData(oData);
                 }
                 return oData;
@@ -318,17 +318,17 @@ sap.ui.define([
          * Procesa un ítem seleccionado y actualiza el ítem actual
          */
         onProcesarItem: async function (oEvent) {
-            const oItem = oEvent.getSource().getBindingContext("mainModel")?.getObject(); // Obtener ítem seleccionado
+            const oItem = oEvent.getSource().getBindingContext("mainModel")?.getObject();
             if (!oItem) {
                 this.showErrorMessage("Error: No se pudo obtener el ítem seleccionado");
                 return;
             }
-            const oModel = this.getView().getModel("mainModel"); // Obtener modelo principal
+            const oModel = this.getView().getModel("mainModel");
 
-            // Cargar lista de lotes
+
             await this.onSearchBatchList(oItem);
 
-            // Actualizar ítem actual con datos del ítem seleccionado
+
             oModel.setProperty("/currentItem", {
                 material: oItem.material,
                 txt_material: oItem.txt_material,
@@ -351,9 +351,7 @@ sap.ui.define([
 
             // Cerrar diálogo de ítems
             this.closeDialog("oItemsDialog");
-            // Navegar a la pestaña de posición
             this.navigateToTab("Posicion");
-            // Actualizar campo de lote
             this.updateBatchField();
         },
 
@@ -361,9 +359,9 @@ sap.ui.define([
          * Maneja la selección de una pestaña en el IconTabBar
          */
         onTabSelect: function (oEvent) {
-            const sKey = oEvent.getParameter("key"); // Obtener clave de la pestaña
+            const sKey = oEvent.getParameter("key");
             const oModel = this.getView().getModel("mainModel");
-            // Verificar si la cabecera está completa antes de ir a "Posicion"
+
             if (sKey === "Posicion" && !oModel.getProperty("/savedHeader/move_type")) {
                 this.showMessage("Primero completa la cabecera");
                 this.navigateToTab("Cabecera");
@@ -372,17 +370,14 @@ sap.ui.define([
 
         /**
          * Valida los datos de un ítem antes de guardarlo
-         * @param {Object} oItem - Datos del ítem
-         * @param {string} sMoveType - Tipo de movimiento
          */
         _validateItem: function (oItem, sMoveType) {
-            const oBundle = this.getResourceBundle(); // Obtener textos traducibles
-            // Verificar campos obligatorios
+            const oBundle = this.getResourceBundle();
             if (!oItem.material || !oItem.cantidad || !oItem.um || !oItem.centro || !oItem.almacen) {
                 this.showMessage(oBundle.getText("position.missingFields"));
                 return false;
             }
-            // Validar centro de costo para ciertos movimientos
+
             if ((sMoveType === "201" || sMoveType === "551") && !oItem.costcenter?.trim()) {
                 this.showMessage("El campo Centro de Costo es obligatorio para este tipo de movimiento");
                 return false;
@@ -404,8 +399,7 @@ sap.ui.define([
          * Reinicia los datos del ítem actual
          */
         _resetCurrentItem: function () {
-            const oModel = this.getView().getModel("mainModel"); // Obtener modelo
-            // Restablecer valores del ítem actual
+            const oModel = this.getView().getModel("mainModel");
             oModel.setProperty("/currentItem", {
                 material: "",
                 txt_material: "",
@@ -431,14 +425,12 @@ sap.ui.define([
          * Guarda un ítem en la lista de posiciones
          */
         onSaveItem: async function () {
-            const oModel = this.getView().getModel("mainModel"); // Obtener modelo
-            const oCurrentItem = oModel.getProperty("/currentItem"); // Obtener ítem actual
-            const oHeader = oModel.getProperty("/savedHeader"); // Obtener cabecera guardada
+            const oModel = this.getView().getModel("mainModel");
+            const oCurrentItem = oModel.getProperty("/currentItem");
+            const oHeader = oModel.getProperty("/savedHeader");
 
-            // Validar ítem
             if (!this._validateItem(oCurrentItem, oHeader.move_type)) return;
 
-            // Añadir ítem a la lista de posiciones
             const aPositions = oModel.getProperty("/Positions") || [];
             aPositions.push({
                 material: oCurrentItem.material,
@@ -454,8 +446,8 @@ sap.ui.define([
                 MaterialDocument: oCurrentItem.MaterialDocument || "",
                 isBatchRequired: oCurrentItem.isBatchRequired
             });
-            oModel.setProperty("/Positions", aPositions); // Actualizar lista
-            oModel.setProperty("/itemCount", aPositions.length); // Actualizar contador
+            oModel.setProperty("/Positions", aPositions);
+            oModel.setProperty("/itemCount", aPositions.length);
 
             // Refrescar tabla de ítems
             const oTable = this.getView().byId("itemsTable");
@@ -463,10 +455,9 @@ sap.ui.define([
                 oTable.getBinding("items").refresh();
             }
 
-            // Reiniciar ítem actual
+
             this._resetCurrentItem();
             this.showMessage("Ítem guardado");
-            // Navegar a la pestaña de orden completa
             this.navigateToTab("OrdenCompleta");
         },
 
@@ -474,10 +465,8 @@ sap.ui.define([
          * Cancela la entrada de un ítem
          */
         onCancelItem: function () {
-            // Reiniciar ítem actual
             this._resetCurrentItem();
             this.showMessage("Entrada cancelada");
-            // Enfocar campo de material
             const oMaterialInput = this.getView().byId("material");
             if (oMaterialInput) {
                 setTimeout(() => oMaterialInput.focus(), 100);
@@ -488,8 +477,7 @@ sap.ui.define([
          * Cancela la entrada de la cabecera
          */
         onCancelHeader: function () {
-            const oModel = this.getView().getModel("mainModel"); // Obtener modelo
-            // Reiniciar datos de la cabecera
+            const oModel = this.getView().getModel("mainModel");
             oModel.setProperty("/header", {
                 pstng_date: new Date().toISOString().split("T")[0],
                 doc_date: new Date().toISOString().split("T")[0],
@@ -499,16 +487,15 @@ sap.ui.define([
                 reference_type: "",
                 textClaseMov: ""
             });
-            oModel.setProperty("/savedHeader", {}); // Limpiar cabecera guardada
+            oModel.setProperty("/savedHeader", {});
             this.showMessage("Entrada de cabecera cancelada");
         },
 
         /**
-         * Reinicia todo el proceso
+         * Reinicia todo el proceso de datos
          */
         onResetProcess: function () {
-            const oModel = this.getView().getModel("mainModel"); // Obtener modelo
-            // Reiniciar todos los datos
+            const oModel = this.getView().getModel("mainModel");
             oModel.setProperty("/savedHeader", {});
             oModel.setProperty("/Positions", []);
             oModel.setProperty("/itemCount", 0);
@@ -522,7 +509,6 @@ sap.ui.define([
                 reference_type: "",
                 textClaseMov: ""
             });
-            // Navegar a la pestaña de cabecera
             this.navigateToTab("Cabecera");
             this.showMessage("Proceso reiniciado");
         },
@@ -531,9 +517,7 @@ sap.ui.define([
          * Añade un nuevo componente y navega a la pestaña de posición
          */
         onAddComponent: function () {
-            // Reiniciar ítem actual
             this._resetCurrentItem();
-            // Navegar a la pestaña de posición
             this.navigateToTab("Posicion");
         },
 
@@ -541,10 +525,10 @@ sap.ui.define([
          * Elimina un ítem de la lista de posiciones
          */
         onDeleteItem: function (oEvent) {
-            const oModel = this.getView().getModel("mainModel"); // Obtener modelo
-            const oItem = oEvent.getSource().getBindingContext("mainModel").getObject(); // Obtener ítem seleccionado
-            const aPositions = oModel.getProperty("/Positions"); // Obtener lista de posiciones
-            const iIndex = aPositions.indexOf(oItem); // Encontrar índice del ítem
+            const oModel = this.getView().getModel("mainModel");
+            const oItem = oEvent.getSource().getBindingContext("mainModel").getObject();
+            const aPositions = oModel.getProperty("/Positions");
+            const iIndex = aPositions.indexOf(oItem);
 
             if (iIndex !== -1) {
                 // Mostrar diálogo de confirmación
@@ -562,7 +546,7 @@ sap.ui.define([
                                 oTable.getBinding("items").refresh();
                             }
                         }
-                    }.bind(this) // Vincular contexto
+                    }.bind(this)
                 });
             }
         },
@@ -571,8 +555,8 @@ sap.ui.define([
          * Maneja la selección de un ítem de la lista
          */
         onItemSelected: function (oEvent) {
-            const oItem = oEvent.getParameter("listItem").getBindingContext("mainModel").getObject(); // Obtener ítem seleccionado
-            const oModel = this.getView().getModel("mainModel"); // Obtener modelo
+            const oItem = oEvent.getParameter("listItem").getBindingContext("mainModel").getObject();
+            const oModel = this.getView().getModel("mainModel");
 
             // Actualizar ítem actual con datos seleccionados
             oModel.setProperty("/currentItem", {
@@ -595,23 +579,22 @@ sap.ui.define([
                 quantityStateText: ""
             });
 
-            // Navegar a la pestaña de posición
             this.navigateToTab("Posicion");
-            this.updateBatchField(); // Actualizar campo de lote
+            this.updateBatchField();
         },
 
         /**
          * Crea un movimiento de material enviando datos al servicio OData
          */
         onCreateMov: async function () {
-            this.getView().setBusy(true); // Mostrar indicador de carga
+            this.getView().setBusy(true);
 
             try {
-                const oModel = this.getView().getModel("mainModel"); // Obtener modelo
-                const oODataModel = this.getView().getModel("API_MATERIAL_DOCUMENT_SRV"); // Obtener modelo OData
-                const oBundle = this.getResourceBundle(); // Obtener textos traducibles
-                const oHeader = oModel.getProperty("/savedHeader"); // Obtener cabecera
-                const aPositions = oModel.getProperty("/Positions") || []; // Obtener posiciones
+                const oModel = this.getView().getModel("mainModel");
+                const oODataModel = this.getView().getModel("API_MATERIAL_DOCUMENT_SRV");
+                const oBundle = this.getResourceBundle();
+                const oHeader = oModel.getProperty("/savedHeader");
+                const aPositions = oModel.getProperty("/Positions") || [];
 
                 // Verificar si hay posiciones
                 if (!aPositions.length) {
@@ -620,8 +603,8 @@ sap.ui.define([
                     return;
                 }
 
-                const oDate = oHeader.pstng_date + "T00:00:00"; // Formatear fecha
-                const oGoodMovement = oHeader.move_type; // Obtener tipo de movimiento
+                const oDate = oHeader.pstng_date + "T00:00:00";
+                const oGoodMovement = oHeader.move_type;
 
                 // Verificar tipo de movimiento
                 if (!oGoodMovement) {
@@ -676,8 +659,8 @@ sap.ui.define([
                 // Mostrar mensaje de éxito
                 this.showMessage(oBundle.getText("success.movCreated") + ` (Documento: ${sMaterialDocument})`);
                 console.log("Respuesta del POST:", oResponse);
-                this._resetCurrentItem(); // Reiniciar ítem
-                oModel.setProperty("/itemCount", aUpdatedPositions.length); // Actualizar contador
+                this._resetCurrentItem();
+                oModel.setProperty("/itemCount", aUpdatedPositions.length);
                 // Refrescar tabla
                 const oTable = this.getView().byId("itemsTable");
                 if (oTable) {
@@ -687,7 +670,7 @@ sap.ui.define([
                 console.error("Error en onCreateMov:", error);
                 this.showErrorMessage(oBundle.getText("error.unexpected"));
             } finally {
-                this.getView().setBusy(false); // Ocultar indicador
+                this.getView().setBusy(false);
             }
         },
 
@@ -696,10 +679,9 @@ sap.ui.define([
          */
         onMoveReasValueHelp: async function () {
             try {
-                // Cargar diálogo de ayuda
                 const oDialog = await this.loadFragmentDialog("logaligroup.mapeobapi.fragments.MoveReasValueHelp", "_oValueHelpDialog");
-                this._bindValueHelpDialog(); // Vincular datos al diálogo
-                oDialog.open(); // Abrir diálogo
+                this._bindValueHelpDialog();
+                oDialog.open();
             } catch (error) {
                 this.showErrorMessage("Error al cargar el diálogo de ayuda de motivos: " + error.message);
             }
@@ -710,7 +692,6 @@ sap.ui.define([
          */
         _bindValueHelpDialog: function () {
             if (this._oValueHelpDialog) {
-                // Vincular lista de motivos al diálogo
                 this._oValueHelpDialog.bindAggregation("items", {
                     path: "mainModel>/config/moveReasons",
                     template: new sap.m.StandardListItem({
@@ -719,9 +700,7 @@ sap.ui.define([
                         key: "{mainModel>key}"
                     })
                 });
-                // Limpiar manejadores de eventos previos
                 this._oValueHelpDialog.destroyAggregation("eventHandlers");
-                // Asignar nuevos manejadores
                 this._oValueHelpDialog.attachConfirm(this.onMoveReasConfirm.bind(this));
                 this._oValueHelpDialog.attachSearch(this.onMoveReasSearch.bind(this));
             }
@@ -731,15 +710,14 @@ sap.ui.define([
          * Maneja la confirmación de selección en el diálogo de motivos
          */
         onMoveReasConfirm: function (oEvent) {
-            const oSelectedItem = oEvent.getParameter("selectedItem"); // Obtener ítem seleccionado
+            const oSelectedItem = oEvent.getParameter("selectedItem");
             if (oSelectedItem) {
-                const oInput = this.getView().byId("motivo"); // Obtener campo de motivo
+                const oInput = this.getView().byId("motivo");
                 if (oInput) {
-                    // Actualizar campo y modelo
                     oInput.setValue(oSelectedItem.getTitle());
                     this.getView().getModel("mainModel").setProperty("/currentItem/motivo", oSelectedItem.getKey());
                 }
-                // Cerrar diálogo
+
                 this.closeDialog("_oValueHelpDialog");
             }
         },
@@ -748,8 +726,8 @@ sap.ui.define([
          * Filtra los motivos en el diálogo de ayuda según la búsqueda
          */
         onMoveReasSearch: function (oEvent) {
-            const sValue = oEvent.getParameter("value"); // Obtener valor de búsqueda
-            const oFilter = new Filter("text", FilterOperator.Contains, sValue); // Crear filtro
+            const sValue = oEvent.getParameter("value");
+            const oFilter = new Filter("text", FilterOperator.Contains, sValue);
             // Aplicar filtro a la lista
             oEvent.getSource().getBinding("items").filter([oFilter]);
         },
@@ -758,11 +736,10 @@ sap.ui.define([
          * Valida un material escaneado y actualiza los datos del ítem
          */
         onMaterialScanned: async function (oEvent) {
-            const sScannedValue = oEvent.getParameter("value")?.trim(); // Obtener valor escaneado
-            const oModel = this.getView().getModel("mainModel"); // Obtener modelo
-            const oMaterialInput = this.getView().byId("material"); // Obtener campo de material
+            const sScannedValue = oEvent.getParameter("value")?.trim();
+            const oModel = this.getView().getModel("mainModel");
+            const oMaterialInput = this.getView().byId("material");
 
-            // Verificar si el valor es válido
             if (!sScannedValue) {
                 oModel.setProperty("/currentItem/materialState", "Error");
                 oModel.setProperty("/currentItem/materialStateText", "Código de material inválido");
@@ -771,14 +748,12 @@ sap.ui.define([
             }
 
             try {
-                // Consultar material en la orden de producción
                 const oMatchedMaterial = await this.readOData("API_PRODUCTION_ORDER_2_SRV", "A_ProductionOrderComponent_4", [
                     new Filter("Material", FilterOperator.EQ, sScannedValue),
                     new Filter("ManufacturingOrder", FilterOperator.EQ, oModel.getProperty("/savedHeader/ref_doc_no"))
                 ]);
 
                 if (oMatchedMaterial[0]) {
-                    // Calcular cantidad disponible
                     const fAvailableQuantity = parseFloat(oMatchedMaterial[0].RequiredQuantity) - parseFloat(oMatchedMaterial[0].WithdrawnQuantity);
                     if (fAvailableQuantity <= 0) {
                         oModel.setProperty("/currentItem/materialState", "Error");
@@ -787,7 +762,6 @@ sap.ui.define([
                         return;
                     }
 
-                    // Obtener datos adicionales
                     const isBatchRequired = await this.searchBatchRequired(oMatchedMaterial[0]);
                     const sMaterialText = await this.onSearchMaterialText(oMatchedMaterial[0]);
 
@@ -820,9 +794,9 @@ sap.ui.define([
                 this.showMessage("Error al validar material");
             }
 
-            this.updateBatchField(); // Actualizar campo de lote
+            this.updateBatchField();
             if (oMaterialInput) {
-                setTimeout(() => oMaterialInput.focus(), 100); // Enfocar campo
+                setTimeout(() => oMaterialInput.focus(), 100);
             }
         },
 
@@ -830,11 +804,11 @@ sap.ui.define([
          * Valida la cantidad ingresada para un material
          */
         onQuantityChange: function (oEvent) {
-            const oInput = oEvent.getSource(); // Obtener campo de entrada
-            const fValue = parseFloat(oInput.getValue()); // Obtener valor numérico
-            const oModel = this.getView().getModel("mainModel"); // Obtener modelo
-            const sMaterial = oModel.getProperty("/currentItem/material"); // Obtener material
-            const sRefDocNo = oModel.getProperty("/savedHeader/ref_doc_no"); // Obtener referencia
+            const oInput = oEvent.getSource();
+            const fValue = parseFloat(oInput.getValue());
+            const oModel = this.getView().getModel("mainModel");
+            const sMaterial = oModel.getProperty("/currentItem/material");
+            const sRefDocNo = oModel.getProperty("/savedHeader/ref_doc_no");
 
             // Verificar si hay material seleccionado
             if (!sMaterial) {
@@ -853,7 +827,6 @@ sap.ui.define([
                 const oMatchedMaterial = oData[0];
                 if (oMatchedMaterial) {
                     const fAvailableQuantity = parseFloat(oMatchedMaterial.RequiredQuantity) - parseFloat(oMatchedMaterial.WithdrawnQuantity);
-                    // Validar cantidad
                     if (isNaN(fValue) || fValue <= 0) {
                         oInput.setValueState("Error").setValueStateText("La cantidad debe ser mayor que 0");
                         oModel.setProperty("/currentItem/quantityState", "Error");
@@ -887,23 +860,21 @@ sap.ui.define([
          * Obtiene detalles de un material
          */
         onFetchDetails: async function () {
-            const oModel = this.getView().getModel("mainModel"); // Obtener modelo
-            const sMaterial = oModel.getProperty("/currentItem/material"); // Obtener material
+            const oModel = this.getView().getModel("mainModel");
+            const sMaterial = oModel.getProperty("/currentItem/material");
             if (!sMaterial) {
                 this.showMessage("Ingresa un material para buscar detalles");
                 return;
             }
 
-            this.getView().setBusy(true); // Mostrar indicador de carga
+            this.getView().setBusy(true);
             try {
-                // Consultar detalles del material
                 const oDetails = await this.readOData("productApi", "Product", [
                     new Filter("Material", FilterOperator.EQ, sMaterial)
                 ]);
 
                 if (oDetails[0]) {
-                    const sMaterialText = await this.onSearchMaterialText({ Material: sMaterial }); // Obtener descripción
-                    // Actualizar ítem actual
+                    const sMaterialText = await this.onSearchMaterialText({ Material: sMaterial });
                     oModel.setProperty("/currentItem", {
                         ...oModel.getProperty("/currentItem"),
                         txt_material: sMaterialText,
@@ -915,7 +886,7 @@ sap.ui.define([
                         materialState: "Success",
                         materialStateText: ""
                     });
-                    this.updateBatchField(); // Actualizar campo de lote
+                    this.updateBatchField();
                     this.showMessage("Detalles del material cargados");
                 } else {
                     oModel.setProperty("/currentItem/materialState", "Error");
@@ -925,7 +896,7 @@ sap.ui.define([
             } catch (error) {
                 this.showErrorMessage("Error al cargar detalles: " + (error.message || "Desconocido"));
             } finally {
-                this.getView().setBusy(false); // Ocultar indicador
+                this.getView().setBusy(false);
             }
         },
 
@@ -933,12 +904,11 @@ sap.ui.define([
          * Busca detalles de un material y valida el lote si es necesario
          */
         onBuscarDetalle: async function () {
-            const oModel = this.getView().getModel("mainModel"); // Obtener modelo
-            const sMaterial = oModel.getProperty("/currentItem/material"); // Obtener material
-            const sBatch = oModel.getProperty("/currentItem/batch"); // Obtener lote
-            const sRefDocNo = oModel.getProperty("/savedHeader/ref_doc_no"); // Obtener referencia
+            const oModel = this.getView().getModel("mainModel");
+            const sMaterial = oModel.getProperty("/currentItem/material");
+            const sBatch = oModel.getProperty("/currentItem/batch");
+            const sRefDocNo = oModel.getProperty("/savedHeader/ref_doc_no");
 
-            // Verificar si hay material
             if (!sMaterial) {
                 oModel.setProperty("/currentItem/materialState", "Error");
                 oModel.setProperty("/currentItem/materialStateText", "Ingresa un material válido");
@@ -946,9 +916,8 @@ sap.ui.define([
                 return;
             }
 
-            this.getView().setBusy(true); // Mostrar indicador de carga
+            this.getView().setBusy(true);
             try {
-                // Consultar detalles del material
                 const oDetails = await this.readOData("API_PRODUCTION_ORDER_2_SRV", "A_ProductionOrderComponent_4", [
                     new Filter("Material", FilterOperator.EQ, sMaterial),
                     new Filter("ManufacturingOrder", FilterOperator.EQ, sRefDocNo)
@@ -956,8 +925,8 @@ sap.ui.define([
 
                 if (oDetails[0]) {
                     const fAvailableQuantity = parseFloat(oDetails[0].RequiredQuantity) - parseFloat(oDetails[0].WithdrawnQuantity);
-                    const isBatchRequired = await this.searchBatchRequired(oDetails[0]); // Verificar lote
-                    const sMaterialText = await this.onSearchMaterialText(oDetails[0]); // Obtener descripción
+                    const isBatchRequired = await this.searchBatchRequired(oDetails[0]);
+                    const sMaterialText = await this.onSearchMaterialText(oDetails[0]);
 
                     // Actualizar ítem actual
                     oModel.setProperty("/currentItem", {
@@ -999,8 +968,8 @@ sap.ui.define([
                 oModel.setProperty("/currentItem/materialStateText", "Error al buscar detalles");
                 this.showMessage("Error al buscar detalles: " + (error.message || "Desconocido"));
             } finally {
-                this.getView().setBusy(false); // Ocultar indicador
-                this.updateBatchField(); // Actualizar campo de lote
+                this.getView().setBusy(false);
+                this.updateBatchField();
             }
         },
 
@@ -1008,9 +977,9 @@ sap.ui.define([
          * Valida el material ingresado en tiempo real
          */
         onLiveChangeMaterial: function (oEvent) {
-            const sValue = oEvent.getParameter("value")?.trim(); // Obtener valor
-            const oModel = this.getView().getModel("mainModel"); // Obtener modelo
-            const oInput = oEvent.getSource(); // Obtener campo de entrada
+            const sValue = oEvent.getParameter("value")?.trim();
+            const oModel = this.getView().getModel("mainModel");
+            const oInput = oEvent.getSource();
 
             // Validar valor
             if (!sValue) {
@@ -1029,12 +998,11 @@ sap.ui.define([
          * Valida el lote ingresado en tiempo real
          */
         onLiveChangeLote: function (oEvent) {
-            const sValue = oEvent.getParameter("value")?.trim(); // Obtener valor
-            const oModel = this.getView().getModel("mainModel"); // Obtener modelo
-            const oInput = oEvent.getSource(); // Obtener campo de entrada
-            const bIsBatchRequired = oModel.getProperty("/currentItem/isBatchRequired"); // Verificar si lote es requerido
+            const sValue = oEvent.getParameter("value")?.trim();
+            const oModel = this.getView().getModel("mainModel");
+            const oInput = oEvent.getSource();
+            const bIsBatchRequired = oModel.getProperty("/currentItem/isBatchRequired");
 
-            // Validar lote
             if (bIsBatchRequired && !sValue) {
                 oModel.setProperty("/currentItem/materialState", "Error");
                 oModel.setProperty("/currentItem/materialStateText", "Ingresa un lote válido");

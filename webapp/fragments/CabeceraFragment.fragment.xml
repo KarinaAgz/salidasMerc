@@ -42,7 +42,7 @@
                     class="sapUiSmallMarginBottom"
                     required="true"
                 >
-                    <core:Item
+                    <core:Item id="_IDGenItem1"
                         key="{claseMovModel>ClaseMovimiento}"
                         text="{claseMovModel>Descripcion}"
                     />
@@ -123,14 +123,14 @@
                     class="sapUiSmallMarginBottom"
                     required="true"
                 />
-                <m:Label text="" />
-                <m:HBox
+                <m:Label id="_IDGenLabel" text="" />
+                <m:HBox id="_IDGenHBox"
                     justifyContent="Center"
                     alignItems="Center"
                     width="100%"
                     class="sapUiMediumMarginTop sapUiSizeCompact"
                 >
-                    <m:Button
+                    <m:Button id="_IDGenButton2"
                         text="{i18n>continuar}"
                         type="Success"
                         press=".onContinueHeader"
@@ -138,7 +138,7 @@
                         width="100px"
                         class="sapUiTinyMarginEnd sapUiTinyMarginBottom"
                     />
-                    <m:Button
+                    <m:Button id="_IDGenButton3"
                         text="{i18n>cancelar}"
                         type="Reject"
                         press=".onCancelHeader"

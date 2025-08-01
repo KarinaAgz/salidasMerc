@@ -15,7 +15,7 @@
         icon="sap-icon://filter"
     >
         <items>
-            <StandardListItem
+            <StandardListItem id="_IDGenStandardListItem"
                 title="{mainModel>text}"
                 description="{mainModel>key}"
                 key="{mainModel>key}"
