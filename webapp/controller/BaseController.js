@@ -12,48 +12,38 @@ sap.ui.define([
     "use strict";
 
     return Controller.extend("logaligroup.mapeobapi.controller.BaseController", {
-        /**
-         * Inicializa los modelos OData y JSON comunes
-         * @param {Object} oView - Vista del controlador
-         * @param {Object} oODataModels - Objeto con configuraciones de modelos OData
-         * @param {Object} oJSONModels - Objeto con configuraciones de modelos JSON
-         */
-        initializeModels: function (oView, oODataModels, oJSONModels) {
-            // Configurar modelos OData
-            Object.keys(oODataModels).forEach(sModelName => {
-                const oModel = new ODataModel(oODataModels[sModelName].url, {
-                    json: true,
-                    useBatch: true,
-                    defaultBindingMode: "TwoWay"
-                });
-                oView.setModel(oModel, sModelName);
-            });
 
-            // Configurar modelos JSON
+        initializeModels: function (oView, oJSONModels) {
+            // Iterar sobre configuraciones de modelos JSON
             Object.keys(oJSONModels).forEach(sModelName => {
+                // Crear modelo JSON con datos iniciales
                 const oModel = new JSONModel(oJSONModels[sModelName]);
+                // Asignar modelo a la vista
                 oView.setModel(oModel, sModelName);
             });
         },
 
         /**
-         * Lee datos de un servicio OData
-         * @param {String} sModelName - Nombre del modelo OData
-         * @param {String} sEntitySet - Conjunto de entidades
-         * @param {Array} aFilters - Filtros opcionales
-         * @param {Object} oUrlParameters - Parámetros URL opcionales
-         * @returns {Promise} Promesa con los resultados
+         * Lee datos de un servicio OData y devuelve una promesa con los resultados
+         * @param {string} sModelName - Nombre del modelo OData
+         * @param {string} sEntitySet - Conjunto de entidades OData
+         * @param {sap.ui.model.Filter[]} [aFilters=[]] - Filtros opcionales para la consulta
+         * @param {Object} [oUrlParameters={}] - Parámetros URL adicionales
+         * @returns {Promise<Object>} Promesa con los resultados de la consulta
          */
         readOData: async function (sModelName, sEntitySet, aFilters = [], oUrlParameters = {}) {
-            const oModel = this.getView().getModel(sModelName);
+            const oModel = this.getView().getModel(sModelName); // Obtener modelo OData
             return new Promise((resolve, reject) => {
+                // Ejecutar consulta OData
                 oModel.read(`/${sEntitySet}`, {
-                    filters: aFilters,
-                    urlParameters: oUrlParameters,
+                    filters: aFilters, // Aplicar filtros
+                    urlParameters: oUrlParameters, // Parámetros adicionales
                     success: function (oData) {
+                        // Resolver con resultados (lista o entidad única)
                         resolve(oData.results || oData);
                     },
                     error: function (oError) {
+                        // Rechazar con error
                         reject(oError);
                     }
                 });
@@ -61,110 +51,92 @@ sap.ui.define([
         },
 
         /**
-         * Obtiene el token CSRF para operaciones OData
-         * @param {String} sModelName - Nombre del modelo OData
-         * @returns {Promise} Promesa con el token CSRF
+         * Obtiene el token CSRF para operaciones seguras en OData
+         * @param {string} sModelName - Nombre del modelo OData
+         * @returns {Promise<string>} Promesa con el token CSRF
          */
         fetchCsrfToken: async function (sModelName) {
-            const oModel = this.getView().getModel(sModelName);
+            const oModel = this.getView().getModel(sModelName); // Obtener modelo
             return new Promise((resolve, reject) => {
+                // Refrescar token CSRF
                 oModel.refreshSecurityToken(
-                    () => resolve(oModel.getSecurityToken()),
-                    reject
+                    () => resolve(oModel.getSecurityToken()), // Resolver con el token
+                    reject // Rechazar en caso de error
                 );
             });
         },
 
         /**
-         * Carga la configuración de visualización desde un archivo JSON
-         * @param {String} sConfigPath - Ruta al archivo de configuración
-         * @param {String} sModelName - Nombre del modelo para almacenar la configuración
-         * @returns {Promise} Promesa con la configuración cargada
-         */
-        loadDisplayConfiguration: async function (sConfigPath, sModelName) {
-            const oModel = this.getView().getModel(sModelName);
-            try {
-                const response = await jQuery.ajax({
-                    url: sConfigPath,
-                    method: "GET",
-                    dataType: "json"
-                });
-                oModel.setData(response);
-                this.getView().getModel("mainModel").setProperty("/config/displayConfig", response);
-                console.log("Configuración de visualización cargada:", response);
-                return response;
-            } catch (error) {
-                console.error("Error al cargar configuración:", error);
-                oModel.setData({});
-                this.getView().getModel("mainModel").setProperty("/config/displayConfig", {});
-                this.showErrorMessage("Error al cargar configuración de visualización.");
-            }
-        },
-
-        /**
-         * Aplica la configuración de visualización a los controles
-         * @param {Array} aControls - Lista de controles con {id, key}
-         * @param {String} sConfigPath - Ruta en el modelo de configuración (ej. "/Header")
+         * Aplica la configuración de visualización a controles UI
+         * @param {Object[]} aControls - Lista de controles con {id, key}
+         * @param {string} sConfigPath - Ruta en el modelo de configuración 
          */
         applyDisplayConfiguration: function (aControls, sConfigPath) {
-            const oDisplayModel = this.getView().getModel("oDisplayModel").getData();
-            const oView = this.getView();
+            const oDisplayModel = this.getView().getModel("oDisplayModel").getData(); // Obtener datos de configuración
+            const oView = this.getView(); // Obtener vista
 
+            // Iterar sobre controles
             aControls.forEach(({ id, key }) => {
-                const oControl = oView.byId(id);
+                const oControl = oView.byId(id); // Obtener control por ID
                 if (oControl && oDisplayModel[sConfigPath]?.[key] !== undefined) {
+                    // Establecer visibilidad según configuración
                     oControl.setVisible(oDisplayModel[sConfigPath][key]);
+                    // Obtener contenedor padre
                     const oParent = oControl.getParent();
+                    // Obtener etiqueta asociada (si existe)
                     const oLabel = oParent.getLabel && oParent.getLabel();
-                    if (oLabel) oLabel.setVisible(oDisplayModel[sConfigPath][key]);
+                    if (oLabel) oLabel.setVisible(oDisplayModel[sConfigPath][key]); // Aplicar visibilidad a la etiqueta
                 }
             });
         },
 
         /**
-         * Navega a una pestaña específica en el IconTabBar
-         * @param {String} sKey - Clave de la pestaña
+         * Navega a una pestaña específica en un IconTabBar
+         * @param {string} sKey - Clave de la pestaña
          */
         navigateToTab: function (sKey) {
-            const oTabBar = this.getView().byId("mainTabBar");
+            const oTabBar = this.getView().byId("mainTabBar"); // Obtener IconTabBar
             if (oTabBar) {
+                // Seleccionar pestaña por clave
                 oTabBar.setSelectedKey(sKey);
             }
         },
 
         /**
-         * Valida campos obligatorios
-         * @param {Array} aFields - Lista de campos con {id, prop, label}
-         * @param {String} sModelPath - Ruta base del modelo (ej. "/header")
-         * @param {Object} oDisplayConfig - Configuración de visualización
-         * @returns {Boolean} Verdadero si todos los campos son válidos
+         * Valida campos obligatorios de un formulario
          */
         validateFields: function (aFields, sModelPath, oDisplayConfig) {
-            const oModel = this.getView().getModel("mainModel");
-            const oBundle = this.getResourceBundle();
-            let bValid = true;
-            const aMissingFields = [];
+            const oModel = this.getView().getModel("mainModel"); // Obtener modelo principal
+            const oBundle = this.getResourceBundle(); // Obtener ResourceBundle para i18n
+            let bValid = true; // Indicador de validez
+            const aMissingFields = []; // Lista de campos faltantes
 
+            // Iterar sobre campos
             aFields.forEach(oField => {
-                const oControl = this.getView().byId(oField.id);
-                const sValue = oModel.getProperty(`${sModelPath}/${oField.prop}`);
+                const oControl = this.getView().byId(oField.id); // Obtener control
+                const sValue = oModel.getProperty(`${sModelPath}/${oField.prop}`); // Obtener valor
+                // Verificar si el campo está vacío
                 let bIsEmpty = !sValue || sValue.trim() === "" || (oField.id === "referenceType" && sValue === "0");
 
+                // Excluir refDocNo si no es requerido
                 if (oField.id === "refDocNo" && !oDisplayConfig.referencia) {
                     bIsEmpty = false;
                 }
 
                 if (bIsEmpty) {
-                    bValid = false;
-                    aMissingFields.push(oField.label);
+                    bValid = false; // Marcar como inválido
+                    aMissingFields.push(oField.label); // Añadir campo faltante
+                    // Establecer estado de error en el control
                     oControl.setValueState("Error");
                     oControl.setValueStateText(oBundle.getText("validation.fieldRequired", [oField.label]));
                 } else {
+                    // Limpiar estado de error
                     oControl.setValueState("None");
                 }
             });
 
             if (!bValid) {
+                // Mostrar mensaje de campos faltantes
                 this.showErrorMessage(oBundle.getText("validation.missingFields", [aMissingFields.join(", ")]));
             }
 
@@ -172,55 +144,54 @@ sap.ui.define([
         },
 
         /**
-         * Muestra un mensaje de error con MessageBox
-         * @param {String} sMessage - Mensaje de error
+         * Muestra un mensaje de error usando MessageBox
          */
         showErrorMessage: function (sMessage) {
+            // Mostrar mensaje modal de error
             MessageBox.error(sMessage);
         },
 
         /**
-         * Muestra un mensaje con MessageToast
-         * @param {String} sMessage - Mensaje a mostrar
-         * @param {Number} iDuration - Duración en milisegundos (opcional)
+         * Muestra un mensaje temporal usando MessageToast - Duración en milisegundos
          */
         showMessage: function (sMessage, iDuration = 3000) {
+            // Mostrar mensaje temporal
             MessageToast.show(sMessage, { duration: iDuration });
         },
 
         /**
-         * Carga un fragmento de diálogo
-         * @param {String} sFragmentName - Nombre del fragmento
-         * @param {String} sDialogProperty - Propiedad donde almacenar el diálogo
-         * @returns {Promise} Promesa con el diálogo cargado
+         * Carga un fragmento de diálogo y lo almacena en una propiedad
          */
         loadFragmentDialog: async function (sFragmentName, sDialogProperty) {
             if (!this[sDialogProperty]) {
+                // Cargar fragmento si no existe
                 this[sDialogProperty] = await Fragment.load({
-                    id: this.getView().getId(),
-                    name: sFragmentName,
-                    controller: this
+                    id: this.getView().getId(), // Usar ID de la vista
+                    name: sFragmentName, // Nombre del fragmento
+                    controller: this // Asignar controlador
                 });
+                // Añadir como dependiente de la vista
                 this.getView().addDependent(this[sDialogProperty]);
             }
             return this[sDialogProperty];
         },
 
         /**
-         * Cierra un diálogo
-         * @param {String} sDialogProperty - Propiedad donde está almacenado el diálogo
+         * Cierra un diálogo almacenado en una propiedad
          */
         closeDialog: function (sDialogProperty) {
             if (this[sDialogProperty]) {
+                // Cerrar diálogo si existe
                 this[sDialogProperty].close();
             }
         },
 
         /**
-         * Obtiene el ResourceBundle para i18n
-         * @returns {Object} ResourceBundle
+         * Obtiene el ResourceBundle para textos traducibles
+         * @returns {sap.ui.model.resource.ResourceModel} ResourceBundle
          */
         getResourceBundle: function () {
+            // Obtener modelo i18n del componente
             return this.getOwnerComponent().getModel("i18n").getResourceBundle();
         },
 
@@ -228,12 +199,14 @@ sap.ui.define([
          * Actualiza el estado del campo de lote según isBatchRequired
          */
         updateBatchField: function () {
-            const oModel = this.getView().getModel("mainModel");
-            const bIsBatchRequired = oModel.getProperty("/currentItem/isBatchRequired");
-            const oBatchInput = this.getView().byId("batch");
+            const oModel = this.getView().getModel("mainModel"); // Obtener modelo
+            const bIsBatchRequired = oModel.getProperty("/currentItem/isBatchRequired"); // Verificar si lote es requerido
+            const oBatchInput = this.getView().byId("batch"); // Obtener campo de lote
             if (oBatchInput) {
+                // Habilitar/deshabilitar campo según configuración
                 oBatchInput.setEnabled(bIsBatchRequired);
                 if (!bIsBatchRequired) {
+                    // Limpiar campo si no es requerido
                     oModel.setProperty("/currentItem/batch", "");
                 }
             }

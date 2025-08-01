@@ -123,7 +123,7 @@
                     class="sapUiSmallMarginBottom"
                     required="true"
                 />
-                <m:Label text="" />               
+                <m:Label text="" />
                 <m:HBox
                     justifyContent="Center"
                     alignItems="Center"
