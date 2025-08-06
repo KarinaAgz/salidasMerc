@@ -7,7 +7,6 @@
         id="_IDGenVBox2"
         width="100%"
         fitContainer="true"
-        class="sapUiMediumMargin"
     >
         <layout:SimpleForm
             id="_IDGenSimpleForm1"
@@ -15,26 +14,23 @@
             layout="ResponsiveGridLayout"
             labelSpanL="4"
             labelSpanM="4"
-            labelSpanS="12"
+            labelSpanS="4"
             adjustLabelSpan="false"
             emptySpanL="4"
             emptySpanM="4"
-            emptySpanS="0"
+            emptySpanS="2"
             columnsL="1"
             columnsM="1"
             singleContainerFullSize="true"
             class="sapUiForm sapUiSizeCompact"
         >
             <layout:content>
-                
                 <Label
                     id="materialLabel"
                     text="{i18n>material}"
                     design="Bold"
                     required="true"
-                    
                 />
-               
                 <Input
                     id="material"
                     value="{mainModel>/currentItem/material}"
@@ -43,9 +39,7 @@
                     submit=".onMaterialScanned"
                     liveChange=".onLiveChangeMaterial"
                     placeholder="{i18n>ingreseMaterial}"
-                    class="sapUiMediumMarginBottom"
                 />
-
                 <Label
                     id="materialDescLabel"
                     text="{i18n>descripcion_material}"
@@ -56,9 +50,7 @@
                     value="{mainModel>/currentItem/txt_material}"
                     enabled="false"
                     placeholder="{i18n>descripcionMaterial}"
-                    class="sapUiMediumMarginBottom"
                 />
-
                 <Label
                     id="cantidadLabel"
                     text="{i18n>cantidad}"
@@ -73,9 +65,7 @@
                     change=".onQuantityChange"
                     placeholder="{i18n>ingreseCantidad}"
                     type="Number"
-                    class="sapUiMediumMarginBottom"
                 />
-
                 <Label
                     id="umLabel"
                     text="{i18n>um}"
@@ -87,9 +77,7 @@
                     value="{mainModel>/currentItem/um}"
                     placeholder="{i18n>ingreseUM}"
                     enabled="false"
-                    class="sapUiMediumMarginBottom"
                 />
-
                 <Label
                     id="batchLabel"
                     text="{i18n>lote}"
@@ -103,9 +91,7 @@
                     submit=".onBuscarDetalle"
                     liveChange=".onLiveChangeLote"
                     placeholder="{i18n>ingreseLote}"
-                    class="sapUiMediumMarginBottom"
                 />
-
                 <Label
                     id="centroLabel"
                     text="{i18n>centro}"
@@ -117,9 +103,7 @@
                     value="{mainModel>/currentItem/centro}"
                     placeholder="{i18n>ingreseCentro}"
                     enabled="false"
-                    class="sapUiMediumMarginBottom"
                 />
-
                 <Label
                     id="almacenLabel"
                     text="{i18n>almacen}"
@@ -131,9 +115,7 @@
                     value="{mainModel>/currentItem/almacen}"
                     placeholder="{i18n>ingreseAlmacen}"
                     enabled="false"
-                    class="sapUiMediumMarginBottom"
                 />
-
                 <Label
                     id="costcenterLabel"
                     text="{i18n>ceco}"
@@ -147,9 +129,7 @@
                     editable="{oDisplayModel>/Posiciones/ceco}"
                     visible="{oDisplayModel>/Posiciones/ceco}"
                     placeholder="{i18n>ingreseCeco}"
-                    class="sapUiMediumMarginBottom"
                 />
-
                 <Label
                     id="motivoLabel"
                     text="{i18n>motivo}"
@@ -165,7 +145,6 @@
                     placeholder="{i18n>seleccionarMotivo}"
                     showValueHelp="true"
                     valueHelpRequest=".onMoveReasValueHelp"
-                    class="sapUiMediumMarginBottom"
                 />
                 <Label
                     id="txtPosicionLabel"
@@ -175,13 +154,11 @@
                 <TextArea
                     id="txtPosicion"
                     value="{mainModel>/currentItem/txt_posicion}"
-                    rows="3"
+                    rows="2"
                     growing="true"
                     maxLength="40"
                     placeholder="{i18n>ingreseTextoPosicion}"
-                    class="sapUiMediumMarginBottom"
                 />
-
                 <Label
                     id="txtPosicionHistoricoLabel"
                     text="{i18n>historial_texto_posicion}"
@@ -191,43 +168,40 @@
                     id="txtPosicionHistorico"
                     value="{mainModel>/currentItem/txt_posicion_historico}"
                     editable="false"
-                    rows="5"
-                    class="sapUiMediumMarginBottom"
+                    rows="3"
                 />
             </layout:content>
+            <Label ></Label>
+            <FlexBox
+                id="_IDGenFlexBox1"
+                justifyContent="Center"
+                alignItems="Center"
+                width="100%"
+                wrap="Wrap"
+            >
+                <Button
+                    id="fetchDetails"
+                    text="{i18n>fetchDetails}"
+                    type="Emphasized"
+                    press=".onFetchDetails"
+                />
+                <Button
+                    id="saveItem"
+                    text="{i18n>contabilizar}"
+                    type="Success"
+                    icon=""
+                    press=".onSaveItem"
+                    
+                />
+                <Button
+                    id="cancelItem"
+                    text="{i18n>cancelar}"
+                    type="Reject"
+                    press=".onCancelItem"
+                    icon="sap-icon://decline"
+                    
+                />
+            </FlexBox>
         </layout:SimpleForm>
-
-        <HBox
-            id="_IDGenHBox1"
-            justifyContent="End"
-            alignItems="Center"
-            width="95%"
-            class="sapUiMediumMargin"
-        >
-            <Button
-                id="fetchDetails"
-                text="{i18n>fetchDetails}"
-                type="Emphasized"
-                press=".onFetchDetails"
-                icon="sap-icon://detail-view"
-                class="sapUiTinyMarginEnd customCompactButton"
-            />
-            <Button
-                id="saveItem"
-                text="{i18n>contabilizar}"
-                type="Accept"
-                press=".onSaveItem"
-                icon="sap-icon://sys-enter"
-                class="sapUiTinyMarginEnd customCompactButton"
-            />
-            <Button
-                id="cancelItem"
-                text="{i18n>cancelar}"
-                type="Reject"
-                press=".onCancelItem"
-                icon="sap-icon://decline"
-                class="sapUiTinyMarginEnd customCompactButton"
-            />
-        </HBox>
     </VBox>
 </core:FragmentDefinition>

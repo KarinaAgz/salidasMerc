@@ -5,13 +5,12 @@
     <SelectDialog
         id="moveReasValueHelp"
         title="{i18n>seleccionarMotivo}"
-        contentWidth="90%"
-        contentHeight="400px"
+        contentWidth="{= ${device>/system/phone} ? '100%' : '90%'}"
         stretch="{device>/system/phone}"
         confirm=".onMoveReasConfirm"
         search=".onMoveReasSearch"
         items="{mainModel>/config/moveReasons}"
-        noDataText="{i18n>noMotivosEncontrados}"
+        noDataText="{i18n>MotivosNoEncontrados}"
         icon="sap-icon://filter"
     >
         <items>

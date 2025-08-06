@@ -102,9 +102,7 @@
                         class="sapUiTinyMarginEnd customCompactButton"
                         tooltip="{i18n>agregar_componente_tooltip}"
                     />
-                    
                     <ToolbarSeparator id="_IDGenToolbarSeparator"/>
-
                     <Button
                         id="resetProcessButton"
                         text="{i18n>reiniciar}"
@@ -120,7 +118,7 @@
             </layout:content>
         </layout:SimpleForm>
 
-        <!-- Contador-->
+        <!-- Contador -->
         <HBox
             id="itemCountBox"
             alignItems="Center"
@@ -138,6 +136,7 @@
             />
         </HBox>
 
+        <!-- Tabla con columnas reorganizadas -->
         <Table
             id="itemsTable"
             items="{mainModel>/Positions}"
@@ -152,7 +151,7 @@
                 <Column
                     id="materialColumn"
                     width="auto"
-                    hAlign="Left"
+                    hAlign="Center"
                 >
                     <Label
                         id="materialColumnText"
@@ -161,20 +160,9 @@
                     />
                 </Column>
                 <Column
-                    id="materialDescColumn"
-                    width="auto"
-                    hAlign="Left"
-                >
-                    <Label
-                        id="materialDescColumnText"
-                        text="{i18n>descripcion_material}"
-                        design="Bold"
-                    />
-                </Column>
-                <Column
                     id="cantidadColumn"
                     width="auto"
-                    hAlign="Right"
+                    hAlign="Center"
                 >
                     <Label
                         id="cantidadColumnText"
@@ -241,34 +229,12 @@
                 <Column
                     id="motivoColumn"
                     width="auto"
-                    hAlign="Left"
+                    hAlign="Center"
                     visible="{oDisplayModel>/Posiciones/motivo}"
                 >
                     <Label
                         id="motivoColumnText"
                         text="{i18n>motivo}"
-                        design="Bold"
-                    />
-                </Column>
-                <Column
-                    id="txtPosicionColumn"
-                    width="auto"
-                    hAlign="Left"
-                >
-                    <Label
-                        id="txtPosicionColumnText"
-                        text="{i18n>txt_posicion}"
-                        design="Bold"
-                    />
-                </Column>
-                <Column
-                    id="materialDocumentColumn"
-                    width="auto"
-                    hAlign="Left"
-                >
-                    <Label
-                        id="materialDocumentColumnText"
-                        text="{i18n>num_docto}"
                         design="Bold"
                     />
                 </Column>
@@ -294,10 +260,6 @@
                         <Text
                             id="materialCell"
                             text="{mainModel>material}"
-                        />
-                        <Text
-                            id="materialDescCell"
-                            text="{mainModel>txt_material}"
                         />
                         <Text
                             id="cantidadCell"
@@ -326,15 +288,6 @@
                         <Text
                             id="motivoCell"
                             text="{mainModel>motivo}"
-                        />
-                        <Text
-                            id="txtPosicionCell"
-                            text="{mainModel>txt_posicion}"
-                            wrapping="true"
-                        />
-                        <Text
-                            id="materialDocumentCell"
-                            text="{mainModel>MaterialDocument}"
                         />
                         <Button
                             id="deleteButton"
